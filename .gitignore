@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets and credentials (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.databrickscfg
+
+# AI assistant files (never commit, same level of importance as secrets)
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.claude/
+.cursor/
+.cursorrules
+.github/copilot-instructions.md
+
+# Databricks CLI / bundle local state
+.databricks/
+
+# Tool caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
