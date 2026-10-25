@@ -10,21 +10,48 @@ variables:
   catalog:
     description: Unity Catalog catalog that holds every project object.
     default: workspace
+  alert_email:
+    description: Address that receives job failure notifications.
+  deployer_service_principal:
+    description: Application ID of the service principal that deploys and runs the staging and prod targets.
+    default: ce2eebc9-d8fe-4ecd-8f3c-3f988f2deab5
 
 targets:
-  # Development: resources and schemas are prefixed with dev_<user>_, schedules are paused.
-  # The workspace host comes from the local Databricks CLI profile or DATABRICKS_HOST.
+  # Development: each developer deploys their own copy; resources and schemas are prefixed with dev_<user>_ and
+  # schedules are paused.
   dev:
     mode: development
     default: true
+    variables:
+      alert_email: ${workspace.current_user.userName}
 
-  # Production: deployed by the bundle owner; jobs run as that identity.
+  # Staging: deployed by CI/CD on every merge to main; the job is run as the integration test. Same workspace as
+  # prod (Free Edition has one); the name prefix also prefixes the schemas (staging_landing, staging_ops).
+  # Schedules are paused.
+  staging:
+    mode: production
+    presets:
+      name_prefix: "[staging] "
+      trigger_pause_status: PAUSED
+    workspace:
+      root_path: /Workspace/Users/${var.deployer_service_principal}/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.deployer_service_principal}
+    permissions:
+      - service_principal_name: ${var.deployer_service_principal}
+        level: CAN_MANAGE
+      - group_name: users
+        level: CAN_VIEW
+
+  # Production: deployed by CI/CD from a release tag after approval.
   prod:
     mode: production
     workspace:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Users/${var.deployer_service_principal}/.bundle/${bundle.name}/${bundle.target}
     run_as:
-      user_name: ${workspace.current_user.userName}
+      service_principal_name: ${var.deployer_service_principal}
     permissions:
-      - user_name: ${workspace.current_user.userName}
+      - service_principal_name: ${var.deployer_service_principal}
         level: CAN_MANAGE
+      - group_name: users
+        level: CAN_VIEW

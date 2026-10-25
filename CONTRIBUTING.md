@@ -58,6 +58,14 @@ A change is done when:
 6. The diff contains no secrets, credentials, personal data or AI assistant files.
 7. The pull request has its label.
 
+## Deployment
+
+- `dev`: deployed by each developer with `databricks bundle deploy -t dev` to verify a change before review.
+- `staging`: deployed by the CD workflow on every merge to `main`. The workflow runs the ingestion job and the
+  integration tests (`tests/integration/`) against it; a failure blocks the next release.
+- `prod`: deployed by the CD workflow when a release tag is pushed, after approval in the `prod` GitHub environment.
+- Nobody deploys `staging` or `prod` by hand: both are deployed and run by the CI/CD service principal.
+
 ## Versioning and releases
 
 - [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`, from `0.y.z` while the platform is in initial
@@ -66,7 +74,9 @@ A change is done when:
   `.github/release.yml`. There is no hand-written changelog.
 - Release steps:
   1. A `chore(release): vX.Y.Z` pull request bumps the version in `pyproject.toml`.
-  2. After the merge, publish the release from `main`:
+  2. After the merge, and once staging is green for that commit, publish the release from `main`:
      `gh release create vX.Y.Z --target main --title vX.Y.Z --generate-notes`. It creates the tag and the release
      notes.
+  3. The tag starts the `prod` deployment; approve it in GitHub Actions. The workflow checks that the tag is on
+     `main` and matches the version in `pyproject.toml`.
 - A faulty release is fixed forward: revert the change on `main` and publish a new patch release.
