@@ -10,9 +10,21 @@ resources:
       schedule:
         quartz_cron_expression: "0 0 6 * * ?"
         timezone_id: Atlantic/Canary
+      # Failure is notified once, after the last task retry; a run longer than 1 hour (usually under 15 minutes)
+      # raises a duration warning before the 2-hour timeout cancels it.
+      health:
+        rules:
+          - metric: RUN_DURATION_SECONDS
+            op: GREATER_THAN
+            value: 3600
       email_notifications:
         on_failure:
           - ${var.alert_email}
+        on_duration_warning_threshold_exceeded:
+          - ${var.alert_email}
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
       tags:
         project: canarias_lakehouse
         layer: landing

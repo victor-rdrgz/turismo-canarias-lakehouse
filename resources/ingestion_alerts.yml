@@ -1,0 +1,74 @@
+# Data-level alerts on the ingestion audit table. They catch what job failure notifications cannot: runs that
+# succeed with no or too few records, and datasets that stop being refreshed. Only prod runs on a schedule, so the
+# alerts are deployed to prod only. Response to each alert: docs/runbook.md.
+targets:
+  prod:
+    resources:
+      alerts:
+        landing_freshness:
+          display_name: "[landing] Stale datasets"
+          custom_summary: "Landing datasets without a successful ingestion in the last 26 hours"
+          warehouse_id: ${var.warehouse_id}
+          query_text: |
+            SELECT count(*) AS stale_datasets
+            FROM (
+              SELECT dataset_name, max(CASE WHEN status = 'SUCCEEDED' THEN started_at END) AS last_succeeded_at
+              FROM ${var.catalog}.${resources.schemas.ops.name}.ingestion_audit
+              GROUP BY dataset_name
+            )
+            WHERE last_succeeded_at IS NULL OR last_succeeded_at < current_timestamp() - INTERVAL 26 HOURS
+          evaluation:
+            source:
+              name: stale_datasets
+            comparison_operator: GREATER_THAN
+            threshold:
+              value:
+                double_value: 0
+            empty_result_state: ERROR
+            notification:
+              notify_on_ok: true
+              subscriptions:
+                - user_email: ${var.alert_email}
+          schedule:
+            quartz_cron_schedule: "0 0 9 * * ?"
+            timezone_id: Atlantic/Canary
+
+        landing_volume:
+          display_name: "[landing] Low record counts"
+          custom_summary: "Latest successful ingestion with no records or under half of its recent average"
+          warehouse_id: ${var.warehouse_id}
+          query_text: |
+            WITH succeeded AS (
+              SELECT
+                dataset_name,
+                records,
+                row_number() OVER (PARTITION BY dataset_name ORDER BY started_at DESC) AS recency
+              FROM ${var.catalog}.${resources.schemas.ops.name}.ingestion_audit
+              WHERE status = 'SUCCEEDED'
+            ),
+            baseline AS (
+              SELECT dataset_name, avg(records) AS average_records
+              FROM succeeded
+              WHERE recency BETWEEN 2 AND 8
+              GROUP BY dataset_name
+            )
+            SELECT count(*) AS low_volume_datasets
+            FROM succeeded AS latest
+            LEFT JOIN baseline USING (dataset_name)
+            WHERE latest.recency = 1
+              AND (latest.records = 0 OR latest.records < 0.5 * baseline.average_records)
+          evaluation:
+            source:
+              name: low_volume_datasets
+            comparison_operator: GREATER_THAN
+            threshold:
+              value:
+                double_value: 0
+            empty_result_state: ERROR
+            notification:
+              notify_on_ok: true
+              subscriptions:
+                - user_email: ${var.alert_email}
+          schedule:
+            quartz_cron_schedule: "0 30 8 * * ?"
+            timezone_id: Atlantic/Canary

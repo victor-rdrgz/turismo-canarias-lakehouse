@@ -11,7 +11,11 @@ variables:
     description: Unity Catalog catalog that holds every project object.
     default: workspace
   alert_email:
-    description: Address that receives job failure notifications.
+    description: Address that receives job failure notifications and data alerts.
+  warehouse_id:
+    description: SQL warehouse that evaluates the data alerts.
+    lookup:
+      warehouse: Serverless Starter Warehouse
   deployer_service_principal:
     description: Application ID of the service principal that deploys and runs the staging and prod targets.
     default: ce2eebc9-d8fe-4ecd-8f3c-3f988f2deab5

@@ -23,6 +23,7 @@ databricks.yml                     bundle: variables and targets (dev, staging, 
 resources/
   unity_catalog.yml                schemas landing and ops, landing volume
   ingest_gobierno_canarias.job.yml job that ingests every endpoint in parallel
+  ingestion_alerts.yml             data alerts on the audit table (prod)
 src/
   canarias_lakehouse/ingestion/    ingestion logic (config, HTTP, landing, audit, runner)
   notebooks/                       thin notebook entry points used by jobs
@@ -31,6 +32,7 @@ tests/
   integration/                     tests against a deployed target, run by CD on staging
 docs/
   adr/                             architecture decision records (template: 0000-template.md)
+  runbook.md                       response to each alert
   data-contracts/                  ODCS data contracts per source
 .github/
   workflows/ci.yml                 lint, unit tests and bundle validation on every pull request
