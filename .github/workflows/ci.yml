@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.2
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Unit tests
+        run: uv run pytest
+
+  bundle-validate:
+    name: Validate bundle
+    runs-on: ubuntu-latest
+    # Runs once the repository has the DATABRICKS_HOST variable and the DATABRICKS_TOKEN secret configured.
+    if: ${{ vars.DATABRICKS_HOST != '' }}
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: databricks/setup-cli@v1.22.1
+      - name: Validate dev target
+        run: databricks bundle validate -t dev
+      - name: Validate prod target
+        run: databricks bundle validate -t prod
