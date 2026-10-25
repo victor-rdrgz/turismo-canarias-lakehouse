@@ -1,0 +1,26 @@
+# Unity Catalog objects owned by this bundle.
+resources:
+  schemas:
+    landing:
+      name: landing
+      catalog_name: ${var.catalog}
+      comment: Landing zone. Raw source files before bronze; never modified after being written.
+      lifecycle:
+        prevent_destroy: true
+
+    ops:
+      name: ops
+      catalog_name: ${var.catalog}
+      comment: Operational tables, such as the ingestion audit.
+      lifecycle:
+        prevent_destroy: true
+
+  volumes:
+    gobierno_canarias:
+      name: gobierno_canarias
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.landing.name}
+      volume_type: MANAGED
+      comment: Raw NDJSON responses from Gobierno de Canarias open-data APIs (ISTAC).
+      lifecycle:
+        prevent_destroy: true

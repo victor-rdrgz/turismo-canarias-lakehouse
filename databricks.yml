@@ -1,0 +1,30 @@
+# Declarative Automation Bundle: canarias_lakehouse. Resources are in resources/*.yml.
+bundle:
+  name: canarias_lakehouse
+  databricks_cli_version: ">=1.22.1"
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog that holds every project object.
+    default: workspace
+
+targets:
+  # Development: resources and schemas are prefixed with dev_<user>_, schedules are paused.
+  # The workspace host comes from the local Databricks CLI profile or DATABRICKS_HOST.
+  dev:
+    mode: development
+    default: true
+
+  # Production: deployed by the bundle owner; jobs run as that identity.
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      user_name: ${workspace.current_user.userName}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE

@@ -1,0 +1,86 @@
+# Ingests every Gobierno de Canarias endpoint into the landing volume. Tasks run in parallel on serverless
+# compute (no cluster is defined), all with the same notebook and their own task parameters.
+resources:
+  jobs:
+    ingest_gobierno_canarias_landing:
+      name: ingest_gobierno_canarias_landing
+      description: Raw extraction of Gobierno de Canarias open-data APIs into landing, audited per run.
+      max_concurrent_runs: 1
+      timeout_seconds: 7200
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: Atlantic/Canary
+        pause_status: PAUSED
+      email_notifications:
+        on_failure:
+          - ${workspace.current_user.userName}
+      tags:
+        project: canarias_lakehouse
+        layer: landing
+        provider: gobierno_canarias
+
+      # Job parameters are pushed down to every task.
+      parameters:
+        - name: src_path
+          default: ${workspace.file_path}/src
+        - name: target_volume_path
+          default: /Volumes/${resources.volumes.gobierno_canarias.catalog_name}/${resources.volumes.gobierno_canarias.schema_name}/${resources.volumes.gobierno_canarias.name}
+        - name: audit_table
+          default: ${var.catalog}.${resources.schemas.ops.name}.ingestion_audit
+        - name: environment
+          default: ${bundle.target}
+        - name: job_run_id
+          default: "{{job.run_id}}"
+
+      tasks:
+        - task_key: turismo
+          notebook_task:
+            notebook_path: ../src/notebooks/ingest_api_to_landing.py
+            base_parameters:
+              dataset_name: istac_frontur_turistas
+              endpoint_path: /api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/E16028B_000011/~latest.json
+              pagination: none
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          retry_on_timeout: true
+          timeout_seconds: 1800
+          disable_auto_optimization: true
+
+        - task_key: alquileres
+          notebook_task:
+            notebook_path: ../src/notebooks/ingest_api_to_landing.py
+            base_parameters:
+              dataset_name: istac_vivienda_vacacional
+              endpoint_path: /api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00065A_000061/~latest.json
+              pagination: none
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          retry_on_timeout: true
+          timeout_seconds: 1800
+          disable_auto_optimization: true
+
+        - task_key: transporte
+          notebook_task:
+            notebook_path: ../src/notebooks/ingest_api_to_landing.py
+            base_parameters:
+              dataset_name: istac_pasajeros_aeropuertos
+              endpoint_path: /api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00017A_000001/~latest.json
+              pagination: none
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          retry_on_timeout: true
+          timeout_seconds: 1800
+          disable_auto_optimization: true
+
+        - task_key: indicadores_catalogo
+          notebook_task:
+            notebook_path: ../src/notebooks/ingest_api_to_landing.py
+            base_parameters:
+              dataset_name: istac_indicadores_catalogo
+              endpoint_path: /api/estadisticas/indicators/v1.0/indicators
+              pagination: offset
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          retry_on_timeout: true
+          timeout_seconds: 1800
+          disable_auto_optimization: true
