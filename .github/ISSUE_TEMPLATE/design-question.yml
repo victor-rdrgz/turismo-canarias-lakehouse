@@ -1,0 +1,21 @@
+name: Design question
+description: A design decision to discuss before it is recorded as an ADR.
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The decision to make and why it has to be made now.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options considered
+      description: Each option with its trade-offs and the documentation that supports it.
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: Free Edition limits, existing ADRs, data contracts.
