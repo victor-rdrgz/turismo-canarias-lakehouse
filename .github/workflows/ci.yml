@@ -17,8 +17,8 @@ jobs:
     name: Lint and unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: astral-sh/setup-uv@v10.3.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
       - name: Install dependencies
         run: uv sync --frozen
       - name: Lint
@@ -31,15 +31,20 @@ jobs:
   bundle-validate:
     name: Validate bundle
     runs-on: ubuntu-latest
-    # Runs once the repository has the DATABRICKS_HOST variable and the DATABRICKS_TOKEN secret configured.
-    if: ${{ vars.DATABRICKS_HOST != '' }}
+    # Authenticates as the CI/CD service principal (OAuth M2M). The workspace host and the alert address are
+    # secrets so that they are masked in the public logs. Skipped where the credentials are not available,
+    # such as pull requests from forks.
+    if: ${{ vars.DATABRICKS_CLIENT_ID != '' }}
     env:
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
-      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+      BUNDLE_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: databricks/setup-cli@v1.22.1
-      - name: Validate dev target
-        run: databricks bundle validate -t dev
-      - name: Validate prod target
-        run: databricks bundle validate -t prod
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: databricks/setup-cli@8de769ec2543ee05e456ee2121350efc7efc4bda # v1.22.1
+      - name: Validate every target
+        run: |
+          for target in dev staging prod; do
+            databricks bundle validate -t "$target"
+          done

@@ -10,10 +10,9 @@ resources:
       schedule:
         quartz_cron_expression: "0 0 6 * * ?"
         timezone_id: Atlantic/Canary
-        pause_status: PAUSED
       email_notifications:
         on_failure:
-          - ${workspace.current_user.userName}
+          - ${var.alert_email}
       tags:
         project: canarias_lakehouse
         layer: landing

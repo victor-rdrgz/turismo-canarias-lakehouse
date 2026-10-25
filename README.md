@@ -19,19 +19,23 @@ Gobierno de Canarias APIs ──► landing (UC volume, raw NDJSON) ──► br
 ## Repository layout
 
 ```
-databricks.yml                     bundle: variables and targets (dev, prod)
+databricks.yml                     bundle: variables and targets (dev, staging, prod)
 resources/
   unity_catalog.yml                schemas landing and ops, landing volume
   ingest_gobierno_canarias.job.yml job that ingests every endpoint in parallel
 src/
   canarias_lakehouse/ingestion/    ingestion logic (config, HTTP, landing, audit, runner)
   notebooks/                       thin notebook entry points used by jobs
-tests/unit/                        unit tests (pytest, no network)
+tests/
+  unit/                            unit tests (pytest, no network)
+  integration/                     tests against a deployed target, run by CD on staging
 docs/
   adr/                             architecture decision records (template: 0000-template.md)
   data-contracts/                  ODCS data contracts per source
 .github/
-  workflows/ci.yml                 lint, tests and bundle validation on every pull request
+  workflows/ci.yml                 lint, unit tests and bundle validation on every pull request
+  workflows/cd.yml                 deployment: staging on merge to main, prod on release tag
+  dependabot.yml                   weekly updates of GitHub Actions and Python dependencies
   pull_request_template.md         Definition of Done checklist
   ISSUE_TEMPLATE/                  issue forms: bug, feature, design question
   release.yml                      release notes categories, by pull request label
@@ -52,6 +56,18 @@ databricks bundle validate -t dev  # validate the bundle
 databricks bundle deploy -t dev    # deploy to the development target
 databricks bundle run ingest_gobierno_canarias_landing -t dev
 ```
+
+## Environments
+
+| Target | Deployed by | Identity | Objects | Schedule |
+|---|---|---|---|---|
+| `dev` | each developer, from their machine | developer | prefixed `dev_<user>_` | paused |
+| `staging` | CD, on every merge to `main`; the job run is the integration test | service principal | prefixed `staging_` | paused |
+| `prod` | CD, on a release tag, after approval | service principal | no prefix | active |
+
+The three targets share the single Free Edition workspace and are isolated by name prefixes. CD authenticates as the
+service principal with OAuth machine-to-machine credentials; workload identity federation needs the account
+console, which Free Edition does not provide.
 
 Work is planned in GitHub Issues. Branching, pull requests, the Definition of Done and releases are described in
 [CONTRIBUTING.md](CONTRIBUTING.md); releases and their notes are in GitHub Releases.
