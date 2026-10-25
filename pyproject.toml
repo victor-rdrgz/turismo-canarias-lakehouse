@@ -1,12 +1,12 @@
 [project]
 name = "canarias-lakehouse"
 version = "0.1.0"
-description = "Add your description here"
+description = "Databricks lakehouse for Canary Islands public data: tourism, energy and housing."
+readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
-
-[project.scripts]
-canarias-lakehouse = "canarias_lakehouse:main"
+dependencies = [
+    "requests>=2.31",
+]
 
 [build-system]
 requires = ["uv_build>=0.13.5,<0.14.0"]
@@ -17,3 +17,18 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.17.2",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Databricks notebooks: dbutils and spark are provided by the runtime; imports follow the sys.path setup cell.
+"src/notebooks/*.py" = ["F821", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
