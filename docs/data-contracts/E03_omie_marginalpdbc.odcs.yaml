@@ -1,0 +1,228 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: d63dbf10-7704-578b-874d-93a10312da7e
+version: 0.1.0
+status: draft
+name: OMIE day-ahead market marginal price (marginalpdbc)
+domain: energy
+description:
+  purpose: Marginal price of the Iberian day-ahead electricity market (zones Spain and Portugal) per period
+    of the day, published by OMIE as one text file per day.
+  limitations: 'Unit of the price fields is not stated in the producer table read (EUR/MWh not verified).
+    The sample shows negative prices while the producer documents the range as 0.0 to 99999.99. How hourly
+    and 15-minute periods coexist in the history is not explained by the producer. Timezone: the producer
+    states CET; the mapping of period numbers to clock time on DST days is not verified here. Annual zip
+    files are not described by the producer. No SLA or publication-time guarantee is published. Licence/reuse
+    terms not verified. Retention documented by the producer: public repository keeps the last 6 years,
+    older data on request. File version suffix (.1) semantics beyond ''file version'' not verified. marginalpdbcpt
+    (Portugal-only file) not sampled.'
+  usage: Parse the headerless semicolon-delimited text, ignoring the first line and the final '*' line.
+    Derive timestamps from year/month/day/period according to the producer's resolution (hourly or 15-minute).
+tags:
+- energy
+- electricity-price
+- omie
+- day-ahead
+schema:
+- name: marginalpdbc
+  logicalType: object
+  physicalType: delimited text file (';'), no header, one file per day
+  description: 'Hourly/quarter-hourly marginal day-ahead market price for Spain and Portugal. File layout:
+    first line ''MARGINALPDBC;'', then one record per period ''year;month;day;period;MarginalPT;MarginalES;''
+    (each line ends with '';''), last line ''*''. The file has no header row; column names in this contract
+    are snake_case renderings of the producer field names.'
+  properties:
+  - name: year
+    logicalType: integer
+    physicalType: I4
+    description: Year. Producer format I4, possible values 20XX.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2018.0
+    - property: observed_max
+      value: 2026.0
+    - property: observed_values
+      value:
+      - '2018'
+      - '2025'
+      - '2026'
+    - property: producer_format
+      value: I4
+  - name: month
+    logicalType: integer
+    physicalType: I2
+    description: Month. Producer format I2, values 1 to 12.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 12.0
+    - property: observed_values
+      value:
+      - '01'
+      - '02'
+      - '03'
+      - '04'
+      - '05'
+      - '06'
+      - '07'
+      - 08
+      - 09
+      - '10'
+      - '11'
+      - '12'
+    - property: producer_format
+      value: I2
+    - property: observed_representation
+      value: zero-padded two characters in the raw text (e.g. 09)
+  - name: day
+    logicalType: integer
+    physicalType: I2
+    description: Day. Producer format I2, values 1 to 31.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 31
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 31.0
+    - property: producer_format
+      value: I2
+    - property: observed_representation
+      value: zero-padded two characters in the raw text
+  - name: period
+    logicalType: integer
+    physicalType: I3
+    description: Period of the day. Producer format I3, values 1 to 100 (allows 23/25-hour days and 15-minute
+      resolution).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 100
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 100.0
+    - property: producer_format
+      value: I3
+  - name: marginal_pt
+    logicalType: number
+    physicalType: F8.2
+    description: Marginal price, Portuguese zone (producer field MarginalPT). Producer format F8.2, range
+      0.0 to 99999.99.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3242
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -10.0
+    - property: observed_max
+      value: 286.76
+    - property: producer_field_name
+      value: MarginalPT
+    - property: producer_format
+      value: F8.2
+    - property: unit_note
+      value: EUR/MWh is the usual unit but the unit is not stated in the producer table read; unverified
+  - name: marginal_es
+    logicalType: number
+    physicalType: F8.2
+    description: Marginal price, Spanish zone (producer field MarginalES). Producer format F8.2, range
+      0.0 to 99999.99.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3295
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -10.0
+    - property: observed_max
+      value: 286.76
+    - property: producer_field_name
+      value: MarginalES
+    - property: producer_format
+      value: F8.2
+    - property: unit_note
+      value: EUR/MWh is the usual unit but the unit is not stated in the producer table read; unverified
+  customProperties:
+  - property: first_line
+    value: MARGINALPDBC;
+  - property: last_line
+    value: '*'
+  - property: line_terminator_observed
+    value: CRLF
+  - property: file_name_pattern
+    value: marginalpdbc_aaaammdd.v (v = file version); annual zip marginalpdbc_aaaa.zip observed to contain
+      the daily files
+  quality:
+  - type: text
+    description: 'Producer-documented: every record has fields year (I4), month (I2), day (I2), period
+      (I3), MarginalPT (F8.2) and MarginalES (F8.2), all mandatory; the last line of the file is an asterisk.'
+  - type: text
+    description: 'Observed in sample of 9288 rows on 2026-10-24; not a producer guarantee: (year, month,
+      day, period) is unique across the sample (key check unique_in_sample=False).'
+  - type: text
+    description: 'Observed in sample of 9288 rows on 2026-10-24; not a producer guarantee: negative prices
+      exist (observed minimum -10.0) although the producer range is documented as 0.0 to 99999.99.'
+customProperties:
+- property: source_url
+  value: https://www.omie.es/es/file-download?parents=marginalpdbc&filename=marginalpdbc_20261022.1
+- property: license
+  value: 'Producer legal notice reviewed only through the prior research: no explicit open licence found;
+    the file access page shows a copyright notice with all rights reserved. Reuse terms unverified.'
+- property: license_url
+  value: https://www.omie.es/es/aviso-legal
+- property: documentation_url
+  value: https://www.omie.es/sites/default/files/2026-09/formato_ficheros_inf_pub_138_1.pdf
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 9288
+- property: sample_selection
+  value: Daily files 2026-10-22, 2025-09-30, 2025-10-01, 2025-10-26 (25-hour day), 2026-03-29 (23-hour
+    day) and 2026-01-01, plus the full 2018 annual zip (366 daily files, hourly resolution). Raw files
+    saved; profile computed on a derived CSV (see request.txt). marginalpdbc_2025.zip and the 2018 DST-day
+    files returned 404.
+- property: sample_status
+  value: ok
+- property: file_format_document_version
+  value: 1.38 (in force 2026-09-22)
+- property: resolution_observed
+  value: hourly periods (23-25 per day) up to 2025-09-30; 15-minute periods (92-100 per day) from 2025-10-01
+contractCreatedTs: '2026-10-24T10:49:12Z'

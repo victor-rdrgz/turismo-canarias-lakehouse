@@ -1,0 +1,307 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 09502c48-abf6-5b51-92f5-dab67f6a912e
+version: 0.1.0
+status: draft
+name: Low-voltage electrical installations of the Canary Islands
+domain: energy
+description:
+  purpose: Registry of low-voltage electrical installations in service in the Canary Islands (excluding
+    self-consumption installations), published by the Consejería de Transición Ecológica y Energía of
+    the Gobierno de Canarias on datos.canarias.es as a CSV with an accompanying CSV data dictionary. The
+    CKAN metadata declares frequency Diaria.
+  limitations: 'Sample is the first 20 MB of a 42.9 MB CSV cut at a complete row (87731 rows, in the order
+    delivered by the producer; not strictly ordered by date: dates observed range from the 0001/01/01
+    sentinel to 2026/10/23). The remaining ~22 MB (about half of the file) is not in the sample, so representativeness
+    is unknown. The CKAN description mentions potencia (power) and estado (status) fields, but neither
+    the dictionary nor the CSV header contain them. The dictionary gives no allowed values, nullability,
+    formats or codings. numero_registro is documented as a unique identifier but is not unique in the
+    sample. Placeholder values (_U, -, DESCONOCIDA, date 0001/01/01) occur without documentation. Dictionary
+    types (Número) disagree with observed alphanumeric codes. Contains addresses and cadastral references;
+    the sample file is kept outside the repository and the contract reproduces no values of those columns.
+    Update behaviour (daily per CKAN) is declared as metadata only; no latency or retention is documented.
+    License is the Aviso Legal of the Gobierno de Canarias open data portal; its text was not read in
+    detail.'
+  usage: Download the CSV from the CKAN resource; read with delimiter ';' and quote '"'; fields may contain
+    line breaks inside quotes.
+tags:
+- energy
+- electricity
+- low-voltage
+- canarias
+- registry
+schema:
+- name: instalaciones_baja_tension
+  logicalType: object
+  physicalType: CSV (semicolon-delimited, double-quoted, CRLF rows, UTF-8)
+  description: 'Low-voltage electrical installations in service in the Canary Islands, excluding self-consumption
+    installations (producer description). One electrical unit per record (producer: each record corresponds
+    to an installation).'
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 87731
+  properties:
+  - name: expediente_inicio
+    logicalType: string
+    physicalType: text
+    description: 'Reference of the original start-up file (expediente) of the electrical unit. Dictionary
+      type: Número (Number); observed values are alphanumeric codes (for example prefix BT) and a placeholder
+      _U.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 66021
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: BT199000418
+    - property: observed_max
+      value: _U
+    - property: documented_type_es
+      value: Número
+  - name: expediente_inicio_modificacion
+    logicalType: string
+    physicalType: text
+    description: 'Reference of the start-up or modification file of the electrical unit. Dictionary type:
+      Número (Number); observed values are alphanumeric codes and a placeholder _U.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68004
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: BT199000418
+    - property: observed_max
+      value: _U
+    - property: documented_type_es
+      value: Número
+  - name: numero_registro
+    logicalType: string
+    physicalType: text
+    description: 'Unique identifier of the electrical unit granted by the registry. Dictionary type: Número
+      (Number); observed as 6-digit strings with leading zeros. Observed duplicates exist in the sample,
+      so uniqueness is not enforced in this contract.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 87721
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 56668
+    - property: observed_max
+      value: 542727
+    - property: documented_type_es
+      value: Número
+    quality:
+    - type: library
+      metric: duplicateValues
+      mustBe: 0
+      unit: rows
+      description: Documented by the producer as unique identifier of the electrical unit. In the sample
+        of 87731 rows on 2026-10-24 the column is NOT unique (87721 distinct values); this rule is expected
+        to fail on the sample.
+  - name: fecha_registro
+    logicalType: date
+    physicalType: text
+    description: Date of registration (alta) of the electrical unit in the registry. Observed text format
+      yyyy/MM/dd; the sentinel 0001/01/01 appears as a value.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1193
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0001/01/01
+    - property: observed_max
+      value: 2026/10/23
+    - property: documented_type_es
+      value: Fecha
+  - name: direccion_domicilio
+    logicalType: string
+    physicalType: text
+    description: Address of the electrical unit. Contains personal data in the source; values are not
+      reproduced here.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68517
+    - property: observed_unique_in_sample
+      value: false
+    - property: documented_type_es
+      value: Texto
+  - name: direccion_municipio
+    logicalType: string
+    physicalType: text
+    description: Municipality where the electrical unit is located.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 89
+    - property: observed_unique_in_sample
+      value: false
+    - property: documented_type_es
+      value: Texto
+  - name: direccion_isla
+    logicalType: string
+    physicalType: text
+    description: Island where the electrical unit is located.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - DESCONOCIDA
+      - EL HIERRO
+      - FUERTEVENTURA
+      - GRAN CANARIA
+      - LA GOMERA
+      - LA PALMA
+      - LANZAROTE
+      - TENERIFE
+    - property: documented_type_es
+      value: Texto
+  - name: direccion_provincia
+    logicalType: string
+    physicalType: text
+    description: Province where the electrical unit is located.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - DESCONOCIDA
+      - PALMAS (LAS)
+      - SANTA CRUZ DE TENERIFE
+    - property: documented_type_es
+      value: Texto
+  - name: referencia_catastral
+    logicalType: string
+    physicalType: text
+    description: Alphanumeric code assigned by the Cadastre to the property where the electrical unit
+      is located. Observed placeholders such as _U and - appear. Contains personal data in the source;
+      values are not reproduced here.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 44717
+    - property: observed_unique_in_sample
+      value: false
+    - property: documented_type_es
+      value: Texto
+  - name: instalacion_uso
+    logicalType: string
+    physicalType: text
+    description: Description of the purpose of the electrical supply of the unit. Free text in the sample
+      (mixed case and many distinct values).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 19069
+    - property: observed_unique_in_sample
+      value: false
+    - property: documented_type_es
+      value: Texto
+  - name: instalacion_tipo
+    logicalType: string
+    physicalType: text
+    description: Classification of the installation according to the typologies defined by the registry.
+      Values observed carry a numeric code and a group label; the list of typologies is not published
+      in the dictionary.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 86
+    - property: observed_unique_in_sample
+      value: false
+    - property: documented_type_es
+      value: Texto
+slaProperties:
+- property: frequency
+  value: 1
+  unit: d
+  description: CKAN extra 'frequency' = Diaria; no latency or retention documented.
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/catalogos/general/dataset/instalaciones-baja-tension-canarias
+- property: resource_url
+  value: https://datos.canarias.es/catalogos/general/dataset/b0123b00-7ecb-44d5-aedd-5e4470fa5e04/resource/62dfe381-c2de-48aa-9623-9e0a601663e6/download/registros_baja_tension.csv
+- property: license
+  value: Aviso Legal del Gobierno de Canarias (CKAN license_id gobcan-aviso-legal)
+- property: license_url
+  value: https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso
+- property: documentation_url
+  value: https://datos.canarias.es/catalogos/general/dataset/b0123b00-7ecb-44d5-aedd-5e4470fa5e04/resource/b38b47d7-19b5-46f9-8815-a161e8985f18/download/diccionario_datos_instalaciones_baja_tension.csv
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 87731
+- property: sample_selection
+  value: First 20 MB of the 42.9 MB CSV (byte-range by stream cut), trimmed to the last complete CRLF-terminated
+    row; not a random sample.
+- property: sample_status
+  value: partial
+contractCreatedTs: '2026-10-24T15:04:50Z'

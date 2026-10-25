@@ -1,0 +1,480 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 8ab890cf-c66d-5f92-9f39-9b737c2f0bb6
+version: 0.1.0
+status: draft
+name: ISTAC FRONTUR-Canarias tourists by residence and traveller type (monthly, by island)
+domain: tourism
+description:
+  purpose: 'Statistical cube E16028B_000011 of the Canary Islands Statistics Institute (ISTAC), operation E16028B (Estadistica
+    de Movimientos Turisticos en Fronteras de Canarias, methodology 2016): number of tourists visiting the Canary Islands
+    by place of residence and traveller type (tourists, main tourists, secondary tourists), by island and month, with annual
+    and inter-period variations and rates. Published through the ISTAC statistical-resources API (SDMX-based); this contract
+    describes the CSV representation of the latest version (v1.64 when sampled).'
+  limitations: |-
+    - The producer publishes no per-column data dictionary beyond SDMX dimension/attribute names and codelists; CSV column names (including the #es label columns and OBS_VALUE) are described from the metadata and the sample.
+    - Units per indicator (UNIDAD_MEDIDA, MULTIPLICADOR_UNIDAD) and the collection period (PERIODO_RECOGIDA) are declared as attributes but not exported in the CSV and their values were not read.
+    - Values of CONFIDENCIALIDAD_OBSERVACION are unknown (empty in every sampled row); only the status code M (missing value, data does not exist) and one annotation text (estimate based on fewer than 20 sample observations) are observed.
+    - Many OBS_VALUE cells are empty without an observation status; the reason is not documented.
+    - The cube covers five islands only (La Gomera and El Hierro are not declared).
+    - The ~latest alias moves with each version (v1.64 replaces v1.63, minor data update, next version NON_SCHEDULED_UPDATE); values and the period range change over time.
+    - Sibling cubes E16028B_000001 to _000016 (age, reason, accommodation, forecasts) were not sampled.
+    - No SLA, availability guarantee, deprecation policy or formal quality/not-null/uniqueness rules were found; the legal notice states that ISTAC does not guarantee accuracy, completeness or continuity. The full CSV is about 27 MB, above the sample cap, so the contract sample holds a subset of periods.
+  usage: 'Download the CSV via the ~latest alias or pin the version in the URL. Read all columns as strings and cast OBS_VALUE
+    explicitly (the CSV has no typing). Cite ''Fuente: Instituto Canario de Estadistica (ISTAC)'' and respect the API conditions
+    of the ISTAC legal notice.'
+tags:
+- tourism
+- canary-islands
+- istac
+- sdmx
+- frontur
+- monthly
+- official-statistics
+schema:
+- name: frontur_turistas_cube
+  logicalType: object
+  physicalType: csv
+  description: 'Long-format SDMX cube export of dataset E16028B_000011 (Turistas segun lugares de residencia y tipos de viajero,
+    islas de Canarias por meses; operation E16028B, Estadistica de Movimientos Turisticos en Fronteras de Canarias): one row
+    per period x traveller type x place of residence x island x indicator.'
+  properties:
+  - name: TIME_PERIOD#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension TIME_PERIOD (Periodo). Observed in MM/YYYY form.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 111
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 01/2010
+    - property: observed_max
+      value: 12/2025
+  - name: TIME_PERIOD_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the dimension TIME_PERIOD (Periodo). SDMX monthly period code (YYYY-Mnn). The dataset metadata declares
+      200 periods, 2010-M01 to 2026-M08 (version 1.64).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 111
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2010-M01
+    - property: observed_max
+      value: 2026-M08
+  - name: TIPO_VIAJERO#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension TIPO_VIAJERO (Tipo de viajero). Three values declared in the dataset metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Turista
+    - property: observed_max
+      value: Turistas secundarios
+    - property: observed_values
+      value:
+      - Turista
+      - Turistas principales
+      - Turistas secundarios
+  - name: TIPO_VIAJERO_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension TIPO_VIAJERO (Tipo de viajero). Declared values: TURISTA (Turista), TURISTA_PRINCIPAL
+      (Turistas principales), TURISTA_SECUNDARIO (Turistas secundarios).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: TURISTA
+    - property: observed_max
+      value: TURISTA_SECUNDARIO
+    - property: observed_values
+      value:
+      - TURISTA
+      - TURISTA_PRINCIPAL
+      - TURISTA_SECUNDARIO
+  - name: LUGAR_RESIDENCIA#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension LUGAR_RESIDENCIA (Lugar de residencia). 12 values declared in the dataset
+      metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Alemania
+    - property: observed_max
+      value: Total
+    - property: observed_values
+      value:
+      - Alemania
+      - Bélgica
+      - España (excluida Canarias)
+      - Francia
+      - Irlanda
+      - Italia
+      - Mundo (excluida España)
+      - Otros países o territorios del mundo (excluida España)
+      - Países Bajos
+      - Países Nórdicos
+      - Reino Unido
+      - Total
+  - name: LUGAR_RESIDENCIA_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension LUGAR_RESIDENCIA (Lugar de residencia). Declared values: _T Total, ES_XIC Spain excluding
+      Canary Islands, 5000_XES World excluding Spain, 5000_XES_O Other countries or territories of the world excluding Spain,
+      5100_L1 Nordic countries, DE, BE, FR, IE, IT, NL, GB.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5000_XES
+    - property: observed_max
+      value: _T
+    - property: observed_values
+      value:
+      - 5000_XES
+      - 5000_XES_O
+      - 5100_L1
+      - BE
+      - DE
+      - ES_XIC
+      - FR
+      - GB
+      - IE
+      - IT
+      - NL
+      - _T
+  - name: TERRITORIO#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension TERRITORIO (Territorio). Geographic dimension; five islands declared in the
+      dataset metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Fuerteventura
+    - property: observed_max
+      value: Tenerife
+    - property: observed_values
+      value:
+      - Fuerteventura
+      - Gran Canaria
+      - La Palma
+      - Lanzarote
+      - Tenerife
+  - name: TERRITORIO_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension TERRITORIO (Territorio). Geographic dimension (granularity: islands). Declared values:
+      ES708 Lanzarote, ES704 Fuerteventura, ES705 Gran Canaria, ES709 Tenerife, ES707 La Palma. La Gomera and El Hierro are
+      not declared in this cube.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: ES704
+    - property: observed_max
+      value: ES709
+    - property: observed_values
+      value:
+      - ES704
+      - ES705
+      - ES707
+      - ES708
+      - ES709
+  - name: MEDIDAS#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension MEDIDAS (Indicador). Measure dimension; five indicators declared in the dataset
+      metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Turistas
+    - property: observed_max
+      value: Turistas. Variación interperiódica
+    - property: observed_values
+      value:
+      - Turistas
+      - Turistas. Tasa de variación anual
+      - Turistas. Tasa de variación interperiódica
+      - Turistas. Variación anual
+      - Turistas. Variación interperiódica
+  - name: MEDIDAS_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension MEDIDAS (Indicador). Declared values: TURISTAS (Turistas), TURISTAS_VA (annual variation),
+      TURISTAS_VP (inter-period variation), TURISTAS_TVA (annual variation rate), TURISTAS_TVP (inter-period variation rate).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: TURISTAS
+    - property: observed_max
+      value: TURISTAS_VP
+    - property: observed_values
+      value:
+      - TURISTAS
+      - TURISTAS_TVA
+      - TURISTAS_TVP
+      - TURISTAS_VA
+      - TURISTAS_VP
+  - name: OBS_VALUE
+    logicalType: number
+    physicalType: text
+    description: Observation value (primary measure of the cube); its meaning depends on MEDIDAS_CODE. The unit per indicator
+      is carried by the UNIDAD_MEDIDA and MULTIPLICADOR_UNIDAD attributes, whose values are not exported in the CSV. Empty
+      when no value is published.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 13.363
+    - property: observed_distinct
+      value: 40317
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -471411.0
+    - property: observed_max
+      value: 705598.0
+    - property: note
+      value: Negative values occur (variation indicators). Column name OBS_VALUE is not defined in the dataset metadata read;
+        it is the CSV header.
+  - name: CONFIDENCIALIDAD_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Label of the observation attribute CONFIDENCIALIDAD_OBSERVACION (Confidencialidad - estado), declared in
+      the dataset metadata. Its codelist was not read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: NOTAS_OBSERVACION
+    logicalType: string
+    physicalType: text
+    description: Observation-level annotation (attribute NOTAS_OBSERVACION, 'Anotacion'). Free text.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 81.73
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Dato estimado con menos de 20 observaciones muestrales.
+    - property: observed_max
+      value: Dato estimado con menos de 20 observaciones muestrales.
+    - property: observed_values
+      value:
+      - Dato estimado con menos de 20 observaciones muestrales.
+  - name: ESTADO_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Label of the observation status (attribute ESTADO_OBSERVACION, 'Estado de la observacion'); codes come from
+      the SDMX codelist CL_OBS_STATUS 2.1.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.119
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Valor no disponible; el dato no existe
+    - property: observed_max
+      value: Valor no disponible; el dato no existe
+    - property: observed_values
+      value:
+      - Valor no disponible; el dato no existe
+  - name: ESTADO_OBSERVACION_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the observation status (SDMX codelist CL_OBS_STATUS 2.1). Only the code M is observed in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.119
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: M
+    - property: observed_max
+      value: M
+    - property: observed_values
+      value:
+      - M
+  - name: MULTIPLICADOR_UNIDAD
+    logicalType: string
+    physicalType: not exported in CSV
+    description: 'Attribute declared in the dataset metadata (attachment level: dimension MEDIDAS). Not present as a column
+      in the CSV export.'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  - name: UNIDAD_MEDIDA
+    logicalType: string
+    physicalType: not exported in CSV
+    description: 'Attribute declared in the dataset metadata (attachment level: dimension MEDIDAS). Not present as a column
+      in the CSV export.'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  - name: PERIODO_RECOGIDA
+    logicalType: string
+    physicalType: not exported in CSV
+    description: 'Attribute declared in the dataset metadata (attachment level: dimension TIME_PERIOD). Not present as a column
+      in the CSV export.'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  - name: NOTAS_TIPOS_VIAJEROS
+    logicalType: string
+    physicalType: not exported in CSV
+    description: 'Attribute declared in the dataset metadata (attachment level: dimension TIPO_VIAJERO). Not present as a
+      column in the CSV export.'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  - name: NOTAS_DATASET
+    logicalType: string
+    physicalType: not exported in CSV
+    description: 'Attribute declared in the dataset metadata (attachment level: dataset). Not present as a column in the CSV
+      export.'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  quality:
+  - type: text
+    name: observed_key_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 99900 rows on 2026-10-24; not a producer guarantee: the combination TIME_PERIOD_CODE
+      + TIPO_VIAJERO_CODE + LUGAR_RESIDENCIA_CODE + TERRITORIO_CODE + MEDIDAS_CODE is unique. The five dimensions are the
+      documented dimensions of the cube; uniqueness is not stated as a rule by the producer.'
+  - type: text
+    name: observed_period_grid
+    dimension: completeness
+    description: 'Observed in sample of 99900 rows on 2026-10-24; not a producer guarantee: every one of the 111 sampled periods
+      has exactly 900 rows (3 x 12 x 5 x 5), i.e. the cube is a full grid; empty OBS_VALUE cells appear (13.363% of sampled
+      rows).'
+slaProperties:
+- property: frequency
+  value: 1
+  unit: months
+support:
+- channel: email
+  url: mailto:consultas.istac@gobiernodecanarias.org
+  description: ISTAC contact published in the dataset metadata (rights holder).
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/E16028B_000011/~latest.csv
+- property: license
+  value: 'ISTAC Aviso Legal: free reuse including commercial use, citing ''Fuente: Instituto Canario de Estadistica (ISTAC)''
+    and the update date; no distortion of meaning, no re-identification of statistical units; API additional conditions apply'
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/E16028B_000011/~latest.json?fields=-data
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 99900
+- property: sample_selection
+  value: Full CSV of v1.64 is 180000 rows / 27.18 MB (200 periods, 2010-M01 to 2026-M08). Sample = first 12 periods (2010-M01..2010-M12)
+    plus the latest 99 periods (2018-M06..2026-M08), all rows of those periods, 111 periods in total, original header and
+    row order kept.
+- property: sample_status
+  value: ok
+- property: dataset_version
+  value: '1.64'
+- property: dataset_last_update
+  value: '2026-10-02T10:51:02+01:00'
+contractCreatedTs: '2026-10-24T12:00:00Z'

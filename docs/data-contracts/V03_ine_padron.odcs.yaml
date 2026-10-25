@@ -1,0 +1,429 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 3c41a146-402f-5eb3-836e-9b8989379ca9
+version: 0.1.0
+status: draft
+name: INE Padron - population by municipality and sex (Canary Islands provinces)
+domain: demography
+description:
+  purpose: Population by municipality and sex from the INE Padron operation (DPOP), tables 2889 (Las Palmas)
+    and 2892 (Santa Cruz de Tenerife), served by the INE Tempus3 JSON API.
+  limitations: 'The batch URL (table 2881) is the province of Madrid, not the Canary Islands. Canary tables
+    found via TABLAS_OPERACION/DPOP: 2889 ''Palmas, Las: Población por municipios y sexo'' and 2892 ''Santa
+    Cruz de Tenerife: Población por municipios y sexo''; those were sampled (last 3 periods, 2023-2025,
+    tip=AM). The Madrid probe is kept locally only as evidence. Sample: 105 series for Las Palmas (34
+    municipalities + province, 3 sexes) and 165 for Santa Cruz de Tenerife (54 municipalities + province);
+    810 observations. Only the last 3 periods were fetched, not the full history. The API reference documents
+    the generic output items but not this table''s meaning: reference date semantics (1 January), the
+    Padrón methodology, size-band variable (only ''Total habitantes'' observed) and the meaning of codes
+    T3_Periodo ''A'' and FK_Periodicidad 12 are not read. Municipal codes follow a 5-digit pattern in
+    the sample; the official scheme was not verified. Provisional/final status: all observations were
+    ''Definitivo'' in the sample. No SLA, no quality rules, no deprecation policy read. Table ''Ultima_Modificacion''
+    in the table list is 1765447200000 (epoch ms). Page limit: 500 elements per page (documented for list
+    functions; DATOS_TABLA returned complete responses here). Licence: INE general conditions of reuse
+    citing the source; the text was not read in this run.'
+  usage: GET DATOS_TABLA/{table}?nult=n&tip=AM; flatten series and Data; filter provinces 35 and 38. Cite
+    INE as the source.
+tags:
+- ine
+- padron
+- population
+- canary-islands
+- municipalities
+schema:
+- name: series_element
+  logicalType: object
+  physicalType: json object (element of the top-level array)
+  description: One series of the table (a geography x sex x size-band combination) with its metadata and
+    observations. Top-level response is an array of these objects.
+  properties:
+  - name: COD
+    logicalType: string
+    physicalType: string
+    description: Series code (Tempus3). The API reference describes DATOS_TABLA output as information
+      and data of the series in the table; this field is the series identifier by its observed form (DPOP...).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_example_pattern
+      value: DPOP + digits
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: 'Name of the series (documented output item ''nombre de la serie''): geography, sex,
+      size band and data type joined by ''. ''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: T3_Unidad
+    logicalType: string
+    physicalType: string
+    description: Unit of the series (documented as the Tempus3 unit identifier; in friendly output tip=A/AM
+      the label is returned, observed 'Personas').
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - Personas
+  - name: T3_Escala
+    logicalType: string
+    physicalType: string
+    description: Scale of the series (documented as the Tempus3 scale identifier; observed a single space).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - ' '
+  - name: MetaData
+    logicalType: array
+    physicalType: array of object
+    description: Metadata of the series, returned when tip=M or tip=AM (documented). Each element observed
+      with Id, T3_Variable, Nombre, Codigo; the element structure is not described in the pages read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: Data
+    logicalType: array
+    physicalType: array of object
+    description: 'Observations of the series (one per period returned): Fecha, T3_TipoDato, T3_Periodo,
+      Anyo, Valor (documented output items).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+- name: padron_observations_flat
+  logicalType: object
+  physicalType: csv (derived by the learning project)
+  description: 'Row-per-observation view of the two Canary Islands provincial tables, derived locally
+    from the JSON samples. NOT published by the producer. Grain: one row per series and year.'
+  properties:
+  - name: tabla_id
+    logicalType: integer
+    physicalType: n/a (request parameter)
+    description: Table identifier requested (2889 Las Palmas, 2892 Santa Cruz de Tenerife); added by the
+      sampling script, not in the response.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 2889.0
+    - property: observed_max
+      value: 2892.0
+    - property: observed_values
+      value:
+      - 2889
+      - 2892
+  - name: COD
+    logicalType: string
+    physicalType: string
+    description: Series code.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 270
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: Name of the series.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 267
+  - name: T3_Unidad
+    logicalType: string
+    physicalType: string
+    description: Unit of the series.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Personas
+  - name: T3_Escala
+    logicalType: string
+    physicalType: string
+    description: Scale of the series.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - ' '
+  - name: provincia_nombre
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Provincias' (name); present only for the 3 province-total series
+      per table, empty for municipality series.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.778
+    - property: observed_distinct
+      value: 2
+    - property: observed_values
+      value:
+      - Palmas, Las
+      - Santa Cruz de Tenerife
+  - name: provincia_codigo
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Provincias' (Codigo).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.778
+    - property: observed_distinct
+      value: 2
+    - property: observed_values
+      value:
+      - '35'
+      - '38'
+  - name: municipio_nombre
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Municipios' (name).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 2.222
+    - property: observed_distinct
+      value: 88
+  - name: municipio_codigo
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Municipios' (Codigo; 5 digits province+municipality in the sample,
+      official coding scheme not read).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 2.222
+    - property: observed_distinct
+      value: 88
+  - name: sexo_nombre
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Sexo' (name).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_values
+      value:
+      - Hombres
+      - Mujeres
+      - Total
+  - name: sexo_codigo
+    logicalType: string
+    physicalType: string
+    description: 'From MetaData variable ''Sexo'' (Codigo: 0 Total, 1 Hombres, 2 Mujeres as observed).'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_values
+      value:
+      - '0'
+      - '1'
+      - '2'
+  - name: tamano_municipio_nombre
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Tamaño de los municipios' (name).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Total habitantes
+  - name: tamano_municipio_codigo
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Tamaño de los municipios' (Codigo).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - '0'
+  - name: tipo_dato_nombre
+    logicalType: string
+    physicalType: string
+    description: From MetaData variable 'Tipo de dato' (name).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Personas
+  - name: Fecha
+    logicalType: timestamp
+    physicalType: string (ISO 8601 with offset)
+    description: Date of the observation (documented output item 'fecha'). All observed dates are 1 January.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_values
+      value:
+      - '2023-01-01T00:00:00.000+01:00'
+      - '2024-01-01T00:00:00.000+01:00'
+      - '2025-01-01T00:00:00.000+01:00'
+  - name: T3_TipoDato
+    logicalType: string
+    physicalType: string
+    description: Data type of the observation (documented as Tempus3 data-type identifier; friendly output
+      returns the label, observed 'Definitivo').
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Definitivo
+  - name: T3_Periodo
+    logicalType: string
+    physicalType: string
+    description: Period of the observation (documented as Tempus3 period identifier; observed 'A').
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - A
+  - name: Anyo
+    logicalType: integer
+    physicalType: integer
+    description: Year of the observation (documented output item 'año').
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_min
+      value: 2023.0
+    - property: observed_max
+      value: 2025.0
+    - property: observed_values
+      value:
+      - 2023
+      - 2024
+      - 2025
+  - name: Valor
+    logicalType: number
+    physicalType: number
+    description: Value (data) of the observation, documented output item 'valor'; unit Personas in the
+      sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 781
+    - property: observed_min
+      value: 374.0
+    - property: observed_max
+      value: 1167555.0
+  quality:
+  - type: library
+    metric: duplicateValues
+    description: 'Observed in sample of 810 rows on 2026-10-24; not a producer guarantee: (COD, Anyo)
+      is unique. The producer declares no key.'
+    arguments:
+      properties:
+      - COD
+      - Anyo
+    mustBe: 0
+    dimension: uniqueness
+  - type: library
+    metric: nullValues
+    description: 'Observed in sample of 810 rows on 2026-10-24; not a producer guarantee: Valor has no
+      nulls.'
+    arguments:
+      properties:
+      - Valor
+    mustBe: 0
+    dimension: completeness
+  customProperties:
+  - property: derived_view
+    value: true
+  - property: derivation_script
+    value: flatten_v03.py (learning project scratch)
+customProperties:
+- property: source_url
+  value: https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/2889?nult=3&tip=AM
+- property: source_url_2
+  value: https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/2892?nult=3&tip=AM
+- property: license
+  value: unverified (INE general reuse conditions citing the source, per catalogue note; text not read)
+- property: license_url
+  value: https://www.ine.es/dyngs/DAB/index.htm?cid=1100
+- property: documentation_url
+  value: https://www.ine.es/dyngs/DAB/index.htm?cid=1100
+- property: table_list_url
+  value: https://servicios.ine.es/wstempus/js/ES/TABLAS_OPERACION/DPOP
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 810
+- property: sample_selection
+  value: Tables 2889 and 2892, last 3 periods (nult=3), tip=AM (friendly output plus metadata); all series
+    returned. Flattened to one row per series and year.
+- property: sample_status
+  value: ok
+- property: page_limit_documented
+  value: max 500 elements per page (list functions)
+contractCreatedTs: '2026-10-24T12:00:00Z'

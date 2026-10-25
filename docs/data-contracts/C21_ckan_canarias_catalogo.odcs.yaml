@@ -1,0 +1,1516 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: eb6033fe-0d81-57b0-9055-2b75b84ff36a
+version: 0.1.0
+status: draft
+name: Canary Islands government open-data CKAN catalogue (excluding ISTAC)
+domain: open-data-catalogue
+description:
+  purpose: 'Metadata catalogue of the Canary Islands open-data portal (datos.canarias.es, CKAN) read through the CKAN Action
+    API v3 action package_search. The portal lists 23498 datasets of which 22880 belong to ISTAC (covered by other contracts);
+    this contract covers the other 618 (cabildo de Tenerife / ecit, territorial policy, public administrations, energy, agriculture,
+    GRAFCAN, tourism, health, among others): one record per dataset with licence, publisher, DCAT-style extras and nested
+    resources (files or services in CSV, JSON, GeoJSON, ZIP, API and other formats).'
+  limitations: |-
+    - CKAN documents package_search parameters and the response envelope (count, results, facets, search_facets) but not the per-field content of a dataset or resource; the portal publishes no metadata profile, so every dataset/resource field is described as 'Not defined by the producer' and is observed only.
+    - Vocabularies of extras.frequency and extras.theme, the meaning of harvest_* extras and the Unit of resource.size are undocumented.
+    - The catalogue changes continuously (datasets modified up to the sampling day); counts, ids and modification dates are a snapshot.
+    - CKAN states that unversioned API calls may change across upgrades and recommends pinning /api/3/ (used here); the facets key is deprecated.
+    - Search facets were not requested in the sample, so result.search_facets and result.facets are empty.
+    - Licence varies per dataset (cc-by, gobcan-aviso-legal, sitcan-aviso-legal, cieh-aviso-legal); each must be checked before reuse. The data referenced by resource URLs was not downloaded and is out of scope of this contract.
+    - No SLA, no update schedule (some datasets declare their own extras.frequency) and no formal quality rules were found.
+  usage: 'Query package_search with fq=-organization:istac and rows<=1000, paging with start; use sort=id asc (or another
+    stable key) for reproducible paging. Read nested lists (extras, groups, tags, resources) as JSON arrays. Check the per-dataset
+    licence and cite ''Fuente: Gobierno de Canarias'' (or the dataset''s own organisation) as the portal''s legal notice asks.'
+tags:
+- open-data
+- catalogue
+- ckan
+- canary-islands
+- metadata
+- dcat
+schema:
+- name: ckan_package_search_response
+  logicalType: object
+  physicalType: json
+  description: Envelope of the CKAN Action API v3 package_search response (JSON).
+  properties:
+  - name: success
+    logicalType: boolean
+    physicalType: boolean
+    description: Success flag of the CKAN action response. Not described in the CKAN package_search documentation read.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_values
+      value:
+      - true
+  - name: help
+    logicalType: string
+    physicalType: string
+    description: URL to the action help. Not described in the CKAN package_search documentation read.
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: result.count
+    logicalType: integer
+    physicalType: integer
+    description: Total number of matching datasets (not the number returned), per CKAN documentation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - 618
+  - name: result.results
+    logicalType: array
+    physicalType: array of objects
+    description: List of dictized datasets ordered by sort (object ckan_package), per CKAN documentation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_length
+      value: 618
+  - name: result.facets
+    logicalType: object
+    physicalType: object
+    description: Facet counts; marked deprecated in the CKAN documentation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: '{}'
+  - name: result.search_facets
+    logicalType: object
+    physicalType: object
+    description: Facet info keyed by facet field, each with title and items (count, display_name, name). Empty unless facet.field
+      is requested.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: '{}'
+  - name: result.sort
+    logicalType: string
+    physicalType: string
+    description: Observed key of the result object; not described in the documentation read.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value
+      value: id asc
+- name: ckan_package
+  logicalType: object
+  physicalType: json
+  description: One dataset (package) in result.results of package_search. CKAN documents the response as 'dictized datasets'
+    but defines no field list; fields here are observed in the sample.
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Observed as a UUID.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 00468775-5653-402c-9378-52f0bb3716c1
+    - property: observed_max
+      value: ffb5f5a3-e1aa-4f7f-977c-07ff8680a990
+  - name: name
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Observed as a URL slug.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: accesos-al-pabellon-de-deportes-santiago-martin-de-tenerife
+    - property: observed_max
+      value: zonas-especiales-de-conservacion-zec-de-canarias
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: API portal de Datos Abiertos de Tenerife
+    - property: observed_max
+      value: Órganos colegiados del Gobierno de Canarias
+  - name: notes
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Observed as the free-text description.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 427
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: "* Fuente: Censo digital de suelo industrial de Canarias\r\n* C"
+    - property: observed_max
+      value: Índice de ocupación de turistas alojados en Tenerife por cat
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: dataset
+    - property: observed_max
+      value: dataset
+    - property: observed_values
+      value:
+      - dataset
+  - name: state
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: active
+    - property: observed_max
+      value: active
+    - property: observed_values
+      value:
+      - active
+  - name: private
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'False'
+    - property: observed_values
+      value:
+      - 'False'
+  - name: isopen
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'True'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'True'
+  - name: license_id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Observed values listed in observed_values.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: cc-by
+    - property: observed_max
+      value: sitcan-aviso-legal
+    - property: observed_values
+      value:
+      - cc-by
+      - cieh-aviso-legal
+      - gobcan-aviso-legal
+      - sitcan-aviso-legal
+  - name: license_title
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Aviso Legal del Cabildo de El Hierro
+    - property: observed_max
+      value: CC BY
+    - property: observed_values
+      value:
+      - Aviso Legal del Cabildo de El Hierro
+      - Aviso Legal del Gobierno de Canarias
+      - Aviso Legal del SITCAN
+      - CC BY
+  - name: license_url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: http://www.opendefinition.org/licenses/cc-by
+    - property: observed_max
+      value: https://opendata.sitcan.es/notice
+    - property: observed_values
+      value:
+      - http://www.opendefinition.org/licenses/cc-by
+      - https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso
+      - https://opendata.elhierro.es/terminos
+      - https://opendata.sitcan.es/notice
+  - name: metadata_created
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_unique_in_sample
+      value: true
+  - name: metadata_modified
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_unique_in_sample
+      value: true
+  - name: creator_user_id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Internal user UUID; observed values not listed.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 01f91bf8-a5e2-465a-ac06-9a60880da733
+    - property: observed_max
+      value: d212e900-68d0-4a47-8ffa-24ef6c204583
+  - name: owner_org
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      UUID of the owning organization (matches organization.id).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 01873388-a0f9-40c8-b5d3-1f47f9635d4d
+    - property: observed_max
+      value: f12d468b-d7df-4e81-8252-eb1dcfcadde8
+  - name: num_resources
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 67
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 342.0
+  - name: num_tags
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 9.0
+    - property: observed_values
+      value:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      - '8'
+      - '9'
+  - name: author
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.249
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Consejería de Administraciones Públicas, Justicia y Segurida
+    - property: observed_max
+      value: Vicepresidencia del Gobierno
+    - property: observed_values
+      value:
+      - Consejería de Administraciones Públicas, Justicia y Seguridad
+      - Consejería de Agricultura, Ganadería y Pesca
+      - Consejería de Derechos Sociales, Igualdad, Diversidad y Juventud
+      - Consejería de Economía, Conocimiento y Empleo
+      - Consejería de Educación, Universidades, Cultura y Deportes
+      - Consejería de Hacienda, Presupuestos y Asuntos Europeos
+      - Consejería de Obras Públicas, Transportes y Vivienda
+      - Consejería de Sanidad
+      - Consejería de Transición Ecológica, Lucha contra el Cambio Climático y Planificación Territorial
+      - Consejería de Turismo, Industria y Comercio
+      - Consejo de Gobierno
+      - Presidencia del Gobierno
+      - Servicio Canario de Empleo
+      - Vicepresidencia del Gobierno
+  - name: author_email
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled dataset.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: maintainer
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.926
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Gobierno de Canarias
+    - property: observed_max
+      value: Servicio Canario de Empleo
+    - property: observed_values
+      value:
+      - Gobierno de Canarias
+      - Presidencia del Gobierno
+      - Servicio Canario de Empleo
+  - name: maintainer_email
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled dataset.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Mixes URLs and free text in the sample.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 89.159
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Buzón de consultas del Servicio de Información y Atención Ci
+    - property: observed_max
+      value: https://www3.gobiernodecanarias.org/noticias/rss-portal/
+    - property: observed_values
+      value:
+      - Buzón de consultas del Servicio de Información y Atención Ciudadana (SIAC)
+      - Consejería de Educación, Universidades, Cultura y Deportes
+      - Dirección General de la Función Pública
+      - Directorio de Unidades Administrativas y Oficinas de Registro y Atención a la Ciudadanía (DIRCAC)
+      - Red de Control y Vigilancia de la Calidad del Aire de Canarias
+      - Registro de Fundaciones Canarias
+      - Servicio Canario de Empleo
+      - Sistema de Información de Actuaciones Administrativas (SICAC)
+      - https://www.gobiernodecanarias.org/cmsgobcan/export/sites/agp/sgt/galerias/doc/estadisticas/Manual-de-Open-Data_2023-CAG
+      - https://www.gobiernodecanarias.org/empleo/sce/principal/informacion_y_contacto/index.html
+      - https://www.gobiernodecanarias.org/pesca/temas/entidades_pesqueras/
+      - https://www.gobiernodecanarias.org/pesca/temas/primera_venta/
+      - https://www3.gobiernodecanarias.org/aplicaciones/unifica/
+      - https://www3.gobiernodecanarias.org/noticias/rss-portal/
+  - name: version
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled dataset.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: organization.name
+    logicalType: string
+    physicalType: string
+    description: Publishing organization slug (nested object organization). Not defined by the producer (the portal publishes
+      no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_min
+      value: cabildo-insular-de-el-hierro
+    - property: observed_max
+      value: servicio-canario-de-empleo
+    - property: observed_values
+      value:
+      - cabildo-insular-de-el-hierro
+      - consejeria-de-administraciones-publicas
+      - consejeria-de-agricultura
+      - consejeria-de-bienestar-social
+      - consejeria-de-economia
+      - consejeria-de-educacion
+      - consejeria-de-hacienda
+      - consejeria-de-obras-publicas
+      - consejeria-de-sanidad
+      - consejeria-de-transicion-ecologica-y-energia
+      - consejeria-de-turismo
+      - consejeria-politica-territorial
+      - consejeria-universidades-ciencia-innovacion-cultura
+      - ecit
+      - grafcan
+      - presidencia-del-gobierno
+      - servicio-canario-de-empleo
+  - name: organization.title
+    logicalType: string
+    physicalType: string
+    description: Publishing organization title (nested object organization). Not defined by the producer (the portal publishes
+      no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_min
+      value: 'Cabildo Insular de El Hierro '
+    - property: observed_max
+      value: Servicio Canario de Empleo
+    - property: observed_values
+      value:
+      - 'Cabildo Insular de El Hierro '
+      - Cabildo de Tenerife
+      - Consejería de Agricultura, Ganadería, Pesca y Soberanía Alimentaria
+      - Consejería de Bienestar Social, Igualdad, Juventud, Infancia y Familias
+      - Consejería de Economía, Industria, Comercio y Autónomos
+      - Consejería de Educación, Formación Profesional, Actividad Física y Deportes
+      - Consejería de Hacienda y Relaciones con la Unión Europea
+      - Consejería de Obras Públicas, Vivienda y Movilidad
+      - Consejería de Política Territorial, Cohesión Territorial y Aguas
+      - Consejería de Presidencia, Administraciones Públicas, Justicia y Seguridad
+      - Consejería de Sanidad
+      - Consejería de Transición Ecológica y Energía
+      - Consejería de Turismo y Empleo
+      - Consejería de Universidades, Ciencia e Innovación y Cultura
+      - GRAFCAN
+      - Presidencia del Gobierno
+      - Servicio Canario de Empleo
+  - name: organization.id
+    logicalType: string
+    physicalType: string
+    description: Publishing organization UUID (nested object organization). Not defined by the producer (the portal publishes
+      no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_min
+      value: 01873388-a0f9-40c8-b5d3-1f47f9635d4d
+    - property: observed_max
+      value: f12d468b-d7df-4e81-8252-eb1dcfcadde8
+  - name: organization.type
+    logicalType: string
+    physicalType: string
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: organization
+    - property: observed_max
+      value: organization
+    - property: observed_values
+      value:
+      - organization
+  - name: organization.description
+    logicalType: string
+    physicalType: string
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 52.913
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: Cabildo de Tenerife
+    - property: observed_max
+      value: Cabildo de Tenerife
+  - name: organization.image_url
+    logicalType: string
+    physicalType: string
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_min
+      value: 2020-12-10-145144.715064logo-organizacion-grafcan.jpg
+    - property: observed_max
+      value: https://datos.canarias.es/catalogos/general/uploads/group/20
+  - name: organization.created
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+  - name: organization.is_organization
+    logicalType: boolean
+    physicalType: boolean
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 'True'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'True'
+  - name: organization.approval_status
+    logicalType: string
+    physicalType: string
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: approved
+    - property: observed_max
+      value: approved
+    - property: observed_values
+      value:
+      - approved
+  - name: organization.state
+    logicalType: string
+    physicalType: string
+    description: Field of the nested organization object. Not defined by the producer (the portal publishes no per-field dictionary);
+      CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: active
+    - property: observed_max
+      value: active
+    - property: observed_values
+      value:
+      - active
+  - name: extras
+    logicalType: array
+    physicalType: array of {key, value}
+    description: List of key/value metadata pairs (DCAT-style). Not defined by the producer (the portal publishes no per-field
+      dictionary); CKAN dictized-dataset field. Keys vary per dataset; the portal does not publish a vocabulary for keys or
+      for the frequency and theme values.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_keys_with_counts
+      value:
+        identifier: 618
+        language: 618
+        publisher_uri: 618
+        theme: 618
+        publisher_name: 555
+        guid: 469
+        issued: 469
+        modified: 469
+        uri: 469
+        harvest_object_id: 469
+        harvest_source_id: 469
+        harvest_source_title: 469
+        frequency: 341
+        contact_name: 295
+        spatial_uri: 115
+        contact_email: 5
+    - property: observed_frequency_values_top25
+      value:
+        Semanal: 140
+        Mensual: 87
+        Anual: 38
+        Semestral: 37
+        Trimestral: 17
+        Diaria: 10
+        anual: 7
+        Horaria: 2
+        Quincenal: 1
+        Bimensual: 1
+        semestral: 1
+  - name: groups
+    logicalType: array
+    physicalType: array of objects
+    description: Groups (thematic categories) of the dataset; each element has description, display_name, id, image_display_url,
+      name, title. Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_group_names_with_counts
+      value:
+        medio-ambiente: 229
+        sector-publico: 112
+        urbanismo-infraestructuras: 111
+        transporte: 58
+        medio-rural: 43
+        turismo: 42
+        cultura-ocio: 23
+        comercio: 15
+        hacienda: 13
+        economia: 10
+        energia: 8
+        industria: 8
+        empleo: 7
+        educacion: 7
+        deporte: 6
+        seguridad: 5
+        salud: 5
+        sociedad-bienestar: 5
+        legislacion-justicia: 1
+        vivienda: 1
+    - property: observed_empty_lists
+      value: 1
+  - name: tags
+    logicalType: array
+    physicalType: array of objects
+    description: Tags of the dataset; each element has display_name, id, name, state, vocabulary_id. Not defined by the producer
+      (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_empty_lists
+      value: 163
+  - name: resources
+    logicalType: array
+    physicalType: array of objects
+    description: Resources (files or services) of the dataset; see the object ckan_resource. Not defined by the producer (the
+      portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+  - name: relationships_as_subject
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty list in every sampled dataset.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: '[]'
+    - property: observed_max
+      value: '[]'
+  - name: relationships_as_object
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty list in every sampled dataset.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: '[]'
+    - property: observed_max
+      value: '[]'
+  quality:
+  - type: text
+    name: observed_id_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 618 datasets on 2026-10-24; not a producer guarantee: id, name and title are unique
+      per dataset.'
+  - type: text
+    name: observed_license_set
+    dimension: conformity
+    description: 'Observed in sample of 618 datasets on 2026-10-24; not a producer guarantee: license_id takes only 4 values
+      (cc-by, gobcan-aviso-legal, sitcan-aviso-legal, cieh-aviso-legal).'
+- name: ckan_resource
+  logicalType: object
+  physicalType: json
+  description: One resource inside package.resources. No field list is documented by CKAN or the portal; fields are observed
+    (11196 resources in the sample, derived by flattening).
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 11196
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 000083e1-1bc4-435f-93bb-15f6a428d6f6
+    - property: observed_max
+      value: fff04888-5a5c-4ac0-b60d-bd045736f76e
+  - name: package_id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      References the dataset id.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 618
+    - property: observed_min
+      value: 00468775-5653-402c-9378-52f0bb3716c1
+    - property: observed_max
+      value: ffb5f5a3-e1aa-4f7f-977c-07ff8680a990
+  - name: name
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.045
+    - property: observed_distinct
+      value: 5075
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '      Retribuciones del personal directivo de programas y pr'
+    - property: observed_max
+      value: Órganos colegiados del Gobierno de Canarias. (CSV)
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.107
+    - property: observed_distinct
+      value: 5536
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: "\r\n\r\n* Datos de la retribuciones percibidas por el personal d"
+    - property: observed_max
+      value: Índice sintético de riesgos por erosión e inundación costera
+  - name: format
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Observed formats are listed in observed_values.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 22
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: API
+    - property: observed_max
+      value: ZIP
+    - property: observed_values
+      value:
+      - API
+      - CSV
+      - GEOPACKAGE
+      - GeoJSON
+      - HTML
+      - JP2
+      - JPEG
+      - JSON
+      - KMZ
+      - LAS
+      - NetCDF
+      - ODS
+      - PDF
+      - RDF
+      - RSS
+      - SHP
+      - SVG
+      - TIFF
+      - TXT
+      - XLS
+      - XLSX
+      - ZIP
+  - name: mimetype
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.491
+    - property: observed_distinct
+      value: 22
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: application/api
+    - property: observed_max
+      value: text/plain
+    - property: observed_values
+      value:
+      - application/api
+      - application/geo+json
+      - application/geopackage+sqlite3
+      - application/json
+      - application/netcdf
+      - application/pdf
+      - application/rdf+xml
+      - application/rss+xml
+      - application/vnd.geo+json
+      - application/vnd.google-earth.kmz
+      - application/vnd.ms-excel
+      - application/vnd.oasis.opendocument.spreadsheet
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - application/x-rar-compressed
+      - application/zip
+      - image/jp2
+      - image/jpeg
+      - image/svg+xml
+      - image/tiff
+      - text/csv
+      - text/html
+      - text/plain
+  - name: mimetype_inner
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled resource.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Download or access URL of the resource.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 11046
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: http://geobdp.grafcan.es/core/documentos/1027/
+    - property: observed_max
+      value: https://www3.gobiernodecanarias.org/noticias/feed/
+  - name: url_type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Only present for uploaded resources.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.06
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: upload
+    - property: observed_max
+      value: upload
+    - property: observed_values
+      value:
+      - upload
+  - name: size
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Unit presumed bytes by CKAN convention but not stated by the portal.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 27.563
+    - property: observed_distinct
+      value: 6969
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 146.0
+    - property: observed_max
+      value: 6342277831.0
+  - name: hash
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.345
+    - property: observed_distinct
+      value: 825
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 00343ddd4ae7b806e47db4a875d766ea
+    - property: observed_max
+      value: ffcf514f592a138a236dbef0259a6eed
+  - name: created
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10768
+    - property: observed_unique_in_sample
+      value: false
+  - name: last_modified
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.042
+    - property: observed_distinct
+      value: 891
+    - property: observed_unique_in_sample
+      value: true
+  - name: metadata_modified
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 11196
+    - property: observed_unique_in_sample
+      value: true
+  - name: position
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 342
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 341.0
+  - name: state
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: active
+    - property: observed_max
+      value: active
+    - property: observed_values
+      value:
+      - active
+  - name: resource_type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled resource.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: datastore_active
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+  - name: datastore_contains_all_records_of_source_file
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+  - name: cache_url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled resource.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: cache_last_updated
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Empty in every sampled resource.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: access_url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 8.19
+    - property: observed_distinct
+      value: 10129
+    - property: observed_min
+      value: http://geobdp.grafcan.es/core/documentos/1027/
+    - property: observed_max
+      value: https://www3.gobiernodecanarias.org/aplicaciones/unifica/Tra
+  - name: distribution_ref
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 8.19
+    - property: observed_distinct
+      value: 10279
+    - property: observed_min
+      value: N00206574526c42d4abd3ce30b2f4d8d8
+    - property: observed_max
+      value: https://opendata.sitcan.es/dataset/ff19f660-eda3-4732-8f65-8
+  - name: uri
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 57.583
+    - property: observed_distinct
+      value: 4749
+    - property: observed_min
+      value: https://datosabiertos.elhierro.es/dataset/09ba6c63-6f14-44da
+    - property: observed_max
+      value: https://opendata.sitcan.es/dataset/ff19f660-eda3-4732-8f65-8
+  - name: issued
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 8.601
+    - property: observed_distinct
+      value: 10225
+  - name: modified
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 10.004
+    - property: observed_distinct
+      value: 10076
+  - name: resource_id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.962
+    - property: observed_distinct
+      value: 788
+    - property: observed_min
+      value: 00210625-8fcd-44b0-95f6-9f76310c8062
+    - property: observed_max
+      value: ff5850f0-54f2-45ae-af94-de2eda02f42e
+  - name: ckan_url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.462
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: https://datos.canarias.es
+    - property: observed_max
+      value: https://datos.canarias.es
+    - property: observed_values
+      value:
+      - https://datos.canarias.es
+  - name: ignore_hash
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.462
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+  - name: original_url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 94.239
+    - property: observed_distinct
+      value: 645
+    - property: observed_min
+      value: https://datos.canarias.es/catalogos/general/dataset/019f9d7e
+    - property: observed_max
+      value: https://www.gobiernodecanarias.org/empleo/sce/ftp/principal/
+  - name: set_url_type
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.462
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'False'
+    - property: observed_values
+      value:
+      - 'False'
+  - name: task_created
+    logicalType: timestamp
+    physicalType: string (ISO 8601 timestamp without timezone)
+    description: Not defined by the producer (the portal publishes no per-field dictionary); CKAN dictized-dataset field.
+      Present only on part of the resources (optional).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.462
+    - property: observed_distinct
+      value: 732
+  quality:
+  - type: text
+    name: observed_id_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 11196 resources on 2026-10-24; not a producer guarantee: id is unique per resource.'
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/catalogos/general/api/3/action/package_search
+- property: license
+  value: 'Portal legal notice: datasets under CC BY 4.0 unless a dataset states otherwise; observed per-dataset licences:
+    cc-by, gobcan-aviso-legal, sitcan-aviso-legal, cieh-aviso-legal; no warranty on continuity, completeness, accuracy or
+    update frequency'
+- property: license_url
+  value: https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso
+- property: documentation_url
+  value: https://docs.ckan.org/en/2.10/api/index.html#ckan.logic.action.get.package_search
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 618
+- property: sample_selection
+  value: 'One request: q=*:*, fq=-organization:istac, rows=700, start=0, sort=id asc. Returned all 618 non-ISTAC datasets
+    (complete set at sampling time) with 11196 nested resources; 17.0 MB.'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T12:00:00Z'

@@ -1,0 +1,655 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 1fbb7d7d-241d-5e13-84da-7c03b369622b
+version: 0.1.0
+status: draft
+name: Open-Meteo Marine API hourly forecast and model data
+domain: environment
+description:
+  purpose: 'Open-Meteo Marine Weather API (v1): hourly wave, swell, ocean-current, sea-surface-temperature and sea-level variables
+    for a latitude/longitude, computed from global marine models (e.g. DWD, ECMWF, NOAA/GFS, Meteo-France, ERA5-Ocean) with
+    ''Best match'' model selection by default. Response is a JSON object with location metadata and columnar hourly arrays.
+    Daily and 15-minutely variants exist but were not sampled.'
+  limitations: |-
+    - Model output (forecast/reanalysis), not in-situ measurements; the model that served each value is not identified in the response.
+    - Documentation inconsistencies: forecast_days default stated as 5 in the parameter table and 7 elsewhere; cell_selection default stated as sea in the table and land in the text.
+    - The sample (past_days=7, forecast_days=7) mixes recent past model values and forecast values; the response does not mark which rows are past or forecast.
+    - Null handling is not specified; in the sample, wind_wave_peak_period, swell_wave_peak_period and the three tertiary_swell_* variables are null for all 336 hours (hourly_units reports 'undefined' for them).
+    - Value ranges and nullability per variable are not documented; observed ranges are for one point and one 14-day window only.
+    - Daily variables (require timezone), 15-minutely variables and current block were not sampled; documented by the producer but not sampled.
+    - Multi-location responses (list of objects, CSV/XLSX with location_id) were not sampled.
+    - License page (open-meteo.com/en/license) returned no readable content; license taken from the terms page. No SLA published; model update cadences not verified.
+    - Changes of the Best match model over time are not traceable in the response.
+  usage: One request per coordinate set; unpivot hourly arrays into rows keyed by (grid cell latitude, grid cell longitude,
+    time). Provide attribution to Open-Meteo and, for DWD-based data, to DWD as the documentation requests. Free API only
+    for non-commercial use.
+tags:
+- marine
+- waves
+- sea-surface-temperature
+- open-meteo
+- canary-islands
+- hourly
+- forecast
+- json-api
+schema:
+- name: marine_response_metadata
+  logicalType: object
+  physicalType: json
+  description: Top-level fields of the JSON response excluding the hourly arrays (one object per location).
+  properties:
+  - name: latitude
+    logicalType: number
+    physicalType: float
+    description: Centre of the grid cell used, which may be a few km from the requested point.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: unit_documented
+      value: degrees
+    - property: observed_value
+      value: 28.125
+    - property: requested_value
+      value: 28.1
+  - name: longitude
+    logicalType: number
+    physicalType: float
+    description: Centre of the grid cell used, which may be a few km from the requested point.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: unit_documented
+      value: degrees
+    - property: observed_value
+      value: -15.2916565
+    - property: requested_value
+      value: -15.4
+  - name: generationtime_ms
+    logicalType: number
+    physicalType: float
+    description: Generation time of the response in milliseconds.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: unit_documented
+      value: ms
+    - property: observed_value
+      value: 0.8906126022338867
+  - name: utc_offset_seconds
+    logicalType: integer
+    physicalType: integer
+    description: UTC offset resolved at request time.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: unit_documented
+      value: s
+    - property: observed_value
+      value: 0
+  - name: timezone
+    logicalType: string
+    physicalType: string
+    description: Resolved timezone (GMT by default).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: GMT
+  - name: timezone_abbreviation
+    logicalType: string
+    physicalType: string
+    description: Timezone abbreviation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: GMT
+  - name: elevation
+    logicalType: number
+    physicalType: float
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value
+      value: 0.0
+  - name: hourly_units
+    logicalType: object
+    physicalType: object
+    description: Unit per hourly variable.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value:
+        time: iso8601
+        wave_height: m
+        wave_direction: °
+        wave_period: s
+        wind_wave_height: m
+        wind_wave_direction: °
+        wind_wave_period: s
+        wind_wave_peak_period: undefined
+        swell_wave_height: m
+        swell_wave_direction: °
+        swell_wave_period: s
+        swell_wave_peak_period: undefined
+        secondary_swell_wave_height: m
+        secondary_swell_wave_direction: °
+        secondary_swell_wave_period: s
+        tertiary_swell_wave_height: undefined
+        tertiary_swell_wave_direction: undefined
+        tertiary_swell_wave_period: undefined
+        ocean_current_velocity: km/h
+        ocean_current_direction: °
+        sea_surface_temperature: °C
+        sea_level_height_msl: m
+        invert_barometer_height: m
+  - name: hourly
+    logicalType: object
+    physicalType: object of arrays
+    description: Object with the time array (ISO 8601) plus one array per requested variable.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: note
+      value: Columnar arrays; contract schema marine_hourly describes the per-hour rows after unpivoting.
+- name: marine_hourly
+  logicalType: object
+  physicalType: json (columnar arrays under hourly)
+  description: Per-hour values; in the response each variable is an array aligned to hourly.time. Profile computed after unpivoting
+    to one row per hour.
+  properties:
+  - name: time
+    logicalType: timestamp
+    physicalType: string (ISO 8601, local to the requested timezone)
+    description: Hourly timestamp (ISO 8601; timeformat iso8601 or unixtime). Timezone is GMT unless the timezone parameter
+      is set.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 336
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM (no timezone suffix)
+    - property: observed_unit_in_response
+      value: iso8601
+  - name: wave_height
+    logicalType: number
+    physicalType: float
+    description: Significant height of mean waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 63
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.7
+    - property: observed_max
+      value: 1.96
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  - name: wave_direction
+    logicalType: number
+    physicalType: float
+    description: Mean direction the waves come from (0 = from north, 90 = from east).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 359.0
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: °
+  - name: wave_period
+    logicalType: number
+    physicalType: float
+    description: Mean period between waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 78
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 7.05
+    - property: observed_max
+      value: 10.9
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: s
+  - name: wind_wave_height
+    logicalType: number
+    physicalType: float
+    description: Significant height of wind waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 42
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.88
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  - name: wind_wave_direction
+    logicalType: number
+    physicalType: float
+    description: Mean direction wind waves come from.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 131
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 359.0
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: °
+  - name: wind_wave_period
+    logicalType: number
+    physicalType: float
+    description: Mean period between wind waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 71
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 3.7
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: s
+  - name: wind_wave_peak_period
+    logicalType: number
+    physicalType: float
+    description: Peak period of wind waves. Availability depends on the model.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: undefined
+  - name: swell_wave_height
+    logicalType: number
+    physicalType: float
+    description: Significant height of swell waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.56
+    - property: observed_max
+      value: 1.74
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  - name: swell_wave_direction
+    logicalType: number
+    physicalType: float
+    description: Mean direction swell waves come from.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 54
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 359.0
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: °
+  - name: swell_wave_period
+    logicalType: number
+    physicalType: float
+    description: Mean period between swell waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 105
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 4.9
+    - property: observed_max
+      value: 10.9
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: s
+  - name: swell_wave_peak_period
+    logicalType: number
+    physicalType: float
+    description: Peak period of swell waves. Availability depends on the model.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: undefined
+  - name: secondary_swell_wave_height
+    logicalType: number
+    physicalType: float
+    description: Significant height of secondary swell waves; available only for some models.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 45
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.1
+    - property: observed_max
+      value: 1.04
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  - name: secondary_swell_wave_direction
+    logicalType: number
+    physicalType: float
+    description: Mean direction secondary swell waves come from.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 86
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 359.0
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: °
+  - name: secondary_swell_wave_period
+    logicalType: number
+    physicalType: float
+    description: Mean period of secondary swell waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 172
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 3.1
+    - property: observed_max
+      value: 16.35
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: s
+  - name: tertiary_swell_wave_height
+    logicalType: number
+    physicalType: float
+    description: Significant height of tertiary swell waves; available only for GFS wave models.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: undefined
+  - name: tertiary_swell_wave_direction
+    logicalType: number
+    physicalType: float
+    description: Mean direction tertiary swell waves come from.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: undefined
+  - name: tertiary_swell_wave_period
+    logicalType: number
+    physicalType: float
+    description: Mean period of tertiary swell waves.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: unit_documented
+      value: s
+    - property: observed_unit_in_response
+      value: undefined
+  - name: ocean_current_velocity
+    logicalType: number
+    physicalType: float
+    description: Current speed including Eulerian, wave and tidal components. Unit km/h by default (m/s, mph, knots selectable).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.8
+    - property: unit_documented
+      value: km/h
+    - property: observed_unit_in_response
+      value: km/h
+  - name: ocean_current_direction
+    logicalType: number
+    physicalType: float
+    description: Direction the current flows toward (0 = north, 90 = east).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 19
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 346.0
+    - property: unit_documented
+      value: degrees
+    - property: observed_unit_in_response
+      value: °
+  - name: sea_surface_temperature
+    logicalType: number
+    physicalType: float
+    description: Temperature close to the water surface.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 23.9
+    - property: observed_max
+      value: 24.6
+    - property: unit_documented
+      value: degC
+    - property: observed_unit_in_response
+      value: °C
+  - name: sea_level_height_msl
+    logicalType: number
+    physicalType: float
+    description: Sea level including tides, inverted barometer and other effects; datum is global mean sea level.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 174
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -1.32
+    - property: observed_max
+      value: 0.98
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  - name: invert_barometer_height
+    logicalType: number
+    physicalType: float
+    description: Sea level effect of high and low pressure (already included in sea_level_height_msl).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -0.15
+    - property: observed_max
+      value: -0.04
+    - property: unit_documented
+      value: m
+    - property: observed_unit_in_response
+      value: m
+  quality:
+  - name: observed_unique_time
+    type: library
+    metric: duplicateValues
+    mustBe: 0
+    unit: rows
+    arguments:
+      properties:
+      - time
+    description: 'Observed in sample of 336 rows on 2026-10-24: no duplicate time values within the single-location response;
+      not a producer guarantee.'
+customProperties:
+- property: source_url
+  value: https://marine-api.open-meteo.com/v1/marine?latitude=28.1&longitude=-15.4&hourly=<variables>&past_days=7&forecast_days=7
+- property: license
+  value: CC-BY 4.0 for data obtained through the API (per Open-Meteo terms); free API restricted to non-commercial use; attribution
+    to Open-Meteo and DWD requested by the API documentation
+- property: license_url
+  value: https://open-meteo.com/en/terms
+- property: documentation_url
+  value: https://open-meteo.com/en/docs/marine-weather-api
+- property: free_tier_limits_documented
+  value: Less than 10,000 API calls per day, 5,000 per hour, 600 per minute (terms page); applied per IP and per application
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 336
+- property: sample_selection
+  value: 'One request: point 28.1,-15.4 (grid cell resolved by the API to 28.125,-15.2916565), all 22 hourly variables, past_days=7,
+    forecast_days=7, default GMT timezone; 336 hourly rows (2026-10-17T00:00 to 2026-10-30T23:00). One location only.'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T10:51:10Z'

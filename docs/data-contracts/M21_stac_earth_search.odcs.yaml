@@ -1,0 +1,1562 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 5f0b89f2-c35a-5651-97d9-0cb8f79810e5
+version: 0.1.0
+status: draft
+name: Earth Search STAC API (Element 84)
+domain: earth-observation
+description:
+  purpose: 'Earth Search by Element 84: public STAC API (v1) over open satellite imagery on AWS, including Sentinel-2
+    L2A, Sentinel-2 L1C, Sentinel-1 GRD, Landsat C2 L2, Copernicus DEM and NAIP, with assets stored as cloud-optimized
+    GeoTIFF (COG) and JP2 on S3. The sample covers the collections list and Sentinel-2 L2A items intersecting a
+    bounding box around the Canary Islands.'
+  limitations: 'The catalog is self-describing (STAC 1.0.0 plus extensions); there is no producer data dictionary
+    for item properties (s2:*, earthsearch:*, etc. are not defined in the pages read). Only sentinel-2-l2a items
+    were sampled (150 items in two query windows: 2017-06-01 to 2017-08-31 and 2026-09-01 to 2026-10-24); other
+    collections'' items were not sampled. No SLA (the research notes mention a best-effort public service), no publication
+    cadence, no catalog/API license beyond the collection license link to the Sentinel data legal notice (collection
+    license field is ''proprietary''). Some assets live in a different bucket (s3://sentinel-s2-l2a) and may be
+    requester-pays: not verified. Known missing items in some collections are mentioned in the repository README
+    (not read in this pass). Pagination was not followed beyond the first page of each query (matched 477 and 167
+    items).'
+  usage: Discover Sentinel-2 L2A scenes over the Canary Islands (bbox, datetime, eo:cloud_cover) and fetch COG assets
+    by href.
+tags:
+- stac
+- sentinel-2
+- earth-observation
+- aws-open-data
+- canarias
+- api
+schema:
+- name: stac_collection
+  logicalType: object
+  physicalType: json
+  description: STAC collection object from GET /v1/collections (9 collections in the response; the detailed sample
+    property list comes from all 9, item-level detail only for sentinel-2-l2a).
+  properties:
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Collection identifier.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: Collection title.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: Collection description.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: stac_version
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: links
+    logicalType: array
+    physicalType: array
+    description: Links (self, cite-as DOI, license, parent, root, items, queryables, aggregate...).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: stac_extensions
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: item_assets
+    logicalType: object
+    physicalType: object
+    description: Assets that items of the collection may carry.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: extent
+    logicalType: object
+    physicalType: object
+    description: Spatial and temporal extent; sentinel-2-l2a is global with temporal interval open-ended since 2015-06-27.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: license
+    logicalType: string
+    physicalType: string
+    description: License identifier as published ('proprietary' for the collection read); the license link points
+      to the Sentinel data legal notice.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: keywords
+    logicalType: array
+    physicalType: array
+    description: Keywords.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: providers
+    logicalType: array
+    physicalType: array
+    description: Providers (e.g. ESA producer, Sinergise processor, AWS host, Element 84 processor for sentinel-2-l2a).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: summaries
+    logicalType: object
+    physicalType: object
+    description: Summaries of item properties (platform, constellation, instruments, gsd, view:off_nadir, sci:doi,
+      eo:bands for sentinel-2-l2a).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_present_pct
+      value: 100.0
+  - name: sci:doi
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_present_pct
+      value: 11.1
+  - name: sci:publications
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_present_pct
+      value: 11.1
+- name: stac_item_sentinel2_l2a
+  logicalType: object
+  physicalType: json
+  description: STAC Item (GeoJSON Feature) of collection sentinel-2-l2a returned by GET /v1/search for a bounding
+    box around the Canary Islands.
+  properties:
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: GeoJSON/STAC object type.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Feature
+    - property: observed_max
+      value: Feature
+    - property: observed_values
+      value:
+      - Feature
+  - name: stac_version
+    logicalType: string
+    physicalType: string
+    description: STAC version of the Item.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0.0
+    - property: observed_max
+      value: 1.0.0
+    - property: observed_values
+      value:
+      - 1.0.0
+  - name: stac_extensions
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 113
+    - property: observed_unique_in_sample
+      value: false
+    items:
+      logicalType: string
+      physicalType: string
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Item identifier (one scene/tile); the research notes document it as mandatory in STAC Item.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 150
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: S2A_27RYL_20261013_0_L2A
+    - property: observed_max
+      value: S2C_28RFT_20261018_0_L2A
+  - name: geometry
+    logicalType: object
+    physicalType: object
+    description: Footprint of the item (GeoJSON, WGS84 degrees per the research notes).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: geometry.type
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: Polygon
+      - property: observed_max
+        value: Polygon
+      - property: observed_values
+        value:
+        - Polygon
+    - name: coordinates
+      logicalType: array
+      physicalType: array
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 121
+      - property: observed_unique_in_sample
+        value: false
+      items:
+        logicalType: array
+        physicalType: array
+  - name: bbox
+    logicalType: array
+    physicalType: array
+    description: Bounding box of the item footprint.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 116
+    - property: observed_unique_in_sample
+      value: false
+    items:
+      logicalType: number
+      physicalType: number
+  - name: properties
+    logicalType: object
+    physicalType: object
+    description: Item properties (STAC). Fields beyond datetime, eo:cloud_cover, platform, constellation and instruments
+      are not defined by the producer in the pages read. Presence varies between old (2017) and recent (2026) items.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: created
+      logicalType: timestamp
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 150
+      - property: observed_unique_in_sample
+        value: true
+      - property: observed_min
+        value: '2022-11-03T06:01:38.923Z'
+      - property: observed_max
+        value: '2026-10-23T19:16:32.882Z'
+    - name: platform
+      logicalType: string
+      physicalType: string
+      description: Platform; the collection summaries list sentinel-2a and sentinel-2b (sentinel-2c also observed
+        in the sample).
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 3
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: sentinel-2a
+      - property: observed_max
+        value: sentinel-2c
+      - property: observed_values
+        value:
+        - sentinel-2a
+        - sentinel-2b
+        - sentinel-2c
+    - name: constellation
+      logicalType: string
+      physicalType: string
+      description: Constellation; the collection summaries list sentinel-2.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: sentinel-2
+      - property: observed_max
+        value: sentinel-2
+      - property: observed_values
+        value:
+        - sentinel-2
+    - name: instruments
+      logicalType: array
+      physicalType: array
+      description: Instruments; the collection summaries list msi.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      items:
+        logicalType: string
+        physicalType: string
+    - name: eo:cloud_cover
+      logicalType: number
+      physicalType: number
+      description: Cloud cover percentage (eo extension); listed as the only queryable of the collection in /queryables.
+        Unit/range not verified against the eo specification in this pass.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 140
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.001181
+      - property: observed_max
+        value: 100.0
+    - name: proj:epsg
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 32627.0
+      - property: observed_max
+        value: 32628.0
+      - property: observed_values
+        value:
+        - '32627'
+        - '32628'
+    - name: mgrs:utm_zone
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 27.0
+      - property: observed_max
+        value: 28.0
+      - property: observed_values
+        value:
+        - '27'
+        - '28'
+    - name: mgrs:latitude_band
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: R
+      - property: observed_max
+        value: R
+      - property: observed_values
+        value:
+        - R
+    - name: mgrs:grid_square
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 18
+      - property: observed_unique_in_sample
+        value: false
+    - name: grid:code
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 18
+      - property: observed_unique_in_sample
+        value: false
+    - name: view:azimuth
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 32.667
+      - property: observed_distinct
+        value: 101
+      - property: observed_unique_in_sample
+        value: true
+      - property: observed_min
+        value: 100.68766734917823
+      - property: observed_max
+        value: 291.4885073763779
+    - name: view:incidence_angle
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 32.667
+      - property: observed_distinct
+        value: 101
+      - property: observed_unique_in_sample
+        value: true
+      - property: observed_min
+        value: 2.771096325059119
+      - property: observed_max
+        value: 11.68121251104617
+    - name: view:sun_azimuth
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 142
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 121.25155886845
+      - property: observed_max
+        value: 162.232370912631
+    - name: view:sun_elevation
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 142
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 46.4468072488397
+      - property: observed_max
+        value: 69.2090157699196
+    - name: s2:tile_id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 32.667
+      - property: observed_distinct
+        value: 101
+      - property: observed_unique_in_sample
+        value: true
+    - name: s2:degraded_msi_data_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 70
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 0.6882
+    - name: s2:nodata_pixel_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 99
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 99.787372
+    - name: s2:saturated_defective_pixel_percentage
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 0.0
+    - name: s2:cloud_shadow_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 83
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 3.73658
+    - name: s2:vegetation_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 99
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 3.624567
+    - name: s2:not_vegetated_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 109
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 25.391889
+    - name: s2:water_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 140
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 99.998581
+    - name: s2:unclassified_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 85
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 4.42534
+    - name: s2:medium_proba_clouds_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 149
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 100.0
+    - name: s2:high_proba_clouds_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 146
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 100.0
+    - name: s2:thin_cirrus_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 121
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 64.650685
+    - name: s2:snow_ice_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 31
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 0.145647
+    - name: s2:product_type
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: S2MSI2A
+      - property: observed_max
+        value: S2MSI2A
+      - property: observed_values
+        value:
+        - S2MSI2A
+    - name: s2:processing_baseline
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.01
+      - property: observed_max
+        value: 5.13
+      - property: observed_values
+        value:
+        - '00.01'
+        - '05.13'
+    - name: s2:product_uri
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 150
+      - property: observed_unique_in_sample
+        value: true
+    - name: s2:generation_time
+      logicalType: timestamp
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 61
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: '2020-03-31T00:11:35.600Z'
+      - property: observed_max
+        value: '2026-10-23T17:48:07.000000Z'
+    - name: s2:datatake_id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 17
+      - property: observed_unique_in_sample
+        value: false
+    - name: s2:datatake_type
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: INS-NOBS
+      - property: observed_max
+        value: INS-NOBS
+      - property: observed_values
+        value:
+        - INS-NOBS
+    - name: s2:datastrip_id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 61
+      - property: observed_unique_in_sample
+        value: false
+    - name: s2:reflectance_conversion_factor
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 17
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.973671480795431
+      - property: observed_max
+        value: 1.00865236776673
+    - name: datetime
+      logicalType: timestamp
+      physicalType: string
+      description: Acquisition date-time, ISO 8601 UTC (mandatory in STAC Item per the research notes of this project).
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 108
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: '2017-08-14T11:52:41.712000Z'
+      - property: observed_max
+        value: '2026-10-23T11:54:11.973000Z'
+    - name: s2:sequence
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 1.0
+      - property: observed_values
+        value:
+        - '0'
+        - '1'
+    - name: earthsearch:s3_path
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 150
+      - property: observed_unique_in_sample
+        value: true
+    - name: earthsearch:payload_id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 150
+      - property: observed_unique_in_sample
+        value: true
+    - name: earthsearch:boa_offset_applied
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 'False'
+      - property: observed_max
+        value: 'True'
+    - name: updated
+      logicalType: timestamp
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 150
+      - property: observed_unique_in_sample
+        value: true
+      - property: observed_min
+        value: '2022-11-08T04:19:29.398Z'
+      - property: observed_max
+        value: '2026-10-23T19:16:32.882Z'
+    - name: s2:dark_features_percentage
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 66.667
+      - property: observed_distinct
+        value: 33
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0.0
+      - property: observed_max
+        value: 86.474365
+    - name: s2:granule_id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 67.333
+      - property: observed_distinct
+        value: 49
+      - property: observed_unique_in_sample
+        value: true
+    - name: proj:centroid
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_present_pct
+        value: 67.333
+      properties:
+      - name: lat
+        logicalType: number
+        physicalType: number
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: observed
+        - property: observed_null_pct
+          value: 32.667
+        - property: observed_distinct
+          value: 80
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_min
+          value: 27.37356
+        - property: observed_max
+          value: 29.56277
+      - name: lon
+        logicalType: number
+        physicalType: number
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: observed
+        - property: observed_null_pct
+          value: 32.667
+        - property: observed_distinct
+          value: 79
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_min
+          value: -18.40939
+        - property: observed_max
+          value: -13.40476
+    - name: processing:software
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      properties:
+      - name: sentinel2-to-stac
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: observed
+        - property: observed_null_pct
+          value: 0.0
+        - property: observed_distinct
+          value: 2
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_min
+          value: 0.1.0
+        - property: observed_max
+          value: 2026.08.16
+        - property: observed_values
+          value:
+          - 0.1.0
+          - 2026.08.16
+  - name: links
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 150
+    - property: observed_unique_in_sample
+      value: true
+    items:
+      logicalType: object
+      physicalType: object
+  - name: assets
+    logicalType: object
+    physicalType: object
+    description: Map of files per item, keyed by asset name. Each asset observed with href, type, title and (for
+      bands) eo:bands, gsd, proj:shape, proj:transform, raster:bands, roles. Some asset hrefs are s3:// URLs of
+      a different bucket (sentinel-s2-l2a), others https URLs of sentinel-cogs; access conditions (e.g. requester-pays)
+      are not verified.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: aot
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: blue
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: coastal
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: granule_metadata
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: green
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: nir
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: nir08
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: nir09
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: red
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: rededge1
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: rededge2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: rededge3
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: scl
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: swir16
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: swir22
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: thumbnail
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: tileinfo_metadata
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: visual
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: wvp
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 100.0
+    - name: aot-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: blue-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: coastal-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: green-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: nir-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: nir08-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: nir09-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: red-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: rededge1-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: rededge2-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: rededge3-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: scl-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: swir16-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: swir22-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: visual-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: wvp-jp2
+      logicalType: object
+      physicalType: object
+      description: Asset declared in the collection item_assets.
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_present_pct
+        value: 99.333
+    - name: cloud
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_present_pct
+        value: 67.333
+    - name: preview
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_present_pct
+        value: 0.667
+    - name: product_metadata
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_present_pct
+        value: 67.333
+    - name: snow
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_present_pct
+        value: 67.333
+  - name: collection
+    logicalType: string
+    physicalType: string
+    description: Collection to which the item belongs.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: sentinel-2-l2a
+    - property: observed_max
+      value: sentinel-2-l2a
+    - property: observed_values
+      value:
+      - sentinel-2-l2a
+  quality:
+  - name: observed_item_id_unique
+    type: text
+    description: 'Observed in sample of 150 items on 2026-10-24; not a producer guarantee: id is unique in the sample
+      (the research notes name (collection, id) as the usual STAC key, not declared by the producer).'
+    dimension: uniqueness
+  - name: observed_property_presence
+    type: text
+    description: 'Observed in sample of 150 items on 2026-10-24; not a producer guarantee: old (2017) items lack
+      proj:centroid, view:azimuth, view:incidence_angle and s2:tile_id in 49 of 50 cases; recent items carry them;
+      s2:dark_features_percentage and s2:granule_id appear only in the 2017 selection.'
+    dimension: consistency
+customProperties:
+- property: source_url
+  value: https://earth-search.aws.element84.com/v1/collections
+- property: license
+  value: 'Collection license field: proprietary; license link: Sentinel data legal notice (Copernicus). The API/catalog
+    itself has no license statement in what was read.'
+- property: license_url
+  value: https://sentinel.esa.int/documents/247904/690755/Sentinel_Data_Legal_Notice
+- property: documentation_url
+  value: https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 159
+- property: sample_selection
+  value: 'Collections: 1 request (9 collections). Items: 2 search requests on collection sentinel-2-l2a with bbox
+    -18.2,27.6,-13.3,29.5: limit=100 for 2026-09-01/2026-10-24 (477 matched) and limit=50 for 2017-06-01/2017-08-31
+    (167 matched), first page only, to see schema variation between old and recent items. sample_rows = 150 items
+    + 9 collections.'
+- property: sample_status
+  value: partial
+- property: sample_rows_by_entity
+  value:
+    stac_collection: 9
+    stac_item_sentinel2_l2a: 150
+- property: stac_version
+  value: 1.0.0
+contractCreatedTs: '2026-10-24T00:00:00Z'

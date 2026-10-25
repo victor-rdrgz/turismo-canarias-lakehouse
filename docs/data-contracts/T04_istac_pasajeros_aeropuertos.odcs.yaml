@@ -1,0 +1,446 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 391ad7e5-84c2-57ea-8897-c5fcd1aa487b
+version: 0.1.0
+status: draft
+name: ISTAC airport passengers by Canary airport and stopover airport (monthly/annual)
+domain: tourism
+description:
+  purpose: 'Statistical cube C00017A_000001 of the Canary Islands Statistics Institute (ISTAC), operation C00017A (Recopilacion
+    de Estadisticas de Transporte Aereo): total passenger traffic at the airports of the Canary Islands by type of air service
+    and stopover airport, monthly and annual periods from 2004. Published through the ISTAC statistical-resources API (SDMX-based);
+    this contract describes the CSV representation of the latest version (v2.77 when sampled).'
+  limitations: |-
+    - The producer publishes no per-column data dictionary beyond SDMX dimension/attribute names and codelists; CSV column names (including the #es label columns and OBS_VALUE) are described from the metadata and the sample.
+    - The meaning of 'aeropuerto de escala' (origin, destination or previous/next stop) and whether aggregates overlap with their member airports or services are not documented in the metadata read.
+    - The unit of OBS_VALUE is not defined by an exported attribute; it is read as passengers from the indicator name.
+    - CONFIDENCIALIDAD_OBSERVACION is empty in the whole sample; its codelist is unknown. Annual periods are declared but absent from the sample.
+    - Dataset version 2.77 replaces 2.76 (minor series update, 2026-10-14); next version declared NO_UPDATES, but the ~latest alias may still move. No update frequency is declared in the metadata of this dataset.
+    - The full cube has 652231 observations in a 3132900-cell grid (well above the sample cap), so the sample is a subset of eight monthly periods obtained with the API dim filter.
+    - No SLA, deprecation policy or formal quality/not-null/uniqueness rules were found; the ISTAC legal notice states that ISTAC does not guarantee accuracy, completeness or continuity.
+  usage: 'Download the CSV via the ~latest alias (optionally filtering periods with the dim parameter) or pin the version
+    in the URL. Read all columns as strings and cast OBS_VALUE explicitly. Cite ''Fuente: Instituto Canario de Estadistica
+    (ISTAC)'' and respect the API conditions of the ISTAC legal notice.'
+tags:
+- tourism
+- air-transport
+- canary-islands
+- istac
+- sdmx
+- airports
+- official-statistics
+schema:
+- name: pasajeros_aeropuertos_cube
+  logicalType: object
+  physicalType: csv
+  description: 'Long-format SDMX cube export of dataset C00017A_000001 (Trafico total de pasajeros en los aeropuertos de las
+    islas de Canarias segun servicios y aeropuertos de escala; operation C00017A, Recopilacion de Estadisticas de Transporte
+    Aereo): one row per air service x indicator x aircraft movement x period x Canary airport x stopover airport.'
+  properties:
+  - name: SERVICIO_AEREO#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension SERVICIO_AEREO (Servicio aereo). Four values declared.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Comercial
+    - property: observed_max
+      value: Regular
+    - property: observed_values
+      value:
+      - Comercial
+      - No regular
+      - Otros servicios comerciales
+      - Regular
+  - name: SERVICIO_AEREO_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension SERVICIO_AEREO (Servicio aereo). Declared values: COMMERCIAL (Comercial), SCHEDULED
+      (Regular), NON_SCHEDULED (No regular), COMMERCIAL_O (Otros servicios comerciales). How the four relate (e.g. whether
+      COMMERCIAL is the sum of the others) is not documented.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: COMMERCIAL
+    - property: observed_max
+      value: SCHEDULED
+    - property: observed_values
+      value:
+      - COMMERCIAL
+      - COMMERCIAL_O
+      - NON_SCHEDULED
+      - SCHEDULED
+  - name: MEDIDAS#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension MEDIDAS (Indicador). Single indicator declared.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Pasajeros
+    - property: observed_max
+      value: Pasajeros
+    - property: observed_values
+      value:
+      - Pasajeros
+  - name: MEDIDAS_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension MEDIDAS (Indicador). Single declared value: PASAJEROS (Pasajeros).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: PASAJEROS
+    - property: observed_max
+      value: PASAJEROS
+    - property: observed_values
+      value:
+      - PASAJEROS
+  - name: MOVIMIENTO_AERONAVE#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension MOVIMIENTO_AERONAVE (Movimiento aeronave). Single value declared.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Total
+    - property: observed_max
+      value: Total
+    - property: observed_values
+      value:
+      - Total
+  - name: MOVIMIENTO_AERONAVE_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension MOVIMIENTO_AERONAVE (Movimiento aeronave). Single declared value: _T (Total).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: _T
+    - property: observed_max
+      value: _T
+    - property: observed_values
+      value:
+      - _T
+  - name: TIME_PERIOD#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension TIME_PERIOD (Periodo). Observed as MM/YYYY.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 01/2004
+    - property: observed_max
+      value: 09/2026
+    - property: observed_values
+      value:
+      - 01/2004
+      - 03/2025
+      - 03/2026
+      - 08/2026
+      - 09/2004
+      - 09/2015
+      - 09/2025
+      - 09/2026
+  - name: TIME_PERIOD_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension TIME_PERIOD (Periodo). SDMX period code. The metadata declares 295 periods: monthly
+      (YYYY-Mnn, 2004-M01 to 2026-M09) and annual (YYYY, 2004 to 2025); only monthly codes occur in the sample.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2004-M01
+    - property: observed_max
+      value: 2026-M09
+    - property: observed_values
+      value:
+      - 2004-M01
+      - 2004-M09
+      - 2015-M09
+      - 2025-M03
+      - 2025-M09
+      - 2026-M03
+      - 2026-M08
+      - 2026-M09
+  - name: AEROPUERTO_BASE#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension AEROPUERTO_BASE (Aeropuerto base). Nine values declared.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Aeropuerto de Fuerteventura
+    - property: observed_max
+      value: Canarias
+    - property: observed_values
+      value:
+      - Aeropuerto de Fuerteventura
+      - Aeropuerto de Gran Canaria
+      - Aeropuerto de Hierro
+      - Aeropuerto de La Gomera
+      - Aeropuerto de La Palma
+      - Aeropuerto de Lanzarote
+      - Aeropuerto de Tenerife Norte
+      - Aeropuerto de Tenerife Sur
+      - Canarias
+  - name: AEROPUERTO_BASE_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension AEROPUERTO_BASE (Aeropuerto base). Declared values: ES70 (Canarias) and eight airport
+      codes ES_GCFV Fuerteventura, ES_GCLP Gran Canaria, ES_GCRR Lanzarote, ES_GCHI El Hierro, ES_GCGM La Gomera, ES_GCLA
+      La Palma, ES_GCTS Tenerife Sur, ES_GCXO Tenerife Norte.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: ES70
+    - property: observed_max
+      value: ES_GCXO
+    - property: observed_values
+      value:
+      - ES70
+      - ES_GCFV
+      - ES_GCGM
+      - ES_GCHI
+      - ES_GCLA
+      - ES_GCLP
+      - ES_GCRR
+      - ES_GCTS
+      - ES_GCXO
+  - name: AEROPUERTO_ESCALA#es
+    logicalType: string
+    physicalType: text
+    description: Spanish label of the dimension AEROPUERTO_ESCALA (Aeropuerto de escala). 295 values declared (airports and
+      aggregates by country/island/region).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 295
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Aeropuerto Brussels South Charleroi
+    - property: observed_max
+      value: Venezuela
+  - name: AEROPUERTO_ESCALA_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the dimension AEROPUERTO_ESCALA (Aeropuerto de escala). 295 codes declared, a hierarchy mixing aggregates
+      (e.g. ES Spain, ES70 Canary Islands, island and country codes) and individual airports (e.g. ES_GCFV, BE_EBBR). Whether
+      aggregates overlap with their member airports is not documented in the metadata read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 295
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: AT
+    - property: observed_max
+      value: _O
+  - name: OBS_VALUE
+    logicalType: integer
+    physicalType: text
+    description: 'Observation value (primary measure): passengers, per the single indicator PASAJEROS. Empty when no value
+      is published.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 80.239
+    - property: observed_distinct
+      value: 7300
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 3275392.0
+    - property: note
+      value: Column name OBS_VALUE is not defined in the metadata read; it is the CSV header.
+  - name: ESTADO_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: 'Label of the observation status (attribute ESTADO_OBSERVACION). Declared values: Valor normal (A), Valor
+      provisional (P).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 80.239
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Valor normal
+    - property: observed_max
+      value: Valor provisional
+    - property: observed_values
+      value:
+      - Valor normal
+      - Valor provisional
+  - name: ESTADO_OBSERVACION_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the observation status. Declared values: A (Valor normal), P (Valor provisional).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 80.239
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A
+    - property: observed_max
+      value: P
+    - property: observed_values
+      value:
+      - A
+      - P
+  - name: CONFIDENCIALIDAD_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Label of the observation attribute CONFIDENCIALIDAD_OBSERVACION, declared in the metadata (named 'Estado
+      de la observacion' there). Its codelist was not read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: TERRITORIO
+    logicalType: string
+    physicalType: not exported in CSV
+    description: Dataset-level attribute declared in the metadata with value ES70 (Canarias). Not present as a column in the
+      CSV export.
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: present_in_sample
+      value: false
+  quality:
+  - type: text
+    name: observed_key_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 84960 rows on 2026-10-24; not a producer guarantee: the combination of the six dimension
+      codes is unique. The six dimensions are the documented dimensions of the cube; uniqueness is not stated as a rule by
+      the producer.'
+  - type: text
+    name: observed_status_when_value
+    dimension: completeness
+    description: 'Observed in sample of 84960 rows on 2026-10-24; not a producer guarantee: ESTADO_OBSERVACION_CODE is populated
+      exactly when OBS_VALUE is populated (80.239% of rows have neither); OBS_VALUE is empty for most airport pairs without
+      a status.'
+support:
+- channel: email
+  url: mailto:consultas.istac@gobiernodecanarias.org
+  description: ISTAC contact published in the dataset metadata (rights holder).
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00017A_000001/~latest.csv
+- property: license
+  value: 'ISTAC Aviso Legal: free reuse including commercial use, citing ''Fuente: Instituto Canario de Estadistica (ISTAC)''
+    and the update date; no distortion of meaning, no re-identification of statistical units; API additional conditions apply'
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00017A_000001/~latest.json?fields=-data
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 84960
+- property: sample_selection
+  value: 'Full cube: 652231 observations, 3132900-cell grid, 295 periods (monthly 2004-M01..2026-M09 and annual 2004..2025).
+    Sample = API filter dim=TIME_PERIOD for 8 monthly periods: 2004-M01, 2004-M09, 2015-M09, 2025-M03, 2025-M09, 2026-M03,
+    2026-M08, 2026-M09; all rows of those periods.'
+- property: sample_status
+  value: ok
+- property: dataset_version
+  value: '2.77'
+- property: dataset_last_update
+  value: '2026-10-14T12:38:37+01:00'
+contractCreatedTs: '2026-10-24T12:00:00Z'

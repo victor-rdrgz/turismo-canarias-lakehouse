@@ -1,0 +1,1551 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 56a7ad5d-d8e8-5776-9ba6-0426ad1d2e86
+version: 0.1.0
+status: draft
+name: adsb.fi open data - aircraft near the Canary Islands
+domain: mobility
+description:
+  purpose: Real-time ADS-B aircraft state vectors within a radius of a point, from the adsb.fi community
+    network open data API (readsb-style JSON).
+  limitations: 'Single snapshot of 27 aircraft taken on 2026-10-24 with the v3 radius endpoint (center
+    28.0,-15.4; radius 100 NM); no time series. adsb.fi publishes no field dictionary: field descriptions
+    are taken from the readsb documentation on the assumption of compatibility, which adsb.fi states only
+    as ADSBexchange v2 compatibility. Keys are omitted when data is unavailable, so null percentages count
+    absent keys. Fields r, t, desc, dbFlags depend on a server-side database; only r, t and desc were
+    seen (desc absent for 2 aircraft). Keys msg and ctime are not documented. The batch''s known URL used
+    the v2 radius endpoint, which adsb.fi marks deprecated (different format); the v3 endpoint was sampled
+    instead. No SLA; service provided as-is and may be suspended. Public endpoint rate limit: 1 request
+    per second; 400/401/403/404/429 responses count toward a temporary IP restriction. Terms: personal,
+    non-commercial use only; the data may not be licensed, sold, rented or leased; adsb.fi must be cited
+    with a link to its home page. This may conflict with a public portfolio: do not republish the raw
+    data. Refresh frequency of the public endpoint is not declared.'
+  usage: Query the v3 radius endpoint no faster than once per second; for personal non-commercial use
+    with attribution to adsb.fi (https://adsb.fi).
+tags:
+- adsb
+- aviation
+- real-time
+- canary-islands
+schema:
+- name: snapshot_envelope
+  logicalType: object
+  physicalType: json object (response root)
+  description: 'Response root of the radius query: aircraft array plus snapshot metadata.'
+  properties:
+  - name: msg
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_values
+      value:
+      - No error
+  - name: now
+    logicalType: integer
+    physicalType: integer
+    description: Time the data was generated since the Unix epoch. readsb states milliseconds for the
+      jv2 syntax; the value observed (1792839048001) is consistent with milliseconds.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: total
+    logicalType: integer
+    physicalType: integer
+    description: Number of aircraft in the aircraft array (readsb jv2 syntax).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: 27
+  - name: ctime
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value
+      value: 1792839048001
+  - name: ptime
+    logicalType: integer
+    physicalType: integer
+    description: Time in milliseconds it took to parse the request and create the JSON output (readsb).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: 0
+  - name: ac
+    logicalType: array
+    physicalType: array of object
+    description: Array of aircraft objects. Keys are omitted when data is not available (readsb). The
+      key name 'ac' is not documented by adsb.fi in the pages read.
+    customProperties:
+    - property: evidence
+      value: observed
+- name: aircraft_state
+  logicalType: object
+  physicalType: json object inside array 'ac'
+  description: 'One aircraft state vector at the instant of the snapshot (grain: one object per aircraft;
+    hex is unique within one snapshot per readsb convention).'
+  properties:
+  - name: hex
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. 24-bit ICAO identifier of the aircraft as 6 hex digits; may start with '~'
+      for non-ICAO addresses.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Type of underlying messages / best source of the current data (e.g. adsb_icao,
+      mlat, tisb_icao, mode_s).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - adsb_icao
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: flight
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Callsign, flight name or aircraft registration as 8 characters.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: alt_baro
+    logicalType: string
+    physicalType: integer | string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Barometric altitude in feet as a number, or the string 'ground'.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 26
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+    - property: observed_values_string
+      value:
+      - ground
+  - name: alt_geom
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Geometric (GNSS/INS) altitude in feet referenced to the WGS84 ellipsoid.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.704
+    - property: observed_distinct
+      value: 26
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 800.0
+    - property: observed_max
+      value: 38875.0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: gs
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Ground speed in knots.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 77.8
+    - property: observed_max
+      value: 498.6
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: ias
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Indicated air speed in knots.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 22.222
+    - property: observed_distinct
+      value: 19
+    - property: observed_min
+      value: 168.0
+    - property: observed_max
+      value: 299.0
+    - property: observed_values
+      value:
+      - 168
+      - 190
+      - 191
+      - 200
+      - 212
+      - 217
+      - 219
+      - 222
+      - 239
+      - 243
+      - 250
+      - 251
+      - 257
+      - 259
+      - 264
+      - 267
+      - 275
+      - 289
+      - 299
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: tas
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. True air speed in knots.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 40.741
+    - property: observed_distinct
+      value: 14
+    - property: observed_min
+      value: 178.0
+    - property: observed_max
+      value: 488.0
+    - property: observed_values
+      value:
+      - 178
+      - 200
+      - 264
+      - 268
+      - 280
+      - 288
+      - 318
+      - 364
+      - 414
+      - 420
+      - 426
+      - 446
+      - 462
+      - 488
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: mach
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Mach number.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 22.222
+    - property: observed_distinct
+      value: 18
+    - property: observed_min
+      value: 0.26
+    - property: observed_max
+      value: 0.832
+    - property: observed_values
+      value:
+      - 0.26
+      - 0.3
+      - 0.324
+      - 0.336
+      - 0.392
+      - 0.412
+      - 0.42
+      - 0.424
+      - 0.444
+      - 0.488
+      - 0.596
+      - 0.672
+      - 0.684
+      - 0.708
+      - 0.712
+      - 0.764
+      - 0.796
+      - 0.832
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: track
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. True track over ground in degrees (0-359).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 21.5
+    - property: observed_max
+      value: 359.74
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: track_rate
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Rate of change of track, degrees/second.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 62.963
+    - property: observed_distinct
+      value: 7
+    - property: observed_min
+      value: -0.38
+    - property: observed_max
+      value: 1.25
+    - property: observed_values
+      value:
+      - -0.03
+      - -0.16
+      - -0.31
+      - -0.38
+      - 0.0
+      - 0.03
+      - 1.25
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: roll
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Roll in degrees, negative is left roll.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 40.741
+    - property: observed_distinct
+      value: 10
+    - property: observed_min
+      value: -6.33
+    - property: observed_max
+      value: 15.82
+    - property: observed_values
+      value:
+      - -0.18
+      - -0.35
+      - -0.53
+      - -1.93
+      - -6.33
+      - 0.0
+      - 0.18
+      - 0.35
+      - 0.53
+      - 15.82
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: mag_heading
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Heading in degrees clockwise from magnetic north.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 22.222
+    - property: observed_distinct
+      value: 21
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 2.11
+    - property: observed_max
+      value: 338.2
+    - property: observed_values
+      value:
+      - 119.53
+      - 128.14
+      - 196.17
+      - 198.63
+      - 2.11
+      - 201.09
+      - 205.14
+      - 217.44
+      - 23.73
+      - 230.1
+      - 230.27
+      - 233.44
+      - 24.79
+      - 26.37
+      - 260.51
+      - 262.79
+      - 273.69
+      - 274.39
+      - 289.86
+      - 338.2
+      - 59.41
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: true_heading
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Heading in degrees clockwise from true north.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 22.222
+    - property: observed_distinct
+      value: 21
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 20.89
+    - property: observed_max
+      value: 358.73
+    - property: observed_values
+      value:
+      - 116.87
+      - 124.88
+      - 192.8
+      - 194.96
+      - 197.92
+      - 20.89
+      - 202.14
+      - 21.55
+      - 214.18
+      - 227.31
+      - 227.6
+      - 23.37
+      - 230.25
+      - 257.4
+      - 260.13
+      - 270.23
+      - 270.75
+      - 287.18
+      - 334.96
+      - 358.73
+      - 56.25
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: baro_rate
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Rate of change of barometric altitude, feet/minute.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 14.815
+    - property: observed_distinct
+      value: 17
+    - property: observed_min
+      value: -3584.0
+    - property: observed_max
+      value: 1792.0
+    - property: observed_values
+      value:
+      - -128
+      - -1472
+      - -1536
+      - -192
+      - -2112
+      - -2176
+      - -2304
+      - -3584
+      - -512
+      - -576
+      - 0
+      - 1024
+      - 128
+      - 1792
+      - 192
+      - 640
+      - 832
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: geom_rate
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Rate of change of geometric altitude, feet/minute.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 14.815
+    - property: observed_distinct
+      value: 18
+    - property: observed_min
+      value: -4672.0
+    - property: observed_max
+      value: 1760.0
+    - property: observed_values
+      value:
+      - -1504
+      - -192
+      - -2112
+      - -2272
+      - -2368
+      - -4672
+      - -544
+      - -64
+      - -832
+      - -960
+      - 0
+      - 1056
+      - 128
+      - 1760
+      - 32
+      - 608
+      - 704
+      - 832
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: squawk
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Mode A code (squawk), encoded as 4 octal digits.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: emergency
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. ADS-B emergency/priority status (none, general, lifeguard, minfuel, nordo,
+      unlawful, downed, reserved).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - none
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: category
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Emitter category identifying aircraft or vehicle classes (A0 - D7).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_values
+      value:
+      - A1
+      - A2
+      - A3
+      - A5
+      - C0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nav_qnh
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Altimeter setting (QFE or QNH/QNE), hPa.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 18.519
+    - property: observed_distinct
+      value: 4
+    - property: observed_min
+      value: 1012.8
+    - property: observed_max
+      value: 1024.0
+    - property: observed_values
+      value:
+      - 1012.8
+      - 1013.6
+      - 1020.8
+      - 1024.0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nav_altitude_mcp
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Selected altitude from the Mode Control Panel / Flight Control Unit (feet implied
+      by the altitude fields; unit not stated for this field).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 18.519
+    - property: observed_distinct
+      value: 16
+    - property: observed_min
+      value: 2496.0
+    - property: observed_max
+      value: 36992.0
+    - property: observed_values
+      value:
+      - 10016
+      - 12000
+      - 12992
+      - 14016
+      - 15008
+      - 16992
+      - 2496
+      - 3008
+      - 32992
+      - 34016
+      - 35008
+      - 36000
+      - 36992
+      - 4000
+      - 6016
+      - 8992
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nav_altitude_fms
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Selected altitude from the Flight Management System.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 88.889
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 17008.0
+    - property: observed_max
+      value: 36000.0
+    - property: observed_values
+      value:
+      - 17008
+      - 36000
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nav_heading
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Selected heading (true or magnetic not defined, mostly magnetic).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 59.259
+    - property: observed_distinct
+      value: 10
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 291.09
+    - property: observed_values
+      value:
+      - 0.0
+      - 11.25
+      - 120.23
+      - 196.17
+      - 229.92
+      - 25.31
+      - 26.02
+      - 262.97
+      - 274.92
+      - 291.09
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nav_modes
+    logicalType: array
+    physicalType: array of string
+    description: 'Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Set of engaged automation modes: autopilot, vnav, althold, approach, lnav,
+      tcas.'
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: lat
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Aircraft position latitude in decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 26.482681
+    - property: observed_max
+      value: 29.612484
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: lon
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Aircraft position longitude in decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -16.829153
+    - property: observed_max
+      value: -13.940171
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nic
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Navigation Integrity Category.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_min
+      value: 8.0
+    - property: observed_max
+      value: 11.0
+    - property: observed_values
+      value:
+      - 11
+      - 8
+      - 9
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: rc
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Radius of Containment, meters.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_min
+      value: 8.0
+    - property: observed_max
+      value: 186.0
+    - property: observed_values
+      value:
+      - 186
+      - 75
+      - 8
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: seen_pos
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. How long ago (seconds before 'now') the position was last updated.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_min
+      value: 0.026
+    - property: observed_max
+      value: 15.508
+    - property: observed_values
+      value:
+      - 0.026
+      - 0.08
+      - 0.117
+      - 0.188
+      - 0.336
+      - 0.337
+      - 0.553
+      - 0.68
+      - 0.701
+      - 0.766
+      - 13.41
+      - 15.508
+      - 6.852
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: version
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. ADS-B version number 0, 1, 2 (3-7 reserved).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - 2
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nic_baro
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Navigation Integrity Category for barometric altitude.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - 0
+      - 1
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nac_p
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Navigation Accuracy for Position.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 11.0
+    - property: observed_values
+      value:
+      - 0
+      - 10
+      - 11
+      - 9
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: nac_v
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Navigation Accuracy for Velocity.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.704
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - 1
+      - 2
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: sil
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Source Integrity Level.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 3.0
+    - property: observed_values
+      value:
+      - 0
+      - 3
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: sil_type
+    logicalType: string
+    physicalType: string
+    description: 'Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Interpretation of SIL: unknown, perhour, persample.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - perhour
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: gva
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Geometric Vertical Accuracy.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - 1
+      - 2
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: sda
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. System Design Assurance.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 3.0
+    - property: observed_values
+      value:
+      - 0
+      - 2
+      - 3
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: alert
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Flight status alert bit.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - 0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: spi
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Flight status special position identification bit.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - 0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: mlat
+    logicalType: array
+    physicalType: array
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. List of fields derived from MLAT data.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - '[]'
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: tisb
+    logicalType: array
+    physicalType: array
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. List of fields derived from TIS-B data.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - '[]'
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: messages
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Total number of Mode S messages received from this aircraft.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 949.0
+    - property: observed_max
+      value: 49379.0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: seen
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. How long ago (seconds before 'now') a message was last received from this aircraft.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 7.0
+    - property: observed_values
+      value:
+      - 0.0
+      - 0.1
+      - 0.2
+      - 0.5
+      - 0.6
+      - 1.0
+      - 3.5
+      - 7.0
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: rssi
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Recent average RSSI (signal power) in dBFS; always negative.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 26
+    - property: observed_min
+      value: -32.4
+    - property: observed_max
+      value: -1.5
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: wd
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Wind direction, calculated from ground track, true heading, true airspeed and
+      ground speed.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 51.852
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 26.0
+    - property: observed_max
+      value: 270.0
+    - property: observed_values
+      value:
+      - 125
+      - 165
+      - 188
+      - 200
+      - 202
+      - 233
+      - 250
+      - 26
+      - 264
+      - 265
+      - 268
+      - 270
+      - 60
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: ws
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Wind speed, calculated from ground track, true heading, true airspeed and ground
+      speed.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 51.852
+    - property: observed_distinct
+      value: 12
+    - property: observed_min
+      value: 9.0
+    - property: observed_max
+      value: 67.0
+    - property: observed_values
+      value:
+      - 13
+      - 16
+      - 23
+      - 28
+      - 29
+      - 32
+      - 37
+      - 42
+      - 62
+      - 64
+      - 67
+      - 9
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: oat
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Outer/static air temperature in C, calculated from Mach number and true airspeed
+      (inhibited for Mach < 0.395).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 48.148
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -51.0
+    - property: observed_max
+      value: 14.0
+    - property: observed_values
+      value:
+      - -18
+      - -2
+      - -24
+      - -3
+      - -32
+      - -35
+      - -44
+      - -47
+      - -49
+      - -5
+      - -51
+      - 14
+      - 4
+      - 6
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: tat
+    logicalType: integer
+    physicalType: integer
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Total air temperature in C, calculated from Mach number and true airspeed.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 48.148
+    - property: observed_distinct
+      value: 12
+    - property: observed_min
+      value: -23.0
+    - property: observed_max
+      value: 24.0
+    - property: observed_values
+      value:
+      - -11
+      - -15
+      - -21
+      - -23
+      - -7
+      - -9
+      - 11
+      - 15
+      - 24
+      - 4
+      - 5
+      - 6
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: dst
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Distance from the supplied center point in nautical miles (added for circle/closest
+      queries).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 8.79
+    - property: observed_max
+      value: 98.869
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: dir
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. True direction of the aircraft from the supplied center point, degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 26
+    - property: observed_min
+      value: 8.7
+    - property: observed_max
+      value: 343.1
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: r
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Aircraft registration pulled from the readsb database (available only if a
+      database is configured on the server).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: t
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Aircraft type pulled from the readsb database (ICAO type code).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_values
+      value:
+      - A20N
+      - A21N
+      - A320
+      - A321
+      - A339
+      - AT76
+      - B38M
+      - B738
+      - B77W
+      - GALX
+      - P208
+      - PIVI
+      - TWR
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: desc
+    logicalType: string
+    physicalType: string
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Long type name (readsb optional database field).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 7.407
+    - property: observed_distinct
+      value: 12
+    - property: observed_values
+      value:
+      - AIRBUS A-320
+      - AIRBUS A-320neo
+      - AIRBUS A-321
+      - AIRBUS A-321neo
+      - AIRBUS A-330-900
+      - ATR-72-600
+      - BOEING 737 MAX 8
+      - BOEING 737-800
+      - BOEING 777-300ER
+      - GULFSTREAM G200
+      - PIPSTREL Virus
+      - TECNAM P-2008
+    - property: observed_null_pct_meaning
+      value: percentage of aircraft objects where the key was absent
+  - name: dbFlags
+    logicalType: integer
+    physicalType: integer
+    description: 'Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Bitfield of database flags: military=1, interesting=2, PIA=4, LADD=8.'
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: acas_ra
+    logicalType: object
+    physicalType: object
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Experimental, subject to change (readsb documentation).
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: gpsOkBefore
+    logicalType: number
+    physicalType: number
+    description: 'Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Experimental: aircraft lost GPS or GPS heavily degraded; GPS was working before
+      this timestamp; shown for 15 min after the loss.'
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: lastPosition
+    logicalType: object
+    physicalType: object
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Last position (lat, lon, nic, rc, seen_pos) when regular lat/lon are older
+      than 60 s.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: rr_lat
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Rough estimated latitude based on receiver coordinates when no ADS-B/MLAT position
+      (aggregation server only).
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: rr_lon
+    logicalType: number
+    physicalType: number
+    description: Field description comes from the readsb JSON documentation (adsb.fi states its responses
+      are compatible with the ADSBexchange v2 API, which readsb implements); adsb.fi itself publishes
+      no field dictionary. Rough estimated longitude (see rr_lat).
+    customProperties:
+    - property: evidence
+      value: documented
+  quality:
+  - type: text
+    description: 'Observed in sample of 27 rows on 2026-10-24; not a producer guarantee: hex values are
+      distinct within the snapshot.'
+customProperties:
+- property: source_url
+  value: https://opendata.adsb.fi/api/v3/lat/28.0/lon/-15.4/dist/100
+- property: license
+  value: 'adsb.fi terms: personal, non-commercial use only; no licensing, selling, renting or leasing
+    of data; provided as-is; cite adsb.fi with a link to its home page'
+- property: license_url
+  value: https://github.com/adsbfi/opendata/blob/main/README.md
+- property: documentation_url
+  value: https://github.com/adsbfi/opendata/blob/main/README.md
+- property: field_reference_url
+  value: https://github.com/wiedehopf/readsb/blob/dev/README-json.md
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 27
+- property: sample_selection
+  value: One request to /v3/lat/28.0/lon/-15.4/dist/100 (distance in nautical miles, max 250 documented);
+    single instantaneous snapshot.
+- property: sample_status
+  value: ok
+- property: rate_limit_documented
+  value: 1 request per second on public endpoints
+contractCreatedTs: '2026-10-24T12:00:00Z'

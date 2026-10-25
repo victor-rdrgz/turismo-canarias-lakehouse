@@ -1,0 +1,288 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 0ede0624-cf11-538e-886d-6c38b20e9102
+version: 0.1.0
+status: draft
+name: ISTAC holiday rental (vivienda vacacional) monthly indicators
+domain: tourism
+description:
+  purpose: 'Statistical cube C00065A_000061 of the Canary Islands Statistics Institute (ISTAC), part of the Encuesta de Alojamiento
+    Turistico (operation C00065A): available and booked holiday rental dwellings, available places, booking rate, average
+    stay and total income, by island and municipality, monthly from January 2019. Published through the ISTAC statistical-resources
+    API (SDMX-based) as CSV/JSON; this contract describes the CSV representation of the latest version.'
+  limitations: |-
+    - Units of OBS_VALUE per measure are not defined in the metadata that was read; definitions of 'booked' (reservada), booking rate and average stay are not documented there.
+    - The metadata declares a single INTERVALOS_PLAZAS value (_T, Total); the dimension name suggests intervals of places but no breakdown is published in this version.
+    - Annotation, confidentiality and observation-status attributes are declared but empty in every sample row; their code lists are unknown.
+    - Dataset version 1.30 (replaces 1.29, minor data update, 2026-10-22; next version 'NO_UPDATES'); the ~latest alias moves with each new version, so values and the period range change over time.
+    - No SLA, quality rules, or formal uniqueness/not-null guarantees were found. Terms of reuse are in the ISTAC legal notice (full text not reviewed).
+    - CSV also carries the labels columns only in Spanish (#es); other languages (en, ca, eu, gl) are declared in the metadata but not sampled.
+  usage: Download the CSV via the ~latest alias or pin a version. Treat TERRITORIO_CODE as string. Cite ISTAC as source per
+    its legal notice.
+tags:
+- tourism
+- canary-islands
+- istac
+- sdmx
+- holiday-rental
+- monthly
+- official-statistics
+schema:
+- name: vivienda_vacacional_cube
+  logicalType: object
+  physicalType: csv
+  description: 'Long-format SDMX cube export: one row per territory x period x place interval x measure. 12 columns (labels
+    and codes per dimension, value, three attributes).'
+  properties:
+  - name: TERRITORIO#es
+    logicalType: string
+    physicalType: text
+    description: 'Label (Spanish) of the dimension TERRITORIO (Territory / Reference area; geographic dimension): Canarias,
+      islands and municipalities. 97 areas declared in the dataset metadata.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 97
+    - property: observed_unique_in_sample
+      value: false
+  - name: TERRITORIO_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension TERRITORIO. Metadata declares 97 areas: ES70 (Canarias), ES703 to ES709 (islands),
+      municipality codes and _U (unknown).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 97
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Mixes numeric-looking municipality codes and alphanumeric codes; keep as string (leading characters must not
+        be coerced).
+  - name: TIME_PERIOD#es
+    logicalType: string
+    physicalType: text
+    description: Label of the dimension TIME_PERIOD (Time period), in MM/YYYY form in the observed sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 93
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_format
+      value: MM/YYYY
+  - name: TIME_PERIOD_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the dimension TIME_PERIOD (SDMX period). Metadata declares monthly (M) and annual (A) temporal granularities
+      and coverage 01/2019 to 09/2026 (93 periods).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 93
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2019-M01
+    - property: observed_max
+      value: 2026-M09
+    - property: observed_format
+      value: YYYY-Mnn
+  - name: INTERVALOS_PLAZAS#es
+    logicalType: string
+    physicalType: text
+    description: Label of the dimension INTERVALOS_PLAZAS (Intervalos de plazas alojativas). The metadata declares a single
+      value.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Total
+  - name: INTERVALOS_PLAZAS_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension INTERVALOS_PLAZAS. Metadata declares one value: _T.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - _T
+  - name: MEDIDAS#es
+    logicalType: string
+    physicalType: text
+    description: Label of the measure dimension MEDIDAS (Indicator). Six indicators declared in the dataset metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Estancia media en la vivienda vacacional
+      - Ingresos totales
+      - Plazas disponibles
+      - Tasa de vivienda reservada
+      - Viviendas vacacionales disponibles
+      - Viviendas vacacionales reservadas
+  - name: MEDIDAS_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the measure dimension MEDIDAS. Declared: INGRESOS_TOTALES, VIVIENDAS_VACACIONALES_DISPONIBLES, VIVIENDAS_VACACIONALES_RESERVADAS,
+      PLAZAS_DISPONIBLES, ESTANCIA_MEDIA_VIVIENDA_VACACIONAL, TASA_VIVIENDA_RESERVADA.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ESTANCIA_MEDIA_VIVIENDA_VACACIONAL
+      - INGRESOS_TOTALES
+      - PLAZAS_DISPONIBLES
+      - TASA_VIVIENDA_RESERVADA
+      - VIVIENDAS_VACACIONALES_DISPONIBLES
+      - VIVIENDAS_VACACIONALES_RESERVADAS
+  - name: OBS_VALUE
+    logicalType: number
+    physicalType: text (decimal)
+    description: Not defined by the producer. Primary measure of the cube; its unit depends on MEDIDAS_CODE and units are
+      not defined in the metadata read.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17065
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 125685666.28
+    - property: note
+      value: Integer-looking for count measures (viviendas, plazas), two decimals for INGRESOS_TOTALES, TASA and ESTANCIA_MEDIA
+        in the sample.
+  - name: NOTAS_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Attribute NOTAS_OBSERVACION (Annotation), attached to the primary measure. Empty in all sample rows.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: CONFIDENCIALIDAD_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Attribute CONFIDENCIALIDAD_OBSERVACION (Confidentiality - status), attached to the primary measure. Empty
+      in all sample rows.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: ESTADO_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Attribute ESTADO_OBSERVACION (Observation status), attached to the primary measure. Empty in all sample rows.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  quality:
+  - name: observed_unique_cube_key
+    type: library
+    metric: duplicateValues
+    mustBe: 0
+    unit: rows
+    arguments:
+      properties:
+      - TERRITORIO_CODE
+      - TIME_PERIOD_CODE
+      - INTERVALOS_PLAZAS_CODE
+      - MEDIDAS_CODE
+    description: 'Observed in sample of 54126 rows on 2026-10-24 (complete cube, 97 areas x 93 periods x 6 measures x 1 interval):
+      no duplicate combinations of TERRITORIO_CODE, TIME_PERIOD_CODE, INTERVALOS_PLAZAS_CODE, MEDIDAS_CODE; not a producer
+      guarantee.'
+support:
+- channel: email
+  url: mailto:consultas.istac@gobiernodecanarias.org
+  description: ISTAC enquiries contact published in the dataset metadata (rightsHolder contact)
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00065A_000061/~latest.csv
+- property: license
+  value: Aviso Legal ISTAC (legal notice); full text not reviewed - reuse conditions unverified beyond the dataset metadata
+    pointing to it
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00065A_000061/~latest.json?fields=-data
+- property: api_documentation_url
+  value: https://www3.gobiernodecanarias.org/aplicaciones/appsistac/api
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 54126
+- property: sample_selection
+  value: Complete dataset (all rows of version 1.30, all 93 monthly periods 2019-M01 to 2026-M09); 5.9 MB, below the 25 MB
+    limit.
+- property: sample_status
+  value: ok
+- property: dataset_version
+  value: '1.30'
+- property: dataset_last_update
+  value: '2026-10-22T13:01:10.975+01:00'
+- property: statistical_operation
+  value: C00065A Encuesta de Alojamiento Turistico
+- property: official_statistic
+  value: true
+contractCreatedTs: '2026-10-24T10:49:30Z'

@@ -1,0 +1,866 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: af36dc42-ad29-52dc-9ac4-3d8b791b4458
+version: 0.1.0
+status: draft
+name: TITSA GTFS Schedule feed (Tenerife buses)
+domain: mobility
+description:
+  purpose: 'Static GTFS Schedule feed of TITSA (Transportes Interurbanos de Tenerife) published as a ZIP
+    of text files on the Cabildo de Tenerife open data portal (CKAN dataset "Información sobre el sistema
+    de transporte de TITSA en Tenerife"): stops, routes, trips, stop times, service-calendar exceptions
+    and shapes.'
+  limitations: Field definitions, types and presence rules are inherited from the GTFS Schedule reference
+    (gtfs.org); the producer publishes no data dictionary of its own, so required/primaryKey flags express
+    the GTFS reference, not a TITSA guarantee. Only columns present in the sample are declared; optional
+    GTFS fields absent from the files are not declared. The sample ZIP has no calendar.txt, feed_info.txt
+    or transfers.txt. Update periodicity, calendar validity policy and change/versioning policy are not
+    documented by the producer (CKAN metadata gives only modification dates). The original URL https://www.titsa.com/Google_transit.zip
+    could not be downloaded because its TLS certificate could not be verified; the sample comes from the
+    Cabildo de Tenerife CKAN resource and is assumed, not proven, to be identical. Coverage is TITSA only.
+    The semantics of observed value ranges (for example IDs, calendar window) are not documented. License
+    comes from CKAN metadata (cc-by); the resource itself carries no license text.
+  usage: Download the ZIP and read the GTFS files as CSV (UTF-8 with BOM). Join trips to routes by route_id,
+    stop_times to trips by trip_id and to stops by stop_id. Times in stop_times may exceed 24:00:00.
+tags:
+- gtfs
+- transport
+- tenerife
+- titsa
+- bus
+schema:
+- name: agency
+  logicalType: object
+  physicalType: GTFS file agency.txt (CSV, UTF-8 with BOM)
+  description: Transit agency (GTFS agency.txt). File is required by the GTFS reference.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 1
+  properties:
+  - name: agency_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a transit brand/agency. Conditionally required in the GTFS reference.
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 2
+    - property: observed_max
+      value: 2
+    - property: observed_values
+      value:
+      - '2'
+  - name: agency_name
+    logicalType: string
+    physicalType: text
+    description: Full name of the transit agency.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - TITSA
+  - name: agency_url
+    logicalType: string
+    physicalType: text
+    description: URL of the transit agency.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - http://www.titsa.com
+  - name: agency_timezone
+    logicalType: string
+    physicalType: text
+    description: Timezone where the agency is located.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - Atlantic/Canary
+  - name: agency_lang
+    logicalType: string
+    physicalType: text
+    description: Primary language used by the agency.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - ES
+  - name: agency_phone
+    logicalType: string
+    physicalType: text
+    description: Voice telephone number for the agency.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+- name: stops
+  logicalType: object
+  physicalType: GTFS file stops.txt (CSV, UTF-8 with BOM)
+  description: Stops where vehicles pick up or drop off riders (GTFS stops.txt).
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 3897
+  properties:
+  - name: stop_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a stop, station, entrance, generic node or boarding area. Unique ID in the
+      GTFS reference; observed values are all numeric.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3897
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1100
+    - property: observed_max
+      value: 9496
+  - name: stop_name
+    logicalType: string
+    physicalType: text
+    description: Rider-facing name of the location (conditionally required in the GTFS reference).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2103
+    - property: observed_unique_in_sample
+      value: false
+  - name: stop_lat
+    logicalType: number
+    physicalType: number
+    description: Latitude of the location, WGS84 decimal degrees (-90.0 to 90.0).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2303
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 28.0067
+    - property: observed_max
+      value: 28.5722
+  - name: stop_lon
+    logicalType: number
+    physicalType: number
+    description: Longitude of the location, WGS84 decimal degrees (-180.0 to 180.0).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2653
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -16.9198
+    - property: observed_max
+      value: -16.1544
+  - name: stop_url
+    logicalType: string
+    physicalType: text
+    description: URL of a web page about the location.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3897
+    - property: observed_unique_in_sample
+      value: true
+- name: routes
+  logicalType: object
+  physicalType: GTFS file routes.txt (CSV, UTF-8 with BOM)
+  description: Transit routes (GTFS routes.txt).
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 181
+  properties:
+  - name: route_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a route. Unique ID in the GTFS reference; observed values are all numeric.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 181
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 267
+  - name: agency_id
+    logicalType: string
+    physicalType: text
+    description: Agency for the specified route.
+    relationships:
+    - type: foreignKey
+      to: agency.agency_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2
+    - property: observed_max
+      value: 2
+    - property: observed_values
+      value:
+      - '2'
+  - name: route_short_name
+    logicalType: string
+    physicalType: text
+    description: Short name of a route (conditionally required in the GTFS reference).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 181
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 10
+    - property: observed_max
+      value: 975
+  - name: route_long_name
+    logicalType: string
+    physicalType: text
+    description: Full name of a route (conditionally required in the GTFS reference).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 180
+    - property: observed_unique_in_sample
+      value: false
+  - name: route_type
+    logicalType: integer
+    physicalType: number
+    description: Indicates the type of transportation used on a route; value 3 means bus in the GTFS reference.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 3
+    - property: observed_max
+      value: 3
+    - property: observed_values
+      value:
+      - '3'
+  - name: route_url
+    logicalType: string
+    physicalType: text
+    description: URL of a web page about the route.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 181
+    - property: observed_unique_in_sample
+      value: true
+  - name: route_color
+    logicalType: string
+    physicalType: text
+    description: 'Route color designation matching public material; six-digit hexadecimal without leading
+      #.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '163762'
+      - 3F8FCF
+      - 4F1780
+      - 5C0A8A
+      - 75AD1C
+      - 8CC8E6
+      - 8F1336
+      - FF2828
+  - name: route_text_color
+    logicalType: string
+    physicalType: text
+    description: 'Legible color to use for text drawn against route_color; six-digit hexadecimal without
+      leading #.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '000000'
+      - FFFFFF
+- name: trips
+  logicalType: object
+  physicalType: GTFS file trips.txt (CSV, UTF-8 with BOM)
+  description: Trips for each route; a trip is a sequence of two or more stops at a specific time (GTFS
+    trips.txt).
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 47091
+  properties:
+  - name: route_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a route.
+    required: true
+    relationships:
+    - type: foreignKey
+      to: routes.route_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 181
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 267
+  - name: service_id
+    logicalType: string
+    physicalType: text
+    description: Identifies the set of dates when service is available.
+    required: true
+    relationships:
+    - type: foreignKey
+      to: calendar_dates.service_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1512
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 342568
+  - name: trip_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a trip. Unique ID in the GTFS reference; observed values are all numeric.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 47091
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 11720384
+  - name: trip_headsign
+    logicalType: string
+    physicalType: text
+    description: Text that appears on signage identifying the trip destination to riders.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 178
+    - property: observed_unique_in_sample
+      value: false
+  - name: shape_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a geospatial shape describing the vehicle travel path for a trip (conditionally
+      required in the GTFS reference).
+    relationships:
+    - type: foreignKey
+      to: shapes.shape_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 856
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 3256
+- name: stop_times
+  logicalType: object
+  physicalType: GTFS file stop_times.txt (CSV, UTF-8 with BOM)
+  description: Times that a vehicle arrives at and departs from stops for each trip (GTFS stop_times.txt).
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 1325225
+  properties:
+  - name: trip_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a trip.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    relationships:
+    - type: foreignKey
+      to: trips.trip_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 47091
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 11720384
+  - name: arrival_time
+    logicalType: string
+    physicalType: text
+    description: Arrival time at the stop for a specific trip. Time type HH:MM:SS; values may exceed 24:00:00
+      for trips past midnight of the service day. Conditionally required.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 70632
+    - property: observed_unique_in_sample
+      value: false
+  - name: departure_time
+    logicalType: string
+    physicalType: text
+    description: Departure time from the stop for a specific trip. Time type HH:MM:SS; may exceed 24:00:00.
+      Conditionally required.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 70632
+    - property: observed_unique_in_sample
+      value: false
+  - name: stop_id
+    logicalType: string
+    physicalType: text
+    description: Identifies the serviced stop (conditionally required).
+    relationships:
+    - type: foreignKey
+      to: stops.stop_id
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3897
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1100
+    - property: observed_max
+      value: 9496
+  - name: stop_sequence
+    logicalType: integer
+    physicalType: number
+    description: Order of stops for a particular trip; values must increase along the trip but need not
+      be consecutive.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 2
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 91
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 91
+- name: calendar_dates
+  logicalType: object
+  physicalType: GTFS file calendar_dates.txt (CSV, UTF-8 with BOM)
+  description: Exceptions for the services defined in calendar.txt, or the full service dates when calendar.txt
+    is omitted (GTFS calendar_dates.txt). The sample contains no calendar.txt.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 25224
+  properties:
+  - name: service_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a set of dates when a service exception occurs for one or more routes.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1512
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 342568
+  - name: date
+    logicalType: date
+    physicalType: text
+    description: Date when service exception occurs, in YYYYMMDD format.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 2
+    logicalTypeOptions:
+      format: yyyyMMdd
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 181
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 20261013
+    - property: observed_max
+      value: 20270411
+  - name: exception_type
+    logicalType: integer
+    physicalType: number
+    description: 'Indicates whether service is available on the date: 1 = service added, 2 = service removed
+      (GTFS reference enum).'
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 1
+    - property: observed_values
+      value:
+      - '1'
+- name: shapes
+  logicalType: object
+  physicalType: GTFS file shapes.txt (CSV, UTF-8 with BOM)
+  description: Rules for mapping vehicle travel paths (GTFS shapes.txt).
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 775517
+  properties:
+  - name: shape_id
+    logicalType: string
+    physicalType: text
+    description: Identifies a shape.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 1
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 856
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 3256
+  - name: shape_pt_lat
+    logicalType: number
+    physicalType: number
+    description: Latitude of a shape point, WGS84 decimal degrees.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 212112
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 28.00589
+    - property: observed_max
+      value: 28.572215
+  - name: shape_pt_lon
+    logicalType: number
+    physicalType: number
+    description: Longitude of a shape point, WGS84 decimal degrees.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 230761
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -16.920117
+    - property: observed_max
+      value: -16.154318
+  - name: shape_pt_sequence
+    logicalType: integer
+    physicalType: number
+    description: Order in which shape points connect to form the shape; values increase but need not be
+      consecutive.
+    required: true
+    primaryKey: true
+    primaryKeyPosition: 2
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3715
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 3715
+  - name: shape_dist_traveled
+    logicalType: number
+    physicalType: number
+    description: Actual distance traveled along the shape from the first point to this point; must not
+      decrease with shape_pt_sequence. Units must match stop_times.txt.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 594438
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 115584.667
+customProperties:
+- property: source_url
+  value: https://datos.tenerife.es/ckan/dataset/36c2e26f-0d18-4b5a-b214-1636168e0765/resource/9f291323-8b78-453a-9008-4f0e3bfb3ce3/download/fichero-zip-de-google-transit.zip
+- property: license
+  value: CC BY (CKAN license_id cc-by, as declared in the datos.canarias.es catalogue metadata)
+- property: license_url
+  value: http://www.opendefinition.org/licenses/cc-by
+- property: documentation_url
+  value: https://gtfs.org/documentation/schedule/reference/
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: agency 1; stops 3897; routes 181; trips 47091; stop_times 1325225; calendar_dates 25224; shapes
+    775517
+- property: sample_selection
+  value: Complete ZIP as published (19.8 MB, under the 25 MB limit); all rows of every file profiled.
+    Resource Last-Modified 2026-10-21 23:00:44 GMT; CKAN notes state data date 13-10-2026 04:07.
+- property: sample_status
+  value: ok
+- property: sample_sha256
+  value: 2046a7cff27746853275bab3de4367d0404ebcd1144479ecd2a91aa6e0a02cbb
+- property: catalogue_url
+  value: https://datos.tenerife.es/datos/conjuntos-de-datos/informacion-sobre-el-sistema-de-transporte-de-titsa-en-tenerife
+contractCreatedTs: '2026-10-24T14:59:27Z'

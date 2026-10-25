@@ -1,0 +1,732 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 95c4060a-6854-542f-a58d-b24b2e6582eb
+version: 0.1.0
+status: draft
+name: Cabildo de Tenerife - Agro-meteorological API (stations, 10-minute readings, daily summaries)
+domain: weather
+description:
+  purpose: Stations, sensors and meteorological readings (temperature, humidity, rain, wind, solar radiation) published
+    by the Cabildo Insular de Tenerife through its open data API (OpenAPI 3.0.2, version 2.0.0, path /latest/).
+  limitations: 'The OpenAPI schemas do not match the observed responses: responses are nested (stations; readings.sensors[].values[];
+    summarized.sensors[].dates[].values[]) and field names differ (municipality vs municipality_id/municipality_name;
+    mean_value/min_value/max_value/date vs mean/min/max/total/observation_date). Fields documented but not observed
+    are declared as documented. No per-field descriptions or units in the OpenAPI (titles only); units come from
+    the sensor catalogue returned by the API itself (/measures: TEMP ºC, HUM %, RAIN mm, WSP m/s, WDR deg., RAD
+    W/m2). Time zone of dates not documented (observed timestamps carry no offset). Coordinate reference system
+    of x_cords/y_cords and the unit of altitude are not documented. Validation criteria for validated_value and
+    is_visual_validated are not documented; update latency not documented; 429 is documented but the rate limit
+    is not quantified (no 429 was received). Pagination: 10 days per page (documented in the parameter description).
+    The OpenAPI license field points to a user manual PDF that could not be read as text; no licence text was verified
+    (the catalogue registry mentions CC BY for the sensors dataset, unverified here). Endpoint /measures/instruments
+    and /stations/{id}/sensors were not modelled as entities. Sample coverage: all 68 stations; readings only for
+    station 1 sensor 282 (temperature) in two windows (2019-01-01..2019-01-10 and 2026-10-01..2026-10-10; the requested
+    2026-10-01..2026-10-23 window returned only page 1 = 10 days); daily summaries only for station 1, year 2025
+    (5 sensors). In the summary the empty-string convention for not-applicable statistics is observed, not documented.'
+  usage: Raw landing of JSON responses; flatten nested sensors/values arrays to one row per sensor and timestamp
+    or date; join readings to stations via id_weatherstation and to the sensor catalogue via id_weatherstationsensor.
+tags:
+- weather
+- tenerife
+- stations
+- api
+- json
+- openapi
+schema:
+- name: weather_station
+  logicalType: object
+  physicalType: json
+  description: 'Station catalogue from GET /stations; response envelope {"stations": [ ... ]}, one element per agro-meteorological
+    station.'
+  properties:
+  - name: id_weatherstation
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 215.0
+    - property: documented_constraint
+      value: required and primary_key in the OpenAPI schema WeatherStation
+    primaryKey: true
+    primaryKeyPosition: 1
+    required: true
+  - name: name
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68
+    - property: observed_unique_in_sample
+      value: true
+  - name: date_install
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 56
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '1996-08-16T00:00:00'
+    - property: observed_max
+      value: '2026-07-17T16:00:00'
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM:SS without offset
+  - name: date_uninstall
+    logicalType: timestamp
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_note
+      value: Empty string in all 68 rows
+  - name: province
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Not present in the stations response sample
+  - name: municipality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Not present in the stations response sample; the sample has municipality_id and municipality_name instead
+  - name: municipality_id
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 28
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 38001.0
+    - property: observed_max
+      value: 38052.0
+  - name: municipality_name
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 28
+    - property: observed_unique_in_sample
+      value: false
+  - name: locality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 50
+    - property: observed_unique_in_sample
+      value: false
+  - name: place
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 13.235
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: true
+  - name: latitude
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_note
+      value: JSON strings holding decimal numbers; observed range 28.0406074763221 to 28.5599059971053; CRS and
+        unit not defined (degrees NOT VERIFIED)
+  - name: longitude
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 68
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_note
+      value: JSON strings holding decimal numbers; observed range -16.877 to -16.157322322606888; CRS and unit not
+        defined (degrees NOT VERIFIED)
+  - name: x_cords
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.176
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 316006.0
+    - property: observed_max
+      value: 386769.0
+    - property: observed_note
+      value: Projected coordinate; CRS not defined by the producer (NOT VERIFIED)
+  - name: y_cords
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.176
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 3102802.0
+    - property: observed_max
+      value: 3159844.0
+    - property: observed_note
+      value: Projected coordinate; CRS not defined by the producer (NOT VERIFIED)
+  - name: altitude
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 66
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 17.0
+    - property: observed_max
+      value: 2071.0
+    - property: observed_note
+      value: Unit not defined by the producer (metres NOT VERIFIED)
+  - name: datalogger_type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Campbell CR1000X estación
+      - DL15 estacion
+      - DLx estacion
+      - iMetos estación
+  - name: sensors_count
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 6.0
+    - property: observed_values
+      value:
+      - '2'
+      - '5'
+      - '6'
+    - property: documented_in
+      value: OpenAPI schema WeatherStationSensors (also returned by /stations in the sample)
+  quality:
+  - type: text
+    name: observed_unique_station_id
+    dimension: uniqueness
+    description: 'Observed in sample of 68 rows on 2026-10-24: id_weatherstation unique; the producer declares it
+      primary key'
+- name: reading_10min
+  logicalType: object
+  physicalType: json
+  description: 'Ten-minute readings of one sensor from GET /readings/station/{id}/sensor/{id}/from/{dateFrom}/to/{dateTo}/{page}.
+    Observed nesting: readings.sensors[].values[]; flattened here to one row per reading.'
+  properties:
+  - name: id_weatherstation
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1'
+    - property: response_path
+      value: readings.id_weatherstation
+    - property: documented_constraint
+      value: required and primary_key in the OpenAPI schema Readings
+    primaryKey: true
+    primaryKeyPosition: 1
+    required: true
+  - name: id_weatherstationsensor
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 282.0
+    - property: observed_max
+      value: 282.0
+    - property: observed_values
+      value:
+      - '282'
+    - property: response_path
+      value: readings.sensors[].id_weatherstationsensor
+    - property: documented_constraint
+      value: required and primary_key in the OpenAPI schema Readings
+    primaryKey: true
+    primaryKeyPosition: 2
+    required: true
+  - name: observation_date
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2737
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: '2019-01-01T00:00:00'
+    - property: observed_max
+      value: '2026-10-10T23:50:00'
+    - property: response_path
+      value: readings.sensors[].values[]
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM:SS without offset; time zone not documented
+    - property: observed_step
+      value: 10 minutes
+    - property: observed_unique_with_station_and_sensor
+      value: true
+  - name: observation_value
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 126
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 14.6
+    - property: observed_max
+      value: 27.5
+    - property: response_path
+      value: readings.sensors[].values[]
+    - property: unit_note
+      value: 'Unit given by Sensor.unit (sample: sensor 282 TEMP, unit ºC as returned by the stations/sensors endpoint)'
+  - name: validated_value
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 126
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 14.6
+    - property: observed_max
+      value: 27.5
+    - property: response_path
+      value: readings.sensors[].values[]
+    - property: unit_note
+      value: Same unit as observation_value; validation criteria not documented
+  - name: is_visual_validated
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'True'
+    - property: response_path
+      value: readings.sensors[].values[]
+  quality:
+  - type: text
+    name: observed_unique_reading_key
+    dimension: uniqueness
+    description: 'Observed in sample of 2737 rows on 2026-10-24: (id_weatherstation, id_weatherstationsensor, observation_date)
+      unique; not a producer guarantee'
+- name: reading_daily_summary
+  logicalType: object
+  physicalType: json
+  description: 'Daily summary of all sensors of a station for one year from GET /readings/summarized/station/{id}/year/{year}.
+    Observed nesting: summarized.sensors[].dates[].values[] (one element per date); flattened here to one row per
+    sensor and date.'
+  properties:
+  - name: id_weatherstation
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1'
+    - property: response_path
+      value: summarized.id_weatherstation
+    - property: documented_constraint
+      value: required and primary_key in the OpenAPI schema Summarized
+    primaryKey: true
+    primaryKeyPosition: 1
+    required: true
+  - name: id_weatherstationsensor
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 280.0
+    - property: observed_max
+      value: 288.0
+    - property: observed_values
+      value:
+      - '280'
+      - '282'
+      - '283'
+      - '285'
+      - '288'
+    - property: response_path
+      value: summarized.sensors[].id_weatherstationsensor
+    - property: documented_constraint
+      value: required and primary_key in the OpenAPI schema Summarized
+    primaryKey: true
+    primaryKeyPosition: 2
+    required: true
+  - name: observation_date
+    logicalType: date
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 365
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2025-01-01'
+    - property: observed_max
+      value: '2025-12-31'
+    - property: response_path
+      value: summarized.sensors[].dates[].observation_date
+    - property: observed_format
+      value: YYYY-MM-DD
+    - property: documented_counterpart
+      value: OpenAPI Summarized.date (date-time); the observed response uses observation_date
+  - name: is_validated
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+    - property: response_path
+      value: summarized.sensors[].dates[].is_validated
+  - name: mean
+    logicalType: number
+    physicalType: number or empty string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 40.0
+    - property: observed_distinct
+      value: 1079
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.8888889
+    - property: observed_max
+      value: 92.385414
+    - property: response_path
+      value: summarized.sensors[].dates[].values[].mean
+    - property: documented_counterpart
+      value: OpenAPI Summarized.mean_value
+    - property: observed_note
+      value: Empty string when not applicable (e.g. rain, radiation sensors)
+  - name: min
+    logicalType: number
+    physicalType: number or empty string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 40.0
+    - property: observed_distinct
+      value: 366
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 87.2
+    - property: response_path
+      value: summarized.sensors[].dates[].values[].min
+    - property: documented_counterpart
+      value: OpenAPI Summarized.min_value
+    - property: observed_note
+      value: Empty string when not applicable
+  - name: max
+    logicalType: number
+    physicalType: number or empty string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 20.0
+    - property: observed_distinct
+      value: 535
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.1
+    - property: observed_max
+      value: 1706.0
+    - property: response_path
+      value: summarized.sensors[].dates[].values[].max
+    - property: documented_counterpart
+      value: OpenAPI Summarized.max_value
+    - property: observed_note
+      value: Empty string when not applicable
+  - name: total
+    logicalType: number
+    physicalType: number or empty string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 60.0
+    - property: observed_distinct
+      value: 385
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 52275.0
+    - property: response_path
+      value: summarized.sensors[].dates[].values[].total
+    - property: observed_note
+      value: Empty string when not applicable
+  - name: date
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Documented name in OpenAPI Summarized; not present in the observed response (observation_date is used)
+  - name: max_value
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Documented name; not present in the observed response (max is used)
+  - name: mean_value
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Documented name; not present in the observed response (mean is used)
+  - name: min_value
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_note
+      value: Documented name; not present in the observed response (min is used)
+  quality:
+  - type: text
+    name: observed_unique_summary_key
+    dimension: uniqueness
+    description: 'Observed in sample of 1825 rows on 2026-10-24: (id_weatherstation, id_weatherstationsensor, observation_date)
+      unique; not a producer guarantee'
+customProperties:
+- property: source_url
+  value: https://datos.tenerife.es/api/meteo/latest/
+- property: license
+  value: 'unverified: the OpenAPI license field is named ''Manual de usuario'' and points to a PDF that was not
+    read'
+- property: license_url
+  value: https://datos.tenerife.es/images/documentacion/Manual_de_usuario_API_datos_meteorologicos.pdf
+- property: documentation_url
+  value: https://datos.tenerife.es/api/meteo/latest/openapi.json
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 4630
+- property: sample_selection
+  value: 'stations: all 68; readings: station 1, sensor 282, page 1 of 2026-10-01..2026-10-23 (10 days) plus page
+    1 of 2019-01-01..2019-01-10; summarized: station 1, year 2025'
+- property: sample_status
+  value: partial
+contractCreatedTs: '2026-10-24T11:00:00Z'

@@ -1,0 +1,4258 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 19d51ee8-6697-5589-9bf9-9224d761afac
+version: 0.1.0
+status: draft
+name: GBIF Occurrence search API (Canary Islands bounding box)
+domain: environment
+description:
+  purpose: 'GBIF Occurrence API v1 /occurrence/search: species occurrence records (observations, specimens) with taxonomy,
+    coordinates, event date, publisher and licence, aggregated by GBIF from many datasets. The sample queries a Canary Islands
+    bounding box (country=ES, lat 27 to 29.5, lon -18.5 to -13). Response: paging envelope (offset, limit, endOfRecords, count,
+    results, facets) with Occurrence objects.'
+  limitations: |-
+    - Sample is 2,400 records (300 per selected year, first page in default order), not a random or complete extract; the box query matched about 1.7 million records overall when first checked and per-year counts are listed in sample_selection.
+    - Months 1 to 4 only appear in the sample because of the per-year first-page selection; geographic and taxonomic mix is not representative.
+    - Rate limits: GBIF states search may return HTTP 429 and the maximum rate varies with load; no fixed rate documented. Maximum offset+limit (deep paging) not documented in the pages read; long extractions should use the download API (requires a GBIF account, not used).
+    - Licence is per record (CC0, CC BY, CC BY-NC observed); the sample contains CC BY-NC records, which restricts commercial reuse.
+    - Properties documented in the OpenAPI Occurrence schema but absent from the 2,400 sample records are declared with evidence 'documented'.
+    - 107 properties appear in the sample but not in the OpenAPI schema (publisher verbatim terms and keys such as http://unknown.org/...); their meaning is not defined by GBIF.
+    - Records may contain personal names (recordedBy, identifiedBy, ORCID iDs); examples are deliberately omitted from this contract.
+    - No SLA, update schedule or quality thresholds are published; the 'issues' flags are the only per-record quality signal and the full enumeration was not extracted here.
+    - Required-ness is taken from the OpenAPI 'required' list of the response schema; some required properties are empty objects/arrays in the sample (e.g. gadm '{}' for some records).
+  usage: Page with limit<=300 and offset, one request at a time, with an identifiable User-Agent; use year/country/geometry
+    filters to slice. Respect each record's licence and cite dataset DOIs/keys; use the asynchronous download API (account
+    required) for large extractions.
+tags:
+- biodiversity
+- species
+- gbif
+- darwin-core
+- canary-islands
+- json-api
+- occurrences
+schema:
+- name: occurrence
+  logicalType: object
+  physicalType: json
+  description: Occurrence object (element of results[] in the search response). One record per occurrence; 'key' is the GBIF
+    occurrence key.
+  properties:
+  - name: key
+    logicalType: integer
+    physicalType: integer (int64)
+    description: Unique GBIF key for the occurrence. We aim to keep these keys stable, but this is not possible in every case.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2400
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 71384.0
+    - property: observed_max
+      value: 6592702306.0
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+  - name: datasetKey
+    logicalType: string
+    physicalType: string (uuid)
+    description: The UUID of the GBIF dataset containing this occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 91
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+  - name: publishingOrgKey
+    logicalType: string
+    physicalType: string (uuid)
+    description: The UUID of the organization which publishes the dataset containing this occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 76
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+  - name: networkKeys
+    logicalType: array
+    physicalType: array
+    description: Any networks to which the dataset containing this occurrence is registered.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 87.0
+    - property: observed_distinct
+      value: 16
+    - property: observed_unique_in_sample
+      value: false
+  - name: datasetCategory
+    logicalType: array
+    physicalType: array
+    description: Categories assigned to the dataset containing this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 53.125
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: installationKey
+    logicalType: string
+    physicalType: string (uuid)
+    description: The UUID of the technical installation hosted the dataset containing this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 41
+    - property: observed_unique_in_sample
+      value: false
+  - name: hostingOrganizationKey
+    logicalType: string
+    physicalType: string (uuid)
+    description: The UUID of the publishing organization which operates the technical installation hosting the dataset containing
+      this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 37
+    - property: observed_unique_in_sample
+      value: false
+  - name: publishingCountry
+    logicalType: string
+    physicalType: string
+    description: The country, territory or island based on ISO-3166 of the organization publishing the dataset containing
+      this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 21
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - AT
+      - AU
+      - BE
+      - BG
+      - CA
+      - CH
+      - CO
+      - CZ
+      - DE
+      - ES
+      - FI
+      - FR
+      - GB
+      - LT
+      - MX
+      - NL
+      - 'NO'
+      - NZ
+      - SE
+      - US
+      - ZZ
+    - property: documented_enum_size
+      value: 253
+  - name: protocol
+    logicalType: string
+    physicalType: string
+    description: The technical protocol by which this occurrence was retrieved from the publisher's systems.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - BIOCASE
+      - BIOCASE_XML_ARCHIVE
+      - DWC_ARCHIVE
+      - EML
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: documented_enum_size
+      value: 21
+    quality:
+    - name: protocol_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - EML
+        - FEED
+        - WFS
+        - WMS
+        - TCS_RDF
+        - TCS_XML
+        - DWC_ARCHIVE
+        - DIGIR
+        - DIGIR_MANIS
+        - TAPIR
+        - BIOCASE
+        - BIOCASE_XML_ARCHIVE
+        - OAI_PMH
+        - COLDP
+        - CAMTRAP_DP
+        - DWC_DP
+        - BIOM_1_0
+        - BIOM_2_1
+        - ACEF
+        - TEXT_TREE
+        - OTHER
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: lastCrawled
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: The time this occurrence was last retrieved from the publisher's systems.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 91
+    - property: observed_unique_in_sample
+      value: false
+  - name: lastParsed
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: The time this occurrence was last processed by GBIF's interpretation system “Pipelines”. This is the time
+      the record was last changed in GBIF, not the time the record was last changed by the publisher.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2290
+    - property: observed_unique_in_sample
+      value: false
+  - name: crawlId
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The sequence number of the attempt by GBIF to download (”crawl”), interpret and index the dataset to which
+      this occurrence belongs.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 84
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 2540.0
+  - name: projectId
+    logicalType: string
+    physicalType: string
+    description: The identifier for a project, often assigned by a funded programme.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 90.875
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: false
+  - name: programmeAcronym
+    logicalType: string
+    physicalType: string
+    description: The identifier for a programme which funded the digitization of this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - CESP
+  - name: extensions
+    logicalType: object
+    physicalType: object
+    description: The verbatim Darwin Core Archive extension fields for this occurrence. The main key is the record class term
+      (the row type in Darwin Core Archive), within that are values with extension terms as keys.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 869
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: basisOfRecord
+    logicalType: string
+    physicalType: string
+    description: The values of the Darwin Core term Basis of Record which can apply to occurrences. See GBIF's Darwin Core
+      Type Vocabulary for definitions.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - HUMAN_OBSERVATION
+      - LIVING_SPECIMEN
+      - MACHINE_OBSERVATION
+      - MATERIAL_CITATION
+      - MATERIAL_SAMPLE
+      - OCCURRENCE
+      - PRESERVED_SPECIMEN
+    - property: documented_enum_size
+      value: 11
+    quality:
+    - name: basisOfRecord_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - PRESERVED_SPECIMEN
+        - FOSSIL_SPECIMEN
+        - LIVING_SPECIMEN
+        - OBSERVATION
+        - HUMAN_OBSERVATION
+        - MACHINE_OBSERVATION
+        - MATERIAL_SAMPLE
+        - LITERATURE
+        - MATERIAL_CITATION
+        - OCCURRENCE
+        - UNKNOWN
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: individualCount
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The number of individuals present at the time of the Occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 64.333
+    - property: observed_distinct
+      value: 37
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 100.0
+  - name: occurrenceStatus
+    logicalType: string
+    physicalType: string
+    description: A statement about the presence or absence of a Taxon at a Location. For definitions, see the GBIF occurrence
+      status vocabulary.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - PRESENT
+    - property: documented_enum_size
+      value: 2
+    quality:
+    - name: occurrenceStatus_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - PRESENT
+        - ABSENT
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: sex
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.25
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Female
+      - Indeterminate
+      - Male
+  - name: lifeStage
+    logicalType: string
+    physicalType: string
+    description: The age class or life stage of the Organism(s) at the time the Occurrence was recorded. Values are aligned
+      to the GBIF LifeStage vocabulary
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 83.5
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Adult
+      - Caterpillar
+      - Flowering
+      - Imago
+      - Immature
+      - Juvenile
+      - Larva
+      - Nymph
+      - Subadult
+      - Unknown
+  - name: establishmentMeans
+    logicalType: string
+    physicalType: string
+    description: Statement about whether an organism or organisms have been introduced to a given place and time through the
+      direct or indirect activity of modern humans.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 88.333
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - native
+  - name: degreeOfEstablishment
+    logicalType: string
+    physicalType: string
+    description: The degree to which an Organism survives, reproduces, and expands its range at the given place and time.
+      Values are aligned to the GBIF DegreeOfEstablishment vocabulary, which is derived from the Darwin Core DegreeOfEstablishment
+      vocabulary.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: pathway
+    logicalType: string
+    physicalType: string
+    description: The process by which an Organism came to be in a given place at a given time. Values are aligned to the GBIF
+      Pathway vocabulary, which is derived from the Darwin Core Pathway vocabulary.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: classifications
+    logicalType: object
+    physicalType: object
+    description: The map of classifications associated with this occurrence keyed by checklistKey.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 1020
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: taxonKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the most specific (lowest rank) taxon for this occurrence. This could
+      be a synonym, see `acceptedTaxonKey`.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 814
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5.0
+    - property: observed_max
+      value: 12225089.0
+    - property: deprecated_per_producer
+      value: true
+  - name: kingdomKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the kingdom of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 7.0
+    - property: deprecated_per_producer
+      value: true
+  - name: phylumKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the phylum of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.5
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 9.0
+    - property: observed_max
+      value: 8376456.0
+    - property: deprecated_per_producer
+      value: true
+  - name: classKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the class of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.917
+    - property: observed_distinct
+      value: 41
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 121.0
+    - property: observed_max
+      value: 11592253.0
+    - property: deprecated_per_producer
+      value: true
+  - name: orderKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the order of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 4.125
+    - property: observed_distinct
+      value: 136
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 376.0
+    - property: observed_max
+      value: 11195093.0
+    - property: deprecated_per_producer
+      value: true
+  - name: familyKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the family of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 2.5
+    - property: observed_distinct
+      value: 318
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2176.0
+    - property: observed_max
+      value: 12196754.0
+    - property: deprecated_per_producer
+      value: true
+  - name: genusKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the genus of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.917
+    - property: observed_distinct
+      value: 572
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1012257.0
+    - property: observed_max
+      value: 12248513.0
+    - property: deprecated_per_producer
+      value: true
+  - name: subgenusKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the subgenus of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: deprecated_per_producer
+      value: true
+  - name: speciesKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the species of thisoccurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 9.542
+    - property: observed_distinct
+      value: 700
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1048549.0
+    - property: observed_max
+      value: 12257222.0
+    - property: deprecated_per_producer
+      value: true
+  - name: acceptedTaxonKey
+    logicalType: integer
+    physicalType: integer (int32)
+    description: A taxon key from the GBIF backbone for the accepted taxon of this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 788
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5.0
+    - property: observed_max
+      value: 12257222.0
+    - property: deprecated_per_producer
+      value: true
+  - name: scientificName
+    logicalType: string
+    physicalType: string
+    description: The scientific name (including authorship) for the taxon from the GBIF backbone matched to this occurrence.
+      This could be a synonym, see also `acceptedScientificName`.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 814
+    - property: observed_unique_in_sample
+      value: false
+  - name: scientificNameAuthorship
+    logicalType: string
+    physicalType: string
+    description: The scientific name authorship for the taxon from the GBIF backbone matched to this occurrence. This could
+      be a synonym, see also `acceptedScientificName`.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.375
+    - property: observed_distinct
+      value: 550
+    - property: observed_unique_in_sample
+      value: false
+  - name: acceptedScientificName
+    logicalType: string
+    physicalType: string
+    description: The accepted scientific name (including authorship) for the taxon from the GBIF backbone matched to this
+      occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 788
+    - property: observed_unique_in_sample
+      value: false
+  - name: kingdom
+    logicalType: string
+    physicalType: string
+    description: The kingdom name (excluding authorship) for the kingdom from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Animalia
+      - Chromista
+      - Fungi
+      - Plantae
+      - Protozoa
+  - name: phylum
+    logicalType: string
+    physicalType: string
+    description: The phylum name (excluding authorship) for the phylum from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.5
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+  - name: order
+    logicalType: string
+    physicalType: string
+    description: The order name (excluding authorship) for the order from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 4.125
+    - property: observed_distinct
+      value: 136
+    - property: observed_unique_in_sample
+      value: false
+  - name: family
+    logicalType: string
+    physicalType: string
+    description: The family name (excluding authorship) for the family from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 2.5
+    - property: observed_distinct
+      value: 318
+    - property: observed_unique_in_sample
+      value: false
+  - name: genus
+    logicalType: string
+    physicalType: string
+    description: The genus name (excluding authorship) for the genus from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.917
+    - property: observed_distinct
+      value: 571
+    - property: observed_unique_in_sample
+      value: false
+  - name: subgenus
+    logicalType: string
+    physicalType: string
+    description: The subgenus name (excluding authorship) for the subgenus from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: species
+    logicalType: string
+    physicalType: string
+    description: The species name (excluding authorship) for the species from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 9.542
+    - property: observed_distinct
+      value: 700
+    - property: observed_unique_in_sample
+      value: false
+  - name: genericName
+    logicalType: string
+    physicalType: string
+    description: The genus name part of the species name from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 10.208
+    - property: observed_distinct
+      value: 541
+    - property: observed_unique_in_sample
+      value: false
+  - name: specificEpithet
+    logicalType: string
+    physicalType: string
+    description: The specific name part of the species name from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 10.208
+    - property: observed_distinct
+      value: 627
+    - property: observed_unique_in_sample
+      value: false
+  - name: infraspecificEpithet
+    logicalType: string
+    physicalType: string
+    description: The infraspecific name part of the species name from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.625
+    - property: observed_distinct
+      value: 42
+    - property: observed_unique_in_sample
+      value: false
+  - name: taxonRank
+    logicalType: string
+    physicalType: string
+    description: The taxonomic rank of the most specific name in the scientificName.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - FAMILY
+      - FORM
+      - GENUS
+      - KINGDOM
+      - ORDER
+      - SPECIES
+      - SUBSPECIES
+      - UNRANKED
+      - VARIETY
+    - property: documented_enum_size
+      value: 75
+  - name: taxonomicStatus
+    logicalType: string
+    physicalType: string
+    description: The status of the use of the scientificName as a label for a taxon.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.125
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ACCEPTED
+      - PROVISIONALLY_ACCEPTED
+      - SYNONYM
+    - property: documented_enum_size
+      value: 9
+    quality:
+    - name: taxonomicStatus_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - ACCEPTED
+        - DOUBTFUL
+        - SYNONYM
+        - HETEROTYPIC_SYNONYM
+        - HOMOTYPIC_SYNONYM
+        - PROPARTE_SYNONYM
+        - MISAPPLIED
+        - AMBIGUOUS_SYNONYM
+        - PROVISIONALLY_ACCEPTED
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: iucnRedListCategory
+    logicalType: string
+    physicalType: string
+    description: The IUCN Red List Category of the taxon of this occurrence. See the GBIF vocabulary for the values and their
+      definitions, and the IUCN Red List of Threatened Species dataset in GBIF for the version of the Red List GBIF's interpretation
+      procedures are using.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 56.125
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - CR
+      - DD
+      - EN
+      - LC
+      - NT
+      - VU
+  - name: dateIdentified
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: The date on which the subject was determined as representing the Taxon.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 72.333
+    - property: observed_distinct
+      value: 577
+    - property: observed_unique_in_sample
+      value: false
+  - name: decimalLatitude
+    logicalType: number
+    physicalType: number (double)
+    description: The geographic latitude (in decimal degrees, using the WGS84 datum) of the geographic centre of the location
+      of the occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1195
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 27.0083
+    - property: observed_max
+      value: 29.2476
+  - name: decimalLongitude
+    logicalType: number
+    physicalType: number (double)
+    description: The geographic longitude (in decimal degrees, using the WGS84 datum) of the geographic centre of the location
+      of the occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1221
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -18.155556
+    - property: observed_max
+      value: -13.25045
+  - name: coordinatePrecision
+    logicalType: number
+    physicalType: number (double)
+    description: A decimal representation of the precision of the coordinates given in the decimalLatitude and decimalLongitude.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 97.417
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.08919
+  - name: coordinateUncertaintyInMeters
+    logicalType: number
+    physicalType: number (double)
+    description: The horizontal distance (in metres) from the given decimalLatitude and decimalLongitude describing the smallest
+      circle containing the whole of the Location.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 60.292
+    - property: observed_distinct
+      value: 198
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.11
+    - property: observed_max
+      value: 999999.0
+  - name: coordinateAccuracy
+    logicalType: number
+    physicalType: number (double)
+    description: Deprecated. This value is always null. It is an obsolete Darwin Core term.
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: deprecated_per_producer
+      value: true
+  - name: elevation
+    logicalType: number
+    physicalType: number (double)
+    description: Elevation (altitude) in metres above sea level. This is not a current Darwin Core term.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 87.625
+    - property: observed_distinct
+      value: 44
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 2250.0
+  - name: elevationAccuracy
+    logicalType: number
+    physicalType: number (double)
+    description: The value of the potential error associated with the elevation. This is not a current Darwin Core term.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 92.875
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 50.0
+  - name: depth
+    logicalType: number
+    physicalType: number (double)
+    description: Depth in metres below sea level. This is not a current Darwin Core term.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.333
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+  - name: depthAccuracy
+    logicalType: number
+    physicalType: number (double)
+    description: The value of the potential error associated with the depth. This is not a current Darwin Core term.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.333
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+  - name: continent
+    logicalType: string
+    physicalType: string
+    description: The continent, based on a 7 continent model described on Wikipedia and the World Geographical Scheme for
+      Recording Plant Distributions (WGSRPD).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 6.125
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - AFRICA
+      - EUROPE
+    - property: documented_enum_size
+      value: 7
+    quality:
+    - name: continent_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - AFRICA
+        - ANTARCTICA
+        - ASIA
+        - OCEANIA
+        - EUROPE
+        - NORTH_AMERICA
+        - SOUTH_AMERICA
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: stateProvince
+    logicalType: string
+    physicalType: string
+    description: The name of the next-smaller administrative region than country (state, province, canton, department, region,
+      etc.) in which the occurrence occurs. This value is unaltered by GBIF's processing; see also the GADM fields.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 14.0
+    - property: observed_distinct
+      value: 29
+    - property: observed_unique_in_sample
+      value: false
+  - name: gadm
+    logicalType: string
+    physicalType: string
+    description: The administrative divisions according to the GADM database. This value is applied by GBIF's processing without
+      consideration of the `stateProvince`, `county` or `locality` fields.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: waterBody
+    logicalType: string
+    physicalType: string
+    description: The name of the water body in which the Location occurs.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.792
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Atlanic ; Atlantic Ocean
+      - Atlantic Ocean
+      - Mediterranean,Italy,cetacean distribution
+  - name: distanceFromCentroidInMeters
+    logicalType: number
+    physicalType: number (double)
+    description: The distance in metres of the occurrence from a centroid known to be applied to occurrences during georeferencing.
+      This can potentially indicate low-precision georeferencing, check the values of `coordinateUncertaintyInMeters` and
+      `georeferenceRemarks`.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: higherGeography
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of geographic names less specific than the information captured in the
+      dwc:locality term.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 87.583
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+  - name: georeferencedBy
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of names of people, groups, or organizations who determined the georeference
+      (spatial representation) for the dcterms:Location.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 95.75
+    - property: observed_distinct
+      value: 21
+    - property: observed_unique_in_sample
+      value: false
+  - name: year
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The four-digit year in which the event occurred, according to the Common Era calendar.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1980.0
+    - property: observed_max
+      value: 2026.0
+  - name: month
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The integer month in which the Event occurred.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 4.0
+  - name: day
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The integer day of the month on which the Event occurred.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.958
+    - property: observed_distinct
+      value: 31
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 31.0
+  - name: eventDate
+    logicalType: string
+    physicalType: string (type not declared in OpenAPI; observed ISO 8601 date or date-time, sometimes intervals)
+    description: The date-time during which an Event occurred. For occurrences, this is the date-time when the event was recorded.
+      Not suitable for a time in a geological context.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 758
+    - property: observed_unique_in_sample
+      value: false
+  - name: startDayOfYear
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The latest integer day of the year on which the Event occurred (1 for 1 January, 365 for 31 December, except
+      in a leap year, in which case it is 366).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.75
+    - property: observed_distinct
+      value: 80
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 121.0
+  - name: endDayOfYear
+    logicalType: integer
+    physicalType: integer (int32)
+    description: The earliest integer day of the year on which the Event occurred (1 for 1 January, 365 for 31 December, except
+      in a leap year, in which case it is 366).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.75
+    - property: observed_distinct
+      value: 80
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 121.0
+  - name: typeStatus
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of nomenclatural types (type status, typified scientific name, publication)
+      applied to the occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.542
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Isotype
+      - NotAType
+      - Topotype
+  - name: typifiedName
+    logicalType: string
+    physicalType: string
+    description: The scientific name that is based on the type specimen. This is not yet a Darwin Core term, see the proposal
+      to add it.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - Cladonia microphylla Ahti & Aptroot
+      - Fulgensia canariensis Follmann & Poelt
+  - name: issues
+    logicalType: array
+    physicalType: array
+    description: A specific interpretation issue found during processing and interpretation of the record.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 123
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: modified
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: The most recent date-time on which the occurrence was changed, according to the publisher.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 36.708
+    - property: observed_distinct
+      value: 710
+    - property: observed_unique_in_sample
+      value: false
+  - name: lastInterpreted
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: The time this occurrence was last processed by GBIF's interpretation system “Pipelines”. This is the time
+      the record was last changed in GBIF, not the time the record was last changed by the publisher.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2290
+    - property: observed_unique_in_sample
+      value: false
+  - name: references
+    logicalType: string
+    physicalType: string (uri)
+    description: A related resource that is referenced, cited, or otherwise pointed to by the described resource.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 66.833
+    - property: observed_distinct
+      value: 790
+    - property: observed_unique_in_sample
+      value: false
+  - name: license
+    logicalType: string
+    physicalType: string
+    description: A legal document giving official permission to do something with the occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - http://creativecommons.org/licenses/by-nc/4.0/legalcode
+      - http://creativecommons.org/licenses/by/4.0/legalcode
+      - http://creativecommons.org/publicdomain/zero/1.0/legalcode
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: documented_enum_size
+      value: 5
+    quality:
+    - name: license_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - CC0_1_0
+        - CC_BY_4_0
+        - CC_BY_NC_4_0
+        - UNSPECIFIED
+        - UNSUPPORTED
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: organismQuantity
+    logicalType: number
+    physicalType: number (double)
+    description: A number or enumeration value for the quantity of organisms.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 93.833
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.1
+    - property: observed_max
+      value: 52.8
+  - name: organismQuantityType
+    logicalType: string
+    physicalType: string
+    description: The type of quantification system used for the quantity of organisms.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 93.708
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Individuals
+      - SpecimensInContainer
+      - individuals
+      - percentage
+  - name: sampleSizeUnit
+    logicalType: string
+    physicalType: string
+    description: The unit of measurement of the size (time duration, length, area, or volume) of a sample in a sampling event.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: sampleSizeValue
+    logicalType: number
+    physicalType: number (double)
+    description: A numeric value for a measurement of the size (time duration, length, area, or volume) of a sample in a sampling
+      event.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: relativeOrganismQuantity
+    logicalType: number
+    physicalType: number (double)
+    description: The relative measurement of the quantity of the organism (i.e. without absolute units).
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: isSequenced
+    logicalType: boolean
+    physicalType: boolean
+    description: Flag occurrence when associatedSequences/extension exists
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+  - name: associatedSequences
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of identifiers (publication, global unique identifier, URI) of genetic
+      sequence information associated with the material entity.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.875
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: true
+  - name: identifiers
+    logicalType: array
+    physicalType: array
+    description: Alternative identifiers for the occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2399
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: media
+    logicalType: array
+    physicalType: array
+    description: Multimedia related to te occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 816
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: facts
+    logicalType: array
+    physicalType: array
+    description: Measurements or facts about the the occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: relations
+    logicalType: array
+    physicalType: array
+    description: Relationships between occurrences.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: institutionKey
+    logicalType: string
+    physicalType: string
+    description: Experimental. The UUID of the institution holding the specimen occurrence, from GRSciColl.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 84.042
+    - property: observed_distinct
+      value: 52
+    - property: observed_unique_in_sample
+      value: false
+  - name: collectionKey
+    logicalType: string
+    physicalType: string
+    description: Experimental. The UUID of the collection containing the specimen occurrence, from GRSciColl.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 89.792
+    - property: observed_distinct
+      value: 36
+    - property: observed_unique_in_sample
+      value: false
+  - name: isInCluster
+    logicalType: boolean
+    physicalType: boolean
+    description: Experimental. Whether the occurrence belongs to a machine-calculated cluster of probable duplicate occurrences.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+  - name: datasetID
+    logicalType: string
+    physicalType: string
+    description: An identifier for the set of data. May be a global unique identifier or an identifier specific to a collection
+      or institution.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 92.5
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+  - name: datasetName
+    logicalType: string
+    physicalType: string
+    description: The name identifying the data set from which the record was derived.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 59.333
+    - property: observed_distinct
+      value: 30
+    - property: observed_unique_in_sample
+      value: false
+  - name: otherCatalogNumbers
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of previous or alternate fully qualified catalogue numbers or other human-used
+      identifiers for the same occurrence, whether in the current or any other data set or collection.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 96.583
+    - property: observed_distinct
+      value: 82
+    - property: observed_unique_in_sample
+      value: true
+  - name: earliestEonOrLowestEonothem
+    logicalType: string
+    physicalType: string
+    description: The full name of the earliest possible geochronologic eon or lowest chrono-stratigraphic eonothem or the
+      informal name ("Precambrian") attributable to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: latestEonOrHighestEonothem
+    logicalType: string
+    physicalType: string
+    description: The full name of the latest possible geochronologic eon or highest chrono-stratigraphic eonothem or the informal
+      name ("Precambrian") attributable to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: earliestEraOrLowestErathem
+    logicalType: string
+    physicalType: string
+    description: The full name of the earliest possible geochronologic era or lowest chronostratigraphic erathem attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: latestEraOrHighestErathem
+    logicalType: string
+    physicalType: string
+    description: The full name of the latest possible geochronologic era or highest chronostratigraphic erathem attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: earliestPeriodOrLowestSystem
+    logicalType: string
+    physicalType: string
+    description: The full name of the earliest possible geochronologic period or lowest chronostratigraphic system attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: latestPeriodOrHighestSystem
+    logicalType: string
+    physicalType: string
+    description: The full name of the latest possible geochronologic period or highest chronostratigraphic system attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: earliestEpochOrLowestSeries
+    logicalType: string
+    physicalType: string
+    description: The full name of the earliest possible geochronologic epoch or lowest chronostratigraphic series attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: latestEpochOrHighestSeries
+    logicalType: string
+    physicalType: string
+    description: The full name of the latest possible geochronologic epoch or highest chronostratigraphic series attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: earliestAgeOrLowestStage
+    logicalType: string
+    physicalType: string
+    description: The full name of the earliest possible geochronologic age or lowest chronostratigraphic stage attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: latestAgeOrHighestStage
+    logicalType: string
+    physicalType: string
+    description: The full name of the latest possible geochronologic age or highest chronostratigraphic stage attributable
+      to the stratigraphic horizon from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: lowestBiostratigraphicZone
+    logicalType: string
+    physicalType: string
+    description: The full name of the lowest possible geological biostratigraphic zone of the stratigraphic horizon from which
+      the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: highestBiostratigraphicZone
+    logicalType: string
+    physicalType: string
+    description: The full name of the highest possible geological biostratigraphic zone of the stratigraphic horizon from
+      which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: group
+    logicalType: string
+    physicalType: string
+    description: The full name of the lithostratigraphic group from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: formation
+    logicalType: string
+    physicalType: string
+    description: The full name of the lithostratigraphic formation from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: member
+    logicalType: string
+    physicalType: string
+    description: The full name of the lithostratigraphic member from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: bed
+    logicalType: string
+    physicalType: string
+    description: The full name of the lithostratigraphic bed from which the dwc:MaterialEntity was collected.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: recordedBy
+    logicalType: string
+    physicalType: string
+    description: A person, group, or organization responsible for recording the original occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.792
+    - property: observed_distinct
+      value: 295
+    - property: observed_unique_in_sample
+      value: false
+  - name: identifiedBy
+    logicalType: string
+    physicalType: string
+    description: A list (concatenated and separated) of names of people, groups, or organizations who assigned the Taxon to
+      the occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 62.833
+    - property: observed_distinct
+      value: 193
+    - property: observed_unique_in_sample
+      value: false
+  - name: preparations
+    logicalType: string
+    physicalType: string
+    description: A preparation or preservation method for a specimen.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 94.458
+    - property: observed_distinct
+      value: 26
+    - property: observed_unique_in_sample
+      value: false
+  - name: samplingProtocol
+    logicalType: string
+    physicalType: string
+    description: The methods or protocols used during an Event, denoted by an IRI.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 76.042
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Captura con sistemas de trampeo no dañinos
+      - Observación directa
+      - diver-operated hand net, sand
+      - field observation
+      - heard
+      - seen
+      - seen and heard
+      - sweep net
+      - unknown
+  - name: dnaSequenceID
+    logicalType: array
+    physicalType: array
+    description: 'Deprecated: use the nucleotideSequence instead. The DNA sequence ID of an occurrence.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: deprecated_per_producer
+      value: true
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: nucleotideSequence
+    logicalType: array
+    physicalType: array
+    description: Nucleotide Sequence objects of an occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: verbatimScientificName
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 'Calendula arvensis Linnaeus (1763: 1304)'
+  - name: geodeticDatum
+    logicalType: string
+    physicalType: string
+    description: The geodetic datum for the interpreted decimal coordinates. Coordinates are reprojected to WGS84 if they
+      exist, so this field is either null or `WGS84`.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - WGS84
+  - name: class
+    logicalType: string
+    physicalType: string
+    description: The class name (excluding authorship) for the class from the GBIF backbone matched to this occurrence.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.917
+    - property: observed_distinct
+      value: 41
+    - property: observed_unique_in_sample
+      value: false
+  - name: countryCode
+    logicalType: string
+    physicalType: string
+    description: The 2-letter country code (as per ISO-3166-1) of the country, territory or area in which the occurrence was
+      recorded.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ES
+    - property: documented_enum_size
+      value: 253
+  - name: recordedByIDs
+    logicalType: array
+    physicalType: array
+    description: A list of the globally unique identifiers for the person, people, groups, or organizations responsible for
+      recording the original Occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: identifiedByIDs
+    logicalType: array
+    physicalType: array
+    description: A list of the globally unique identifiers for the person, people, groups, or organizations responsible for
+      assigning the Taxon to the occurrence.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+    - property: required_source
+      value: OpenAPI 'required' list of the Occurrence response schema
+    - property: observed_encoding
+      value: nested JSON value stored as text for profiling
+  - name: gbifRegion
+    logicalType: string
+    physicalType: string
+    description: An enumeration for all GBIF Regions. These are based on IPBES regions. *This is a political division,* part
+      of GBIF's governance structure.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - EUROPE
+    - property: documented_enum_size
+      value: 7
+    quality:
+    - name: gbifRegion_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - AFRICA
+        - ASIA
+        - EUROPE
+        - NORTH_AMERICA
+        - OCEANIA
+        - LATIN_AMERICA
+        - ANTARCTICA
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: country
+    logicalType: string
+    physicalType: string
+    description: The title (as per ISO-3166-1) of the country, territory or area in which the occurrence was recorded.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Spain
+  - name: publishedByGbifRegion
+    logicalType: string
+    physicalType: string
+    description: An enumeration for all GBIF Regions. These are based on IPBES regions. *This is a political division,* part
+      of GBIF's governance structure.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.167
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - EUROPE
+      - LATIN_AMERICA
+      - NORTH_AMERICA
+      - OCEANIA
+    - property: documented_enum_size
+      value: 7
+    quality:
+    - name: publishedByGbifRegion_documented_values
+      type: library
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      arguments:
+        validValues:
+        - AFRICA
+        - ASIA
+        - EUROPE
+        - NORTH_AMERICA
+        - OCEANIA
+        - LATIN_AMERICA
+        - ANTARCTICA
+      description: Valid values as listed in the producer's OpenAPI enum for this property.
+  - name: http://unknown.org/localId
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.667
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: catalogNumber
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 13.292
+    - property: observed_distinct
+      value: 2077
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        string: 1062
+        integer: 1019
+  - name: http://unknown.org/crawl_attempt
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 80
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 14.0
+    - property: observed_max
+      value: 2540.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: institutionCode
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 14.125
+    - property: observed_distinct
+      value: 79
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: locality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 30.833
+    - property: observed_distinct
+      value: 542
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: collectionCode
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 16.167
+    - property: observed_distinct
+      value: 77
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        string: 1988
+        integer: 24
+  - name: gbifID
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2400
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 71384.0
+    - property: observed_max
+      value: 6592702306.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: occurrenceID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 3.042
+    - property: observed_distinct
+      value: 2326
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 161
+        string: 2166
+  - name: identifier
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 9.667
+    - property: observed_distinct
+      value: 2167
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        string: 1218
+        integer: 950
+  - name: institutionID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 92.5
+    - property: observed_distinct
+      value: 26
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: language
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 85.625
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ES
+      - ca
+      - de
+      - en
+      - es
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 85.417
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Collection
+      - Event
+      - Objeto físico
+      - Physical Object
+      - PhysicalObject
+      - image
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: collectionID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 79.792
+    - property: observed_distinct
+      value: 28
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: informationWithheld
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: nomenclaturalCode
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 94.917
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ICBN
+      - ICN
+      - ICNafp
+      - ICZN
+      - WoRMS LSID
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: dataGeneralizations
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.583
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'WGS84 coordinates generalized with formula: `coord = floor(coord * 100) / 100`'
+      - 'no'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: county
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 77.25
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimCoordinateSystem
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.708
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - MGRS
+      - RT90
+      - UTM
+      - decimal degrees
+      - degrees decimal minutes
+      - degrees minutes seconds
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: eventRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.542
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - A few specimens in rock crevices in the steepest and largest roque.
+      - D 368
+      - Duplicat
+      - 'Markings on label: D368'
+      - 'Markings on label: D376'
+      - Pico de las Nieves
+      - leafmines
+      - purchased from Simon's Specimen Shells
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: disposition
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.583
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Exsiccati Collection
+      - In collection
+      - Type Collection
+      - Vouchered:Registered Collection
+      - good state
+      - in collection
+      - unknown
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: locationID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.917
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '205367'
+      - '205368'
+      - '205375'
+      - '59146'
+      - Costa de Las Galletas (TF)
+      - Costa de Los Cristianos (TF)
+      - Punta del Hidalgo (TF)
+      - bc700160-1abc-11e3-90a2-6c626d51f2da
+      - bf58afda-8c8b-4e6d-8233-de9e768e7360
+      - http://www.geonames.org/2517481
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 5
+        string: 21
+  - name: rights
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.292
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - CC BY-NC 4.0 http://creativecommons.org/licenses/by-nc/4.0/
+      - http://creativecommons.org/licenses/by-nc/3.0/
+      - http://creativecommons.org/licenses/by-nc/4.0/
+      - http://creativecommons.org/publicdomain/zero/1.0/
+      - https://creativecommons.org/licenses/by-nc/4.0/
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: ownerInstitutionCode
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 86.667
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - BPBM
+      - F
+      - JBS
+      - Museum of Comparative Zoology, Harvard University
+      - NMBE
+      - RBINS
+      - Royal Ontario Museum
+      - SEO-BirdLife
+      - Tethys Research Institute
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: bibliographicCitation
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 83.667
+    - property: observed_distinct
+      value: 89
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: accessRights
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.75
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - <a href="http://www.vertnet.org/resources/norms.html">http://www.vertnet.org/resources/norms.html</a
+      - No se restringe el derecho a acceso a los datos
+      - Solo para uso no comercial
+      - Sólo para uso no comercial
+      - http://arctosdb.org/home/data/
+      - http://fieldmuseum.org/about/copyright-information
+      - http://www.vertnet.org/resources/norms.html
+      - https://doi.org/10.3897/rio.10.e124288
+      - not-for-profit use only
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: rightsHolder
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 47.792
+    - property: observed_distinct
+      value: 116
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: habitat
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 68.042
+    - property: observed_distinct
+      value: 158
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: scientificNameID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.292
+    - property: observed_distinct
+      value: 61
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        number: 17
+        integer: 260
+        string: 28
+  - name: samplingEffort
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 88.458
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Captura con sistemas de trampeo no dañinos
+      - Censo con prismáticos/telescopio
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: municipality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.167
+    - property: observed_distinct
+      value: 51
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: higherGeographyID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.25
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - La Laguna
+      - Las Galletas (Arona)
+      - Los Cristianos (Arona)
+      - http://vocab.getty.edu/tgn/1007229
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: vernacularName
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 55.292
+    - property: observed_distinct
+      value: 220
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: taxonID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 61.042
+    - property: observed_distinct
+      value: 425
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 911
+        string: 24
+  - name: eventID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 94.333
+    - property: observed_distinct
+      value: 66
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: footprintWKT
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.75
+    - property: observed_distinct
+      value: 52
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/allowCoordinatesFlipping
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 62.708
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimIdentification
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 94.833
+    - property: observed_distinct
+      value: 79
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: footprintSRS
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.75
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - EPSG:4326
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: taxonConceptID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 77.292
+    - property: observed_distinct
+      value: 136
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: occurrenceRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 90.125
+    - property: observed_distinct
+      value: 119
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/materialEntityType
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.083
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimElevation
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.125
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 21
+        string: 48
+  - name: locationRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.792
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - S8 V. Matuzevičiaus kol.
+      - 'Substrate: on Juniperus phoenicea wood'
+      - 'Substrate: on horizontal soil'
+      - '[Africa]'
+      - '[Europe]'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: georeferenceRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.125
+    - property: observed_distinct
+      value: 41
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimLocality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 76.292
+    - property: observed_distinct
+      value: 199
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: georeferencedDate
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.75
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        date: 4
+        string: 1
+        timestamp: 25
+  - name: verbatimEventDate
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 72.208
+    - property: observed_distinct
+      value: 608
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        string: 373
+        integer: 10
+        timestamp: 270
+        date: 14
+  - name: superfamily
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.833
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Chrysidoidea
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: previousIdentifications
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.75
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Philoctetes caudatus (current)
+      - Philoctetes tenerifensis (current)
+      - 'Skyttea cruciata Sherwood, D.Hawksw. & Coppins, Hafellner J., 1995-02-05, Trans. Br. mycol. Soc. 75: 484 (1980).
+        On Diploicia canescens (thallus).'
+      - '[{"made_date": null, "taxa_formula": "A", "taxon_concept": null, "scientific_name": "Monilearia montigena", "identificationID":
+        "https://arctos.database.museum/guid/DMNS:Inv:33962/IID14362963", "sensu_publication": null, "identification_taxa":
+        [{"taxon": {"ftn": "Biota, Animalia, Mollusca, Gastropoda, Heterobranchia, Euthyneura, Tectipleura, Eupulmonata, Stylommatophora,
+        Helicina, Helicoidei, Helicoidea, Geomitridae, Geomitrinae, Cochlicellini, Monilearia, Monilearia montigena", "name":
+        "Monilearia montigena", "ctrms": [{"psn": 1, "typ": "superdomain", "term": "Biota"}, {"psn": 2, "typ": "kingdom",
+        "term": "Animalia"}, {"psn": 3, "typ": "phylum", "term": "Mollusca"}, {"psn": 4, "typ": "class", "term": "Gastropoda"},
+        {"psn": 5, "typ": "subclass", "term": "Heterobranchia"}, {"psn": 6, "typ": "infraclass", "term": "Euthyneura"}, {"psn":
+        7, "typ": "subterclass", "term": "Tectipleura"}, {"psn": 8, "typ": "superorder", "term": "Eupulmonata"}, {"psn": 9,
+        "typ": "order", "term": "Stylommatophora"}, {"psn": 10, "typ": "suborder", "term": "Helicina"}, {"psn": 11, "typ":
+        "infraorder", "term": "Helicoidei"}, {"psn": 12, "typ": "superfamily", "term": "Helicoidea"}, {"psn": 13, "typ": "family",
+        "term": "Geomitridae"}, {"psn": 14, "typ": "subfamily", "term": "Geomitrinae"}, {"psn": 15, "typ": "tribe", "term":
+        "Cochlicellini"}, {"psn": 16, "typ": "genus", "term": "Monilearia"}, {"psn": 17, "typ": "species", "term": "Monilearia
+        montigena"}], "nctrms": [{"typ": "AphiaID", "term": "1049664"}, {"typ": "authority", "term": "Bank, Groh & Ripken,
+        2002"}, {"typ": "citation", "term": "MolluscaBase eds. (2023). MolluscaBase. Monilearia montigena Bank, Groh & Ripken,
+        2002. Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&id=1049664
+        on 2023-07-20"}, {"typ": "isBrackish", "term": "0"}, {"typ": "isFreshwater", "term": "0"}, {"typ": "isMarine", "term":
+        "0"}, {"typ": "isTerrestrial", "term": "1"}, {"typ": "lsid", "term": "urn:lsid:marinespecies.org:taxname:1049664"},
+        {"typ": "match_type", "term": "exact"}, {"typ": "modified", "term": "2017-12-20T07:59:28.147Z"}, {"typ": "parentNameUsageID",
+        "term": "996323"}, {"typ": "rank", "term": "Species"}, {"typ": "scientificname", "term": "Monilearia montigena"},
+        {"typ": "status", "term": "accepted"}, {"typ": "taxonRankID", "term": "220"}, {"typ": "url", "term": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=1049664"},
+        {"typ": "valid_AphiaID", "term": "1049664"}, {"typ": "valid_authority", "term": "Bank, Groh & Ripken, 2002"}, {"typ":
+        "valid_name", "term": "Monilearia montigena"}], "source": "WoRMS (via Arctos)", "classification_id": "https://arctos.database.museum/name/Monilearia
+        montigena#WoRMSviaArctos"}, "taxon_id": "https://arctos.database.museum/name/Monilearia montigena", "variable": "A"}],
+        "identification_order": 1, "identification_agents": [{"agentID": "https://arctos.database.museum/agent/0", "agent_name":
+        "unknown"}], "identification_remarks": "legacy ID from dealer label; Former nature_of_id: legacy.", "identification_attributes":
+        null}]'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: recordNumber
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 91.333
+    - property: observed_distinct
+      value: 94
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 85
+        string: 123
+  - name: http://unknown.org/recordID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.417
+    - property: observed_distinct
+      value: 86
+    - property: observed_unique_in_sample
+      value: true
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: georeferenceSources
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.25
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Encarta
+      - GEOLocate
+      - GeoLocate
+      - GeoLocate (CoGe)
+      - Label
+      - as printed on label
+      - georef batch tool 2020-12-06; GeoLocate
+      - georef batch tool 2021-02-23; GeoLocate
+      - georef batch tool 2021-02-23; GeoLocate; Alltrails
+      - georef batch tool 2021-03-11; GeoLocate
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/omitFromScheduledCrawl
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 67.667
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: higherClassification
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.417
+    - property: observed_distinct
+      value: 28
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/declaredCount
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 89.667
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 23.0
+    - property: observed_max
+      value: 22938907.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: fieldNumber
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.25
+    - property: observed_distinct
+      value: 35
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        string: 25
+        integer: 17
+  - name: datasetTitle
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Tiroler Landesmuseum Ferdinandeum
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: creator
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - BIOGIS\Robert.Lindner
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: created
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '2004-06-08'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: organismID
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.708
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 56981.0
+    - property: observed_max
+      value: 3801818.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: eventTime
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 63.458
+    - property: observed_distinct
+      value: 724
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 2
+        string: 875
+  - name: identificationID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 76.542
+    - property: observed_distinct
+      value: 562
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+    - property: observed_type_counts
+      value:
+        integer: 561
+        string: 2
+  - name: organismRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - Te80-8
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: geologicalContextID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.208
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - http://purl.obolibrary.org/obo/ENVO_00002007
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/dateLastUpdated
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.208
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/code
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/conceptualSchema
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 94.75
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/maxSearchResponseRecords
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 96.083
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1000.0
+    - property: observed_max
+      value: 10000.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: dynamicProperties
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 95.208
+    - property: observed_distinct
+      value: 66
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: island
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.083
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Canary Islands; Lanzarote Island
+      - El Hierro
+      - Fuerteventura
+      - Gran Canaria
+      - La Graciosa
+      - La Palma
+      - Tenerife
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: georeferenceProtocol
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.792
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - GEOLocate
+      - GeoLocate
+      - Google Earth
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: islandGroup
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.292
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Canary Archipelago
+      - Canary Islands
+      - Islas Canarias
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: identificationRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.583
+    - property: observed_distinct
+      value: 19
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: associatedReferences
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.792
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Lichenes Exsiccati Selecti A Museo Historiae Naturalis Casselensi Editi|330
+      - Lichenoth. Graec.|44
+      - Lichenoth. Graec.|64
+      - Lichenotheca Graecensis|185
+      - Lichenotheca Graecensis|217
+      - '[{"crossref":{"citeinfo":{"origin":"Notarbartolo di Sciara, G., T. Agardy, D. Hyrenbach, T. Scovazzi and P. Van Klaveren","pubdate":"2007","title_html":"The
+        Pelagos sanctuary for Mediterranean marine mammals","title":"The Pelagos sanctuary for Mediterranean marine mammals","serinfo":{"sername":"Aquatic
+        Conservation: Marine and Freshwater Ecosystems","issue":"18:367-391"}}}},{"crossref":{"citeinfo":{"origin":"Bearzi,
+        G., E. Politi, S. Agazzi, S. Bruno, M. Costa and S. Bonizzoni","pubdate":"2005","title_html":"Occurrence and present
+        status of coastal dolphins (Delphinus delphis and Tursiops truncatus) in the eastern Ionian Sea","title":"Occurrence
+        and present status of coastal dolphins (Delphinus delphis and Tursiops truncatus) in the eastern Ionian Sea","serinfo":{"sername":"Aquatic
+        Conservation: Marine and Freshwater Ecosystems","issue":"15:243-257"}}}},{"crossref":{"citeinfo":{"origin":"Azzellino,
+        A., S. Gaspari, S. Airoldi and B. Nani","pubdate":"2008","title_html":"Habitat use and preferences of cetaceans along
+        the continental slope and the adjacent pelagic waters in the western Ligurian Sea","title":"Habitat use and preferences
+        of cetaceans along the continental slope and the adjacent pelagic waters in the western Ligurian Sea","serinfo":{"sername":"Deep-Sea
+        Research I","issue":"55:296-323"}}}},{"crossref":{"citeinfo":{"origin":"Halpin, P.N., A.J. Read, E. Fujioka, B.D.
+        Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and
+        K.D. Hyrenbach","pubdate":"2009","title_html":"OBIS-SEAMAP: The world data center for marine mammal, sea bird, and
+        sea turtle distributions","title":"OBIS-SEAMAP: The world data center for marine mammal, sea bird, and sea turtle
+        distributions","serinfo":{"sername":"Oceanography","issue":"22(2):104-115"},"onlink":"http:\/\/www.tos.org\/oceanography\/article\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle"}}}]'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: materialSampleID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.667
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 12d77841-b99d-4004-be58-8a33a99d165b
+      - 338719f6-12bc-4d69-9537-0e623f10fa76
+      - 7c04091a-0b1b-47bd-923d-eb8c4abeee3f
+      - 82cc802b-60bb-4549-880e-9a8f02feae58
+      - dc97c2fb-c7d7-4998-b629-b386965d36f5
+      - f05037c3-0fe0-43eb-af14-0dd5ddfc21f6
+      - http://purl.org/nhmuio/id/b25cd0c4-eeec-42a8-b473-d21c5343d612
+      - http://purl.org/nhmuio/id/ef96e555-c166-4fde-a690-40401ac5f882
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: associatedTaxa
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.667
+    - property: observed_distinct
+      value: 22
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/recordEnteredBy
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.833
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/taxonRankID
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.5
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5000.0
+    - property: observed_max
+      value: 7000.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/typifiedName
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: taxonRemarks
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.875
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: parentNameUsage
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Manzonia Brusina, 1870
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: materialEntityID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 9a30998f-1f95-4cb4-8b63-c8f3279d1b57
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: georeferenceVerificationStatus
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.125
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Close
+      - reviewed - high confidence
+      - verified by MCZ collection
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: combinationAuthors
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 'Linnaeus (1763:'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/verbatimLabel
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: combinationYear
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1763.0
+    - property: observed_max
+      value: 1763.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: canonicalName
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - Calendula arvensis
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/status
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 40.875
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimDepth
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.875
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 14–18 m
+      - Intertidal
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimTaxonRank
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.875
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Species
+      - subsp.
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/griddedDataset
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.333
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: verbatimSRS
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.917
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - epsg:4326
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: nomenclaturalStatus
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - sp. nov.
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/referenceID
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: namePublishedIn
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 'Wittmann KJ (2024) A new species of Mysidopsis (Crustacea, Mysida) from the Canary and Cape Verde archipelagos. Biodiversity
+        Data Journal 12: e139475. https://doi.org/10.3897/BDJ.12.e139475'
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: furtherInformationURL
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - https://doi.org/10.3897/BDJ.12.e139475
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/species
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.875
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: true
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/nick
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 76.542
+    - property: observed_distinct
+      value: 96
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/captive_cultivated
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 76.542
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: locationAccordingTo
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - Phyllis Sharp
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/orphanEndpoint
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.458
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: http://unknown.org/crawlerArchiveCacheTime
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.458
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1546581601000.0
+    - property: observed_max
+      value: 1546581601000.0
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: reproductiveCondition
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.458
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - flowers
+      - flowers|flower buds
+      - no flowers or fruits
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: fieldNotes
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - There were two males singing at the same time in the area.  Background sounds are the typical of a city (Santa Cruz
+        de Tenerife).; animal seen:no; playback used:no
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: behavior
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.958
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - song
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: vitality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.167
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - alive
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  - name: identificationVerificationStatus
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Present in the sample responses but not declared in the Occurrence response
+      schema of the OpenAPI.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.667
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Approved | Automated
+      - Approved | Expert
+      - Approved | Expert | Evidence
+    - property: note
+      value: Not part of the documented Occurrence schema; likely verbatim publisher term or non-standard key (e.g. http://unknown.org/...).
+  quality:
+  - name: observed_unique_key
+    type: library
+    metric: duplicateValues
+    mustBe: 0
+    unit: rows
+    arguments:
+      properties:
+      - key
+    description: 'Observed in sample of 2400 rows on 2026-10-24: no duplicate key values; not a producer guarantee (OpenAPI
+      says GBIF aims to keep keys stable).'
+customProperties:
+- property: source_url
+  value: https://api.gbif.org/v1/occurrence/search?country=ES&decimalLatitude=27,29.5&decimalLongitude=-18.5,-13&year=<year>&limit=300&offset=0
+- property: license
+  value: 'Per record: CC0 1.0, CC BY 4.0 or CC BY-NC 4.0 (field license; OpenAPI lists allowed values); GBIF API itself: terms
+    not reviewed in this sample'
+- property: license_url
+  value: https://techdocs.gbif.org/en/openapi/
+- property: documentation_url
+  value: https://techdocs.gbif.org/en/openapi/v1/occurrence
+- property: openapi_spec_url
+  value: https://techdocs.gbif.org/openapi/occurrence.json
+- property: openapi_title_version
+  value: Occurrence API v1
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 2400
+- property: sample_selection
+  value: '8 requests, one per year (year=2026, 2025, 2022, 2018, 2012, 2005, 1995, 1980), limit=300, offset=0, country=ES,
+    decimalLatitude=27,29.5, decimalLongitude=-18.5,-13: first 300 records of each year in the API''s default order (not random;
+    in the sample months only 1-4 appear). Total matching records per year on the sample date: {''1980'': 2263, ''1995'':
+    5659, ''2005'': 11397, ''2012'': 21865, ''2018'': 71466, ''2022'': 160875, ''2025'': 97000, ''2026'': 71202}.'
+- property: sample_status
+  value: ok
+- property: versioning_policy_documented
+  value: 'v1 stable: existing resources/properties are not renamed or removed; additions possible; breaking changes announced
+    with notice (techdocs.gbif.org/en/openapi/)'
+contractCreatedTs: '2026-10-24T15:03:05Z'

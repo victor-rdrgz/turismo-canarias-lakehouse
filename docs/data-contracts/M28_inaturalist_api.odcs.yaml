@@ -1,0 +1,2829 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: a1931a6a-7c44-5c3b-bb3d-f59b55414b03
+version: 0.1.0
+status: draft
+name: iNaturalist API v1 - Observations (Canary Islands bounding box)
+domain: biodiversity
+description:
+  purpose: Citizen-science species observations (location, time, taxon, quality grade, media, identifications) from
+    the public iNaturalist API v1, requested here for a bounding box around the Canary Islands.
+  limitations: 'Property definitions in the swagger carry names and types only, with no descriptions, units or value
+    lists; most descriptions are therefore ''Not defined by the producer''. Units of positional_accuracy/public_positional_accuracy
+    are not defined (NOT VERIFIED). geoprivacy and taxon_geoprivacy values are not enumerated; coordinates may be
+    obscured or hidden according to the observer''s settings. License is per observation (license_code, null when
+    none) and per photo (depends on the photo domain); the API is not under a single licence. Throttle: max 100
+    requests/minute (60/minute and under 10,000/day requested); blocks may happen without notice; the API is intended
+    for applications, not data scraping; bulk exports are on the developers page. The sample is only the 600 most
+    recent observations by id (order_by=id desc, 3 pages of 200) inside the bounding box swlat=27.5, swlng=-18.5,
+    nelat=29.5, nelng=-13 of a total of 585759 at request time; 5 pages were fetched and 2 discarded because the
+    total exceeded the 25 MB limit. The box also covers sea and part of Africa-adjacent waters; its relation to
+    Canarias boundaries is not verified. Nested objects (taxon, user, photos, identifications, comments...) are
+    modelled to the first level only. The response contains personal data of observers (login, name, icon); the
+    raw sample is kept outside the repository and contract examples exclude those values. Documented fields not
+    seen in the sample: id_please, out_of_range, private_geojson, private_location, private_place_guess, private_place_ids,
+    verifiable. Observed fields not in the swagger: observation_sounds. No SLA, no deprecation policy; swagger version
+    1.3.0.'
+  usage: Raw landing of /v1/observations pages; flatten results[] to one row per observation; respect per-observation
+    licence_code and attribution when reusing; keep personal fields out of public layers.
+tags:
+- biodiversity
+- species
+- citizen-science
+- canarias
+- api
+- json
+schema:
+- name: observation
+  logicalType: object
+  physicalType: json
+  description: One iNaturalist observation as returned by GET /v1/observations (elements of results[]).
+  properties:
+  - name: annotations
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 4
+    items:
+      logicalType: object
+      physicalType: object
+  - name: cached_votes_total
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1
+  - name: captive
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: comments
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: object
+      physicalType: object
+  - name: comments_count
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 2
+  - name: community_taxon_id
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 55.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 178
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 482
+    - property: observed_max
+      value: 1504826
+  - name: created_at
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 546
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2026-10-22T11:14:48+01:00'
+    - property: observed_max
+      value: '2026-10-24T15:50:09+01:00'
+  - name: created_at_details
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - dict
+    properties:
+    - name: date
+      logicalType: date
+      physicalType: string (date)
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 3
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: '2026-10-22'
+      - property: observed_max
+        value: '2026-10-24'
+    - name: day
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 3
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 22
+      - property: observed_max
+        value: 24
+    - name: hour
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 21
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0
+      - property: observed_max
+        value: 23
+    - name: month
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 10
+      - property: observed_max
+        value: 10
+    - name: week
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 43
+      - property: observed_max
+        value: 43
+    - name: year
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 2026
+      - property: observed_max
+        value: 2026
+  - name: created_time_zone
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Atlantic/Canary
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 81.5
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 64
+    - property: observed_unique_in_sample
+      value: false
+  - name: faves
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 1
+    items:
+      logicalType: object
+      physicalType: object
+  - name: faves_count
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1
+  - name: flags
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 0
+    items:
+      logicalType: object
+      physicalType: object
+  - name: geojson
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - dict
+    properties:
+    - name: coordinates
+      logicalType: array
+      physicalType: array
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - list
+      - property: observed_min_length
+        value: 2
+      - property: observed_max_length
+        value: 2
+      items:
+        logicalType: object
+        physicalType: number
+    - name: type
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - Point
+  - name: geoprivacy
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+  - name: id
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 600
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 410056817
+    - property: observed_max
+      value: 410499977
+    quality:
+    - type: library
+      name: observed_no_nulls_id
+      metric: nullValues
+      mustBe: 0
+      unit: rows
+      dimension: completeness
+      description: Observed in sample of 600 rows on 2026-10-24; not a producer guarantee
+  - name: id_please
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: ident_taxon_ids
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 18
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: identification_disagreements_count
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1
+  - name: identifications
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 7
+    items:
+      logicalType: object
+      physicalType: object
+  - name: identifications_count
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 4
+  - name: identifications_most_agree
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: identifications_most_disagree
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+  - name: identifications_some_agree
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: license_code
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 13.833
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ''
+      - cc-by
+      - cc-by-nc
+      - cc-by-nc-nd
+      - cc-by-nc-sa
+      - cc0
+  - name: location
+    logicalType: string
+    physicalType: string
+    description: In the format "lat,lng"
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 586
+    - property: observed_unique_in_sample
+      value: false
+  - name: map_scale
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+  - name: mappable
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: non_owner_ids
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 4
+    items:
+      logicalType: object
+      physicalType: object
+  - name: num_identification_agreements
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 4
+  - name: num_identification_disagreements
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1
+  - name: oauth_application_id
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 19.667
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2
+    - property: observed_max
+      value: 843
+  - name: obscured
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: observation_photos
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 20
+    items:
+      logicalType: object
+      physicalType: object
+  - name: observation_sounds
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 1
+    items:
+      logicalType: object
+      physicalType: object
+  - name: observed_on
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.333
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '1997-11-20'
+    - property: observed_max
+      value: '2026-10-24'
+  - name: observed_on_details
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.333
+    - property: observed_types
+      value:
+      - dict
+    properties:
+    - name: date
+      logicalType: date
+      physicalType: string (date)
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 59
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: '1997-11-20'
+      - property: observed_max
+        value: '2026-10-24'
+    - name: day
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 28
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1
+      - property: observed_max
+        value: 30
+    - name: hour
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 18
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1
+      - property: observed_max
+        value: 23
+    - name: month
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 11
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1
+      - property: observed_max
+        value: 11
+    - name: week
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 28
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1
+      - property: observed_max
+        value: 47
+    - name: year
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.333
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.333
+      - property: observed_distinct
+        value: 9
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1997
+      - property: observed_max
+        value: 2026
+  - name: observed_on_string
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.333
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 584
+    - property: observed_unique_in_sample
+      value: false
+  - name: observed_time_zone
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Atlantic/Canary
+  - name: ofvs
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: object
+      physicalType: object
+  - name: out_of_range
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: outlinks
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 0
+    items:
+      logicalType: object
+      physicalType: object
+  - name: owners_identification_from_vision
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 2.167
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+      - true
+  - name: photos
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 20
+    items:
+      logicalType: object
+      physicalType: object
+  - name: place_guess
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.833
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 156
+    - property: observed_unique_in_sample
+      value: false
+  - name: place_ids
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 9
+    - property: observed_max_length
+      value: 20
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: positional_accuracy
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 19.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 105
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2
+    - property: observed_max
+      value: 128224
+  - name: preferences
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - dict
+  - name: private_geojson
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: private_location
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: private_place_guess
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: private_place_ids
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: project_ids
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: project_ids_with_curator_id
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 0
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: project_ids_without_curator_id
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: project_observations
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: object
+      physicalType: object
+  - name: public_positional_accuracy
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 18.5
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 109
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2
+    - property: observed_max
+      value: 128224
+  - name: quality_grade
+    logicalType: string
+    physicalType: string
+    description: Quality grade of the observation
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - casual
+      - needs_id
+      - research
+    quality:
+    - type: library
+      name: quality_grade_documented_values
+      metric: invalidValues
+      mustBe: 0
+      unit: rows
+      dimension: conformity
+      arguments:
+        validValues:
+        - casual
+        - needs_id
+        - research
+      description: Values documented as the enum of the quality_grade query parameter of the observations endpoint
+        (the response field itself has no enum in the swagger)
+  - name: quality_metrics
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 2
+    items:
+      logicalType: object
+      physicalType: object
+  - name: reviewed_by
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 5
+    items:
+      logicalType: integer
+      physicalType: integer
+  - name: site_id
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - int
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 26
+    - property: observed_values
+      value:
+      - 1
+      - 2
+      - 22
+      - 25
+      - 26
+  - name: sounds
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 1
+    items:
+      logicalType: object
+      physicalType: object
+  - name: spam
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - bool
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - false
+  - name: species_guess
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 9.167
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 386
+    - property: observed_unique_in_sample
+      value: false
+  - name: tags
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 3
+    items:
+      logicalType: string
+      physicalType: string
+  - name: taxon
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.667
+    - property: observed_types
+      value:
+      - dict
+    properties:
+    - name: ancestor_ids
+      logicalType: array
+      physicalType: array
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - list
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_min_length
+        value: 2
+      - property: observed_max_length
+        value: 18
+      items:
+        logicalType: integer
+        physicalType: integer
+    - name: ancestry
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 353
+      - property: observed_unique_in_sample
+        value: false
+    - name: atlas_id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 80.5
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 59
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 677
+      - property: observed_max
+        value: 145983
+    - name: complete_rank
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 80.167
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 80.167
+      - property: observed_distinct
+        value: 4
+      - property: observed_unique_in_sample
+        value: false
+    - name: complete_species_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 9
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 8
+      - property: observed_max
+        value: 7889
+    - name: conservation_status
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 96.167
+      - property: observed_types
+        value:
+        - dict
+      - property: observed_absent_pct
+        value: 96.167
+    - name: created_at
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 380
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: '2008-03-13T02:36:03+00:00'
+      - property: observed_max
+        value: '2025-10-22T15:08:31+00:00'
+    - name: current_synonymous_taxon_ids
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 100.0
+      - property: observed_types
+        value: []
+      - property: observed_absent_pct
+        value: 0.667
+    - name: default_photo
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - dict
+      - property: observed_absent_pct
+        value: 0.667
+    - name: endemic
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+        - true
+    - name: establishment_means
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented
+      - property: observed_null_pct
+        value: 100.0
+      - property: observed_types
+        value: []
+      - property: observed_absent_pct
+        value: 100.0
+    - name: extinct
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+    - name: flag_counts
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - dict
+      - property: observed_absent_pct
+        value: 0.667
+    - name: iconic_taxon_id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 11
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 1
+      - property: observed_max
+        value: 47178
+    - name: iconic_taxon_name
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 11
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - Actinopterygii
+        - Amphibia
+        - Animalia
+        - Arachnida
+        - Aves
+        - Fungi
+        - Insecta
+        - Mammalia
+        - Mollusca
+        - Plantae
+        - Reptilia
+    - name: id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 383
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 482
+      - property: observed_max
+        value: 1649046
+    - name: introduced
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+        - true
+    - name: is_active
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - true
+    - name: min_species_ancestry
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 375
+      - property: observed_unique_in_sample
+        value: false
+    - name: min_species_taxon_id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 375
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 482
+      - property: observed_max
+        value: 1649046
+    - name: name
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 383
+      - property: observed_unique_in_sample
+        value: false
+    - name: native
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+        - true
+    - name: observations_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 379
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 14
+      - property: observed_max
+        value: 161651353
+    - name: parent_id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 353
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 472
+      - property: observed_max
+        value: 1692501
+    - name: photos_locked
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+    - name: preferred_common_name
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 22.167
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 22.167
+      - property: observed_distinct
+        value: 286
+      - property: observed_unique_in_sample
+        value: false
+    - name: provisional
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+    - name: rank
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 18
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - class
+        - complex
+        - family
+        - genus
+        - kingdom
+        - order
+        - phylum
+        - species
+        - subclass
+        - subfamily
+        - subgenus
+        - suborder
+        - subspecies
+        - subtribe
+        - superfamily
+        - tribe
+        - variety
+        - zoosubsection
+    - name: rank_level
+      logicalType: number
+      physicalType: number
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - float
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 17
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 5
+      - property: observed_max
+        value: 70
+    - name: taxon_changes_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 9
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0
+      - property: observed_max
+        value: 10
+    - name: taxon_schemes_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 12
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 0
+      - property: observed_max
+        value: 11
+    - name: threatened
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - false
+        - true
+    - name: universal_search_rank
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.667
+      - property: observed_types
+        value:
+        - int
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 379
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_min
+        value: 14
+      - property: observed_max
+        value: 161651353
+    - name: wikipedia_url
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 15.333
+      - property: observed_types
+        value:
+        - str
+      - property: observed_absent_pct
+        value: 0.667
+      - property: observed_distinct
+        value: 314
+      - property: observed_unique_in_sample
+        value: false
+  - name: taxon_geoprivacy
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 61.333
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - obscured
+      - open
+  - name: time_observed_at
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.333
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 584
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '1997-11-20T22:41:00+00:00'
+    - property: observed_max
+      value: '2026-10-24T14:46:42+01:00'
+  - name: time_zone_offset
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - +00:00
+  - name: updated_at
+    logicalType: timestamp
+    physicalType: string (date-time)
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 587
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2026-10-22T11:15:16+01:00'
+    - property: observed_max
+      value: '2026-10-24T15:59:32+01:00'
+  - name: uri
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 600
+    - property: observed_unique_in_sample
+      value: true
+  - name: user
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - dict
+    properties:
+    - name: activity_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 70
+      - property: observed_unique_in_sample
+        value: false
+    - name: annotated_observations_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 27
+      - property: observed_unique_in_sample
+        value: false
+    - name: created_at
+      logicalType: timestamp
+      physicalType: string (date-time)
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 72
+      - property: observed_unique_in_sample
+        value: false
+    - name: icon
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 17.5
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 49
+      - property: observed_unique_in_sample
+        value: false
+    - name: icon_url
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 17.5
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 49
+      - property: observed_unique_in_sample
+        value: false
+    - name: id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 72
+      - property: observed_unique_in_sample
+        value: false
+    - name: identifications_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 35
+      - property: observed_unique_in_sample
+        value: false
+    - name: journal_posts_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 2
+      - property: observed_unique_in_sample
+        value: false
+    - name: login
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 72
+      - property: observed_unique_in_sample
+        value: false
+    - name: login_autocomplete
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 72
+      - property: observed_unique_in_sample
+        value: false
+    - name: login_exact
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 72
+      - property: observed_unique_in_sample
+        value: false
+    - name: name
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 11.5
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 53
+      - property: observed_unique_in_sample
+        value: false
+    - name: name_autocomplete
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 11.5
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 53
+      - property: observed_unique_in_sample
+        value: false
+    - name: observations_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 69
+      - property: observed_unique_in_sample
+        value: false
+    - name: orcid
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 99.833
+      - property: observed_types
+        value:
+        - str
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+    - name: preferences
+      logicalType: object
+      physicalType: object
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - dict
+    - name: roles
+      logicalType: array
+      physicalType: array
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - list
+      - property: observed_min_length
+        value: 0
+      - property: observed_max_length
+        value: 0
+      items:
+        logicalType: string
+        physicalType: string
+    - name: site_id
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 21.833
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: false
+    - name: spam
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+    - name: species_count
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 67
+      - property: observed_unique_in_sample
+        value: false
+    - name: suspended
+      logicalType: boolean
+      physicalType: boolean
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - bool
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+    - name: universal_search_rank
+      logicalType: integer
+      physicalType: integer
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_types
+        value:
+        - int
+      - property: observed_distinct
+        value: 69
+      - property: observed_unique_in_sample
+        value: false
+  - name: uuid
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - str
+    - property: observed_distinct
+      value: 600
+    - property: observed_unique_in_sample
+      value: true
+  - name: verifiable
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_types
+      value: []
+    - property: observed_absent_pct
+      value: 100.0
+  - name: votes
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_types
+      value:
+      - list
+    - property: observed_min_length
+      value: 0
+    - property: observed_max_length
+      value: 1
+    items:
+      logicalType: object
+      physicalType: object
+  quality:
+  - type: text
+    name: observed_unique_id_uuid
+    dimension: uniqueness
+    description: 'Observed in sample of 600 rows on 2026-10-24: id and uuid unique; not a producer guarantee'
+- name: observations_response
+  logicalType: object
+  physicalType: json
+  description: Pagination envelope of the observations endpoint.
+  properties:
+  - name: total_results
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values_in_responses
+      value:
+      - 585759
+  - name: page
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - 1
+      - 2
+      - 3
+  - name: per_page
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - 200
+  - name: results
+    logicalType: array
+    physicalType: array
+    description: Array of observation objects (see schema observation)
+    items:
+      logicalType: object
+      physicalType: object
+    customProperties:
+    - property: evidence
+      value: documented+observed
+customProperties:
+- property: source_url
+  value: https://api.inaturalist.org/v1/observations
+- property: license
+  value: Per observation (license_code) and per photo; API use subject to the iNaturalist Terms of Service
+- property: license_url
+  value: https://www.inaturalist.org/terms
+- property: documentation_url
+  value: https://api.inaturalist.org/v1/docs/
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 600
+- property: sample_selection
+  value: 'GET /v1/observations?nelat=29.5&nelng=-13&swlat=27.5&swlng=-18.5&per_page=200&page=1..3&order_by=id&order=desc:
+    the 600 newest observations by id (ids 410056817 to 410499977, created 2026-10-22 to 2026-10-24); total_results
+    at request time 585759'
+- property: sample_status
+  value: partial
+contractCreatedTs: '2026-10-24T11:00:00Z'

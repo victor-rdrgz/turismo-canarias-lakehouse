@@ -1,0 +1,407 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: d0a1eea3-49a9-5e94-8977-b2352c2a0da5
+version: 0.1.0
+status: draft
+name: ISTAC tourist accommodation survey (C00065A_000033)
+domain: tourism
+description:
+  purpose: 'Long-format CSV export of the ISTAC statistical dataset ISTAC/C00065A_000033 (operation C00065A, Encuesta
+    de Alojamiento Turistico): open establishments, beds and rooms offered, occupancy rates by bed and by room,
+    average daily rate (ADR), income per available room, total income and employment, for Canarias, its islands
+    and municipalities. Declared as official statistics, monthly and annual series from 01/2009 to 09/2026, version
+    2.22 (valid from 2026-10-23; next version: non-scheduled update).'
+  limitations: 'Units and methodological definitions of the 13 indicators are not published in the metadata read
+    (operation C00065A methodology sheet not located). The CSV column layout is not formally specified by the producer;
+    the column-to-dimension mapping is inferred from column names that match documented dimensions and attributes.
+    Only one accommodation category (_T, Total) is documented and observed. The sample is a selection of periods
+    (2009-2010 and 2018-2026), not the full dataset (140,530 observations in the full cube). The meaning of an empty
+    OBS_VALUE is only partially documented through the status (O) and confidentiality (C) attributes. No publication
+    calendar documented. License: the Aviso Legal cites reuse under Ley 37/2007 with attribution; no named license.'
+  usage: Raw landing of tourist accommodation indicators for Canarias (Bronze). Keep the granularity of TIME_PERIOD_CODE
+    (month vs year) and the status/confidentiality flags when modelling.
+tags:
+- istac
+- tourism
+- accommodation
+- canarias
+- official-statistics
+- sdmx
+schema:
+- name: alojamiento_turistico_observations
+  logicalType: object
+  physicalType: csv
+  description: 'Long-format (one row per observation) export of the ISTAC statistical dataset C00065A_000033 (Encuesta
+    de Alojamiento Turistico): open tourist establishments, beds and rooms offered, occupancy rates, average daily
+    rate, revenue and employment, by island and municipality of Canarias, monthly and annual.'
+  properties:
+  - name: TERRITORIO#es
+    logicalType: string
+    physicalType: text
+    description: 'Spanish-language label of the dimension ''Territorio'' (reference area): Canarias, islands and
+      municipalities.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 47
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Adeje
+    - property: observed_max
+      value: Yaiza
+  - name: TERRITORIO_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the dimension ''Territorio'' (geographic dimension, 47 values documented in the metadata).
+      Documented examples: ES70 Canarias, ES708/ES704/ES705/ES709/ES706/ES703 islands, INE municipality codes such
+      as 35004 Arrecife and 38038 Santa Cruz de Tenerife.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 47
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '35003'
+    - property: observed_max
+      value: ES709_O
+  - name: TIME_PERIOD#es
+    logicalType: string
+    physicalType: text
+    description: 'Spanish-language label of the time dimension. Observed: monthly as MM/YYYY and annual as YYYY.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 139
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 01/2009
+    - property: observed_max
+      value: '2025'
+  - name: TIME_PERIOD_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the time dimension (SDMX time period). The metadata documents temporal granularities monthly
+      (M) and annual (A); observed codes look like 2018-M10 (monthly) and 2018 (annual).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 139
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2009'
+    - property: observed_max
+      value: 2026-M09
+  - name: ALOJAMIENTO_TURISTICO_CATEGORIA#es
+    logicalType: string
+    physicalType: text
+    description: Spanish-language label of the dimension 'Categoria de alojamiento turistico'.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Total
+    - property: observed_max
+      value: Total
+    - property: observed_values
+      value:
+      - Total
+  - name: ALOJAMIENTO_TURISTICO_CATEGORIA_CODE
+    logicalType: string
+    physicalType: text
+    description: Code of the dimension 'Categoria de alojamiento turistico'. The metadata lists a single value,
+      _T (Total).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: _T
+    - property: observed_max
+      value: _T
+    - property: observed_values
+      value:
+      - _T
+  - name: MEDIDAS#es
+    logicalType: string
+    physicalType: text
+    description: Spanish-language label of the measure dimension 'Indicador' (13 indicators documented).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Empleos
+    - property: observed_max
+      value: Tasa de ocupación por plaza disponible
+  - name: MEDIDAS_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the measure dimension ''Indicador''. Documented values: ADR (Tarifa media diaria), EMPLEOS,
+      EMPLEOS_PERNOCTACIONES (per 1,000 overnight stays), EMPLEOS_PLAZA (per 100 beds), ESTABLECIMIENTOS, HABITACIONES,
+      PLAZAS, REVPAR (labelled ''Ingresos por habitacion''), TASA_OCUPACION_HABITACION, TASA_OCUPACION_PLAZA, EMPLEOS_ENTRADOS
+      (per 100 travellers entered), EMPLEOS_INGRESOS (per 10,000 euros of income), INGRESOS_TOTALES. Units of the
+      indicators are not published in the metadata read.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: ADR
+    - property: observed_max
+      value: TASA_OCUPACION_PLAZA
+    - property: observed_values
+      value:
+      - ADR
+      - EMPLEOS
+      - EMPLEOS_ENTRADOS
+      - EMPLEOS_INGRESOS
+      - EMPLEOS_PERNOCTACIONES
+      - EMPLEOS_PLAZA
+      - ESTABLECIMIENTOS
+      - HABITACIONES
+      - INGRESOS_TOTALES
+      - PLAZAS
+      - REVPAR
+      - TASA_OCUPACION_HABITACION
+      - TASA_OCUPACION_PLAZA
+  - name: OBS_VALUE
+    logicalType: number
+    physicalType: number
+    description: Observation value (primary measure). Its unit depends on the indicator in MEDIDAS_CODE; units are
+      not defined in the metadata read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 2.773
+    - property: observed_distinct
+      value: 20510
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 5929406.0
+  - name: NOTAS_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: Spanish-language text of the observation attribute 'Anotacion' (annotation), attached at observation
+      level.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: CONFIDENCIALIDAD_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: 'Spanish-language label of the observation attribute ''Confidencialidad - estado''. Documented
+      value: C (Informacion estadistica confidencial).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.148
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Información estadística confidencial
+    - property: observed_max
+      value: Información estadística confidencial
+    - property: observed_values
+      value:
+      - Información estadística confidencial
+  - name: CONFIDENCIALIDAD_OBSERVACION_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the observation attribute ''Confidencialidad - estado''. Documented value: C (confidential
+      statistical information).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.148
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: C
+    - property: observed_max
+      value: C
+    - property: observed_values
+      value:
+      - C
+  - name: ESTADO_OBSERVACION#es
+    logicalType: string
+    physicalType: text
+    description: 'Spanish-language label of the observation attribute ''Estado de la observacion''. Documented value:
+      O (Valor no disponible / Missing value).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.082
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Valor no disponible
+    - property: observed_max
+      value: Valor no disponible
+    - property: observed_values
+      value:
+      - Valor no disponible
+  - name: ESTADO_OBSERVACION_CODE
+    logicalType: string
+    physicalType: text
+    description: 'Code of the observation attribute ''Estado de la observacion''. Documented value: O (missing value).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 99.082
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: O
+    - property: observed_max
+      value: O
+    - property: observed_values
+      value:
+      - O
+  - name: ALOJAMIENTO_TURISTICO_TIPO
+    logicalType: string
+    physicalType: text
+    description: Dataset-level attribute 'Tipo de alojamiento turistico'; documented value 5510 (Hotels and similar
+      accommodation). Not present as a column in the CSV sample.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: NOTAS_DATASET
+    logicalType: string
+    physicalType: text
+    description: Dataset-level attribute 'Anotacion' (annotation). Not present as a column in the CSV sample.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: PERIODO_RECOGIDA
+    logicalType: string
+    physicalType: text
+    description: Attribute 'Periodo - recogida' (time period - collection) attached to the dimensions TIME_PERIOD
+      and MEDIDAS. Not present as a column in the CSV sample.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: ESTADO_OBSERVACION_TERRITORIO_CATEGORIA
+    logicalType: string
+    physicalType: text
+    description: Attribute 'Estado de la observacion' attached to the dimensions TERRITORIO and ALOJAMIENTO_TURISTICO_CATEGORIA.
+      Not present as a column in the CSV sample.
+    customProperties:
+    - property: evidence
+      value: documented
+  - name: CONFIDENCIALIDAD_OBSERVACION_TERRITORIO_CATEGORIA
+    logicalType: string
+    physicalType: text
+    description: Attribute 'Confidencialidad - estado' attached to the dimensions TERRITORIO and ALOJAMIENTO_TURISTICO_CATEGORIA.
+      Not present as a column in the CSV sample.
+    customProperties:
+    - property: evidence
+      value: documented
+  quality:
+  - name: observed_composite_key_unique
+    type: text
+    description: 'Observed in sample of 84929 rows on 2026-10-24; not a producer guarantee: the combination TERRITORIO_CODE
+      + TIME_PERIOD_CODE + MEDIDAS_CODE + ALOJAMIENTO_TURISTICO_CATEGORIA_CODE has no duplicates.'
+    dimension: uniqueness
+  - name: observed_obs_value_nulls
+    type: text
+    description: 'Observed in sample of 84929 rows on 2026-10-24; not a producer guarantee: OBS_VALUE is empty in
+      2355 rows (2.773%). Observed empties coincide approximately with rows flagged ESTADO_OBSERVACION_CODE=O (780
+      rows) or CONFIDENCIALIDAD_OBSERVACION_CODE=C (1573 rows).'
+    dimension: completeness
+slaProperties:
+- property: frequency
+  value: 1
+  unit: months
+  description: 'Update frequency declared in the dataset metadata (updateFrequency: M, monthly). Next version: NON_SCHEDULED_UPDATE.'
+support:
+- channel: email
+  url: mailto:consultas.istac@gobiernodecanarias.org
+  description: ISTAC contact published in the dataset metadata.
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00065A_000033/~latest.csv
+- property: license
+  value: 'Aviso Legal ISTAC: reuse allowed (commercial and non-commercial) under Ley 37/2007 provided the source
+    is cited, e.g. ''Fuente: Instituto Canario de Estadistica (ISTAC)''. No named license.'
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://datos.canarias.es/api/estadisticas/statistical-resources/v1.0/datasets/ISTAC/C00065A_000033/~latest.json?fields=-data
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 84929
+- property: sample_selection
+  value: 'Full CSV downloaded (140,530 rows, 13.8 MB) and reduced to rows whose TIME_PERIOD_CODE year is <=2010
+    or >=2018 (84,929 rows) to respect the 100,000-row limit: 2009-2010 as an old stretch and 2018-2026 as recent.
+    Every year has the same number of rows, so no schema variation was visible across years.'
+- property: sample_status
+  value: ok
+- property: dataset_version
+  value: '2.22'
+- property: dataset_last_update
+  value: '2026-10-23T12:33:57.295+01:00'
+- property: dataset_full_observations
+  value: 140530
+- property: official_statistic
+  value: OFFICIAL
+contractCreatedTs: '2026-10-24T00:00:00Z'

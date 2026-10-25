@@ -1,0 +1,1503 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 111306c5-de93-56ce-ae66-6e7f6de5e3ad
+version: 0.1.0
+status: draft
+name: adsb.lol real-time aircraft (v2 point query)
+domain: mobility
+description:
+  purpose: Real-time ADS-B aircraft state reports (identification, position, altitude, speed, heading,
+    integrity indicators) returned by the community adsb.lol API for a circle around a point, in readsb
+    tar1090 JSON format.
+  limitations: 'Field descriptions and units come from the readsb README-json, not from adsb.lol, which
+    publishes only names and types in its OpenAPI; assuming adsb.lol follows readsb is plausible but not
+    declared. Unit of ''now'' for adsb.lol is not documented (readsb: seconds; the sample is consistent
+    with milliseconds). ctime, ptime, msg, total are not described. Possible values of ''type'', ''emergency''
+    and ''category'' are from readsb only; the sample shows a single type value (adsb_icao). No SLA, update
+    frequency, availability or retention is documented; a rate-limit header was observed but is not documented.
+    Terms of use for production are not defined (the producer asks to be contacted). Keys are omitted
+    when data is missing, so null and absent cannot be told apart in the profile. The profiler loads JSON
+    via pandas, so observed integer fields with missing values appear as numbers in profile.json although
+    the raw JSON uses integers. Snapshot has no history: coverage over time, flights over the Canary Islands
+    per day and database fields (r, t, dbFlags) completeness are not known. Aircraft identifiers (hex,
+    registration, callsign) are public ADS-B broadcast data but are not shown as examples here.'
+  usage: Query GET /v2/point/{lat}/{lon}/{radius} (radius max 250 nm) and flatten the ac array; the response
+    is a point-in-time snapshot, so history must be built by repeated polling within the producer's usage
+    limits.
+tags:
+- aviation
+- ads-b
+- real-time
+- adsb-lol
+schema:
+- name: aircraft
+  logicalType: object
+  physicalType: JSON object (element of the ac array)
+  description: 'One aircraft position/state report in an instantaneous snapshot (readsb tar1090 format).
+    Grain: one record per aircraft per query; the same aircraft appears again in later snapshots.'
+  properties:
+  - name: alert
+    logicalType: integer
+    physicalType: integer
+    description: Flight status alert bit. (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - '0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: alt_baro
+    logicalType: string
+    physicalType: integer or string
+    description: Barometric altitude in feet, or the string 'ground'. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 48
+    - property: observed_unique_in_sample
+      value: false
+    - property: nullable_in_openapi
+      value: anyOf null
+    - property: observed_note
+      value: one record with the string 'ground', the others integers
+  - name: alt_geom
+    logicalType: integer
+    physicalType: integer
+    description: Geometric (GNSS/INS) altitude in feet, referenced to WGS84. (description from readsb
+      README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 49
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 175.0
+    - property: observed_max
+      value: 44925.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: baro_rate
+    logicalType: integer
+    physicalType: integer
+    description: Rate of change of barometric altitude in feet per minute. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 8.333
+    - property: observed_distinct
+      value: 29
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -5568.0
+    - property: observed_max
+      value: 1792.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: category
+    logicalType: string
+    physicalType: string
+    description: 'Emitter category (readsb: values A0 through D7). (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - A0
+      - A1
+      - A2
+      - A3
+      - A5
+      - C0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: emergency
+    logicalType: string
+    physicalType: string
+    description: 'Emergency/priority status (readsb values: none, general, lifeguard, minfuel, nordo,
+      unlawful, downed, reserved). (description from readsb README-json; the adsb.lol OpenAPI gives name
+      and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 5.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - none
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: flight
+    logicalType: string
+    physicalType: string
+    description: Callsign or registration, 8 characters. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: true
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: gs
+    logicalType: number
+    physicalType: number
+    description: Ground speed in knots. (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 47.1
+    - property: observed_max
+      value: 501.2
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: gva
+    logicalType: integer
+    physicalType: integer
+    description: Geometric Vertical Accuracy. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - '1.0'
+      - '2.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: hex
+    logicalType: string
+    physicalType: string
+    description: 24-bit ICAO address as 6 hex digits; a leading '~' means a non-ICAO address (e.g. TIS-B).
+      (description from readsb README-json; the adsb.lol OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: lat
+    logicalType: number
+    physicalType: number
+    description: Aircraft latitude in decimal degrees. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 24.671814
+    - property: observed_max
+      value: 32.050564
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: lon
+    logicalType: number
+    physicalType: number
+    description: Aircraft longitude in decimal degrees. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -18.384843
+    - property: observed_max
+      value: -11.215087
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: messages
+    logicalType: integer
+    physicalType: integer
+    description: Total Mode S messages received from this aircraft. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 883.0
+    - property: observed_max
+      value: 925735.0
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: mlat
+    logicalType: array
+    physicalType: array of string
+    description: List of fields derived from MLAT data. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '[]'
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: nac_p
+    logicalType: integer
+    physicalType: integer
+    description: Navigation Accuracy Category for Position. (description from readsb README-json; the
+      adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 11.0
+    - property: observed_values
+      value:
+      - '0'
+      - '10'
+      - '11'
+      - '8'
+      - '9'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nac_v
+    logicalType: integer
+    physicalType: integer
+    description: Navigation Accuracy Category for Velocity. (description from readsb README-json; the
+      adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - '0.0'
+      - '1.0'
+      - '2.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nav_altitude_mcp
+    logicalType: integer
+    physicalType: integer
+    description: Selected altitude from the MCP/FCU; units not documented. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 13.333
+    - property: observed_distinct
+      value: 23
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2304.0
+    - property: observed_max
+      value: 43008.0
+    - property: observed_values
+      value:
+      - '10016.0'
+      - '11008.0'
+      - '12000.0'
+      - '12992.0'
+      - '14016.0'
+      - '15008.0'
+      - '16992.0'
+      - '2304.0'
+      - '24000.0'
+      - '2496.0'
+      - '3008.0'
+      - '32000.0'
+      - '32992.0'
+      - '34016.0'
+      - '35008.0'
+      - '36000.0'
+      - '36992.0'
+      - '38016.0'
+      - '4000.0'
+      - '43008.0'
+      - '4992.0'
+      - '6016.0'
+      - '8992.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nav_heading
+    logicalType: number
+    physicalType: number
+    description: Selected heading; units not documented. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.0
+    - property: observed_distinct
+      value: 24
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 341.72
+    - property: observed_values
+      value:
+      - '0.0'
+      - '0.7'
+      - '109.69'
+      - '11.25'
+      - '196.17'
+      - '212.34'
+      - '213.75'
+      - '220.08'
+      - '222.19'
+      - '227.81'
+      - '229.92'
+      - '23.91'
+      - '25.31'
+      - '26.02'
+      - '262.97'
+      - '274.92'
+      - '28.83'
+      - '291.09'
+      - '30.23'
+      - '30.94'
+      - '32.34'
+      - '341.72'
+      - '35.16'
+      - '37.27'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nav_qnh
+    logicalType: number
+    physicalType: number
+    description: Altimeter setting in hPa. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 13.333
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1012.8
+    - property: observed_max
+      value: 1024.0
+    - property: observed_values
+      value:
+      - '1012.8'
+      - '1013.6'
+      - '1024.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nic
+    logicalType: integer
+    physicalType: integer
+    description: Navigation Integrity Category. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 8.0
+    - property: observed_max
+      value: 11.0
+    - property: observed_values
+      value:
+      - '11'
+      - '8'
+      - '9'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nic_baro
+    logicalType: integer
+    physicalType: integer
+    description: Navigation Integrity Category for barometric altitude. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '0.0'
+      - '1.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: r
+    logicalType: string
+    physicalType: string
+    description: Registration from the database. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 5.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: rc
+    logicalType: integer
+    physicalType: integer
+    description: Radius of Containment in meters, a position integrity measure. (description from readsb
+      README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 8.0
+    - property: observed_max
+      value: 186.0
+    - property: observed_values
+      value:
+      - '186'
+      - '75'
+      - '8'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: rssi
+    logicalType: number
+    physicalType: number
+    description: Recent average signal power in dBFS; always negative. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 53
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -33.6
+    - property: observed_max
+      value: -1.3
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: sda
+    logicalType: integer
+    physicalType: integer
+    description: System Design Assurance. (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 1.667
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 3.0
+    - property: observed_values
+      value:
+      - '0.0'
+      - '2.0'
+      - '3.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: seen
+    logicalType: number
+    physicalType: number
+    description: Seconds before 'now' since the last message from this aircraft. (description from readsb
+      README-json; the adsb.lol OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 33.9
+    - property: observed_values
+      value:
+      - '0.0'
+      - '0.1'
+      - '0.2'
+      - '0.4'
+      - '0.5'
+      - '0.6'
+      - '1.0'
+      - '1.9'
+      - '33.9'
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: seen_pos
+    logicalType: number
+    physicalType: number
+    description: Seconds before 'now' since the position was last updated. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 24
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 33.922
+    - property: observed_values
+      value:
+      - '0.0'
+      - '0.058'
+      - '0.059'
+      - '0.088'
+      - '0.141'
+      - '0.223'
+      - '0.225'
+      - '0.313'
+      - '0.363'
+      - '0.386'
+      - '0.387'
+      - '0.489'
+      - '0.497'
+      - '0.548'
+      - '0.878'
+      - '0.91'
+      - '1.012'
+      - '1.178'
+      - '1.462'
+      - '1.507'
+      - '1.667'
+      - '1.864'
+      - '1.988'
+      - '33.922'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: sil
+    logicalType: integer
+    physicalType: integer
+    description: Source Integrity Level. (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 3.0
+    - property: observed_values
+      value:
+      - '0'
+      - '2'
+      - '3'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: sil_type
+    logicalType: string
+    physicalType: string
+    description: 'Interpretation of SIL (readsb: unknown, perhour, persample). (description from readsb
+      README-json; the adsb.lol OpenAPI gives name and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - perhour
+      - unknown
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: spi
+    logicalType: integer
+    physicalType: integer
+    description: Special position identification bit. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - '0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: squawk
+    logicalType: string
+    physicalType: string
+    description: Mode A code, 4 octal digits. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.333
+    - property: observed_distinct
+      value: 58
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 731.0
+    - property: observed_max
+      value: 7777.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: t
+    logicalType: string
+    physicalType: string
+    description: Aircraft type from the database. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 5.0
+    - property: observed_distinct
+      value: 17
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - A20N
+      - A21N
+      - A320
+      - A321
+      - A332
+      - A339
+      - AT76
+      - B38M
+      - B737
+      - B738
+      - B77W
+      - C130
+      - C56X
+      - GALX
+      - P208
+      - PIVI
+      - TWR
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: tisb
+    logicalType: array
+    physicalType: array of string
+    description: List of fields derived from TIS-B data. (description from readsb README-json; the adsb.lol
+      OpenAPI gives name and type only.)
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '[]'
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: track
+    logicalType: number
+    physicalType: number
+    description: True track over ground in degrees (0-359). (description from readsb README-json; the
+      adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 7.97
+    - property: observed_max
+      value: 359.73
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: 'Source of the current data (readsb values: adsb_icao, adsb_icao_nt, adsr_icao, tisb_icao,
+      adsc, mlat, other, mode_s, adsb_other, adsr_other, tisb_other, tisb_trackfile). (description from
+      readsb README-json; the adsb.lol OpenAPI gives name and type only.)'
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - adsb_icao
+    - property: nullable_in_openapi
+      value: 'no'
+  - name: version
+    logicalType: integer
+    physicalType: integer
+    description: 'ADS-B version number: 0, 1 or 2 (3-7 reserved). (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 2.0
+    - property: observed_values
+      value:
+      - '0'
+      - '2'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: geom_rate
+    logicalType: integer
+    physicalType: integer
+    description: Rate of change of geometric altitude in feet per minute. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 11.667
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -5568.0
+    - property: observed_max
+      value: 1792.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: dbFlags
+    logicalType: integer
+    physicalType: integer
+    description: 'Bitfield: military (&1), interesting (&2), PIA (&4), LADD (&8). (description from readsb
+      README-json; the adsb.lol OpenAPI gives name and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 98.333
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nav_modes
+    logicalType: array
+    physicalType: array of string
+    description: 'Engaged automation modes (readsb: autopilot, vnav, althold, approach, lnav, tcas). (description
+      from readsb README-json; the adsb.lol OpenAPI gives name and type only.)'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: true_heading
+    logicalType: number
+    physicalType: number
+    description: Heading in degrees clockwise from true north; usually only sent on the ground. (description
+      from readsb README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 15.0
+    - property: observed_distinct
+      value: 51
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 6.37
+    - property: observed_max
+      value: 359.78
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: ias
+    logicalType: integer
+    physicalType: integer
+    description: Indicated airspeed in knots. (description from readsb README-json; the adsb.lol OpenAPI
+      gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.667
+    - property: observed_distinct
+      value: 39
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 183.0
+    - property: observed_max
+      value: 319.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: mach
+    logicalType: number
+    physicalType: number
+    description: Mach number (unitless). (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.667
+    - property: observed_distinct
+      value: 34
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.288
+    - property: observed_max
+      value: 0.828
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: mag_heading
+    logicalType: number
+    physicalType: number
+    description: Heading in degrees clockwise from magnetic north. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 16.667
+    - property: observed_distinct
+      value: 46
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 3.16
+    - property: observed_max
+      value: 342.25
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: oat
+    logicalType: integer
+    physicalType: integer
+    description: Outside/static air temperature in degrees Celsius, calculated from Mach and TAS. (description
+      from readsb README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 26.667
+    - property: observed_distinct
+      value: 26
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -61.0
+    - property: observed_max
+      value: 18.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: roll
+    logicalType: number
+    physicalType: number
+    description: Roll angle in degrees; negative means left roll. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 23.333
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -11.07
+    - property: observed_max
+      value: 1.76
+    - property: observed_values
+      value:
+      - '-0.18'
+      - '-0.35'
+      - '-0.53'
+      - '-0.7'
+      - '-0.88'
+      - '-1.23'
+      - '-1.76'
+      - '-11.07'
+      - '0.0'
+      - '0.18'
+      - '0.35'
+      - '0.53'
+      - '1.76'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: tas
+    logicalType: integer
+    physicalType: integer
+    description: True airspeed in knots. (description from readsb README-json; the adsb.lol OpenAPI gives
+      name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 23.333
+    - property: observed_distinct
+      value: 31
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 192.0
+    - property: observed_max
+      value: 486.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: tat
+    logicalType: integer
+    physicalType: integer
+    description: Total air temperature in degrees Celsius, calculated from Mach and TAS. (description
+      from readsb README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 26.667
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -38.0
+    - property: observed_max
+      value: 27.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: track_rate
+    logicalType: number
+    physicalType: number
+    description: Rate of change of track in degrees per second. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 35.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -0.5
+    - property: observed_max
+      value: 0.25
+    - property: observed_values
+      value:
+      - '-0.03'
+      - '-0.06'
+      - '-0.09'
+      - '-0.5'
+      - '0.0'
+      - '0.03'
+      - '0.09'
+      - '0.25'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: wd
+    logicalType: integer
+    physicalType: integer
+    description: Calculated wind direction; units not documented. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 26.667
+    - property: observed_distinct
+      value: 42
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 28.0
+    - property: observed_max
+      value: 307.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: ws
+    logicalType: integer
+    physicalType: integer
+    description: Calculated wind speed; units not documented. (description from readsb README-json; the
+      adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 26.667
+    - property: observed_distinct
+      value: 31
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 3.0
+    - property: observed_max
+      value: 66.0
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: gpsOkBefore
+    logicalType: number
+    physicalType: number
+    description: Experimental timestamp before which GPS was working well; shown for 15 minutes after
+      GPS is lost or degraded. (description from readsb README-json; the adsb.lol OpenAPI gives name and
+      type only.)
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: gpsOkLat
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer (listed in the adsb.lol OpenAPI model without description).
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: gpsOkLon
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer (listed in the adsb.lol OpenAPI model without description).
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: lastPosition
+    logicalType: object
+    physicalType: object (V2Response_LastPosition)
+    description: Object {lat, lon, nic, rc, seen_pos} with the last valid position once regular lat/lon
+      are over 60 seconds old. (description from readsb README-json; the adsb.lol OpenAPI gives name and
+      type only.)
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: rr_lat
+    logicalType: number
+    physicalType: number
+    description: Rough estimated latitude based on the receiver position, used when no ADS-B or MLAT position
+      exists. (description from readsb README-json; the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: rr_lon
+    logicalType: number
+    physicalType: number
+    description: Rough estimated longitude based on the receiver position, used when no ADS-B or MLAT
+      position exists. (description from readsb README-json; the adsb.lol OpenAPI gives name and type
+      only.)
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: calc_track
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (listed in the adsb.lol OpenAPI model without description).
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: nav_altitude_fms
+    logicalType: integer
+    physicalType: integer
+    description: Selected altitude from the FMS; units not documented. (description from readsb README-json;
+      the adsb.lol OpenAPI gives name and type only.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 73.333
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2304.0
+    - property: observed_max
+      value: 38000.0
+    - property: observed_values
+      value:
+      - '13008.0'
+      - '17008.0'
+      - '2304.0'
+      - '2496.0'
+      - '32000.0'
+      - '34000.0'
+      - '36000.0'
+      - '37008.0'
+      - '38000.0'
+    - property: nullable_in_openapi
+      value: anyOf null
+  - name: dst
+    logicalType: number
+    physicalType: number
+    description: 'Distance in nautical miles from the query point (readsb: documented for circle/closest
+      queries). Not listed in the adsb.lol OpenAPI model.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 6.947
+    - property: observed_max
+      value: 249.067
+  - name: dir
+    logicalType: number
+    physicalType: number
+    description: 'True bearing in degrees from the query point (readsb: documented for circle/closest
+      queries). Not listed in the adsb.lol OpenAPI model.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 59
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5.5
+    - property: observed_max
+      value: 359.7
+  quality:
+  - type: text
+    description: 'Producer-documented (OpenAPI): keys hex, type, messages, mlat, tisb, rssi and seen are
+      required in each aircraft item; all other keys are optional (readsb: keys are omitted when data
+      is missing).'
+  - type: text
+    description: 'Observed in sample of 60 rows on 2026-10-24; not a producer guarantee: hex is unique
+      across the aircraft in the snapshot (unique_in_sample=True).'
+  - type: text
+    description: 'Observed in sample of 60 rows on 2026-10-24; not a producer guarantee: the envelope
+      field total equals the number of items in ac (60).'
+- name: response_envelope
+  logicalType: object
+  physicalType: JSON object (top level of /v2/point response)
+  description: Top-level wrapper of the /v2/point/{lat}/{lon}/{radius} response (OpenAPI model V2Response_Model).
+  properties:
+  - name: ac
+    logicalType: array
+    physicalType: array of V2Response_AcItem
+    description: Aircraft list.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_rows
+      value: 60
+  - name: now
+    logicalType: integer
+    physicalType: integer
+    description: Time the response was generated. readsb documents seconds since the Unix epoch; the sample
+      value is consistent with milliseconds (1792838968001), unit for adsb.lol not documented.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1792838968001.0
+    - property: observed_max
+      value: 1792838968001.0
+    - property: observed_values
+      value:
+      - '1792838968001'
+  - name: ctime
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (listed in the OpenAPI model without description).
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1792838968001.0
+    - property: observed_max
+      value: 1792838968001.0
+    - property: observed_values
+      value:
+      - '1792838968001'
+  - name: ptime
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (listed in the OpenAPI model without description).
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - '0'
+  - name: msg
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (listed in the OpenAPI model without description).
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - No error
+  - name: total
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (listed in the OpenAPI model without description).
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 60.0
+    - property: observed_max
+      value: 60.0
+    - property: observed_values
+      value:
+      - '60'
+customProperties:
+- property: source_url
+  value: https://api.adsb.lol/v2/point/28.0/-15.4/250
+- property: license
+  value: Open Data Commons Open Database License (ODbL) v1.0 (stated in the adsb.lol OpenAPI info; it
+    states the licence covers the API and all data adsb.lol makes public)
+- property: license_url
+  value: https://opendatacommons.org/licenses/odbl/1-0/
+- property: documentation_url
+  value: https://api.adsb.lol/api/openapi.json
+- property: documentation_extra_url
+  value: https://github.com/wiedehopf/readsb/blob/dev/README-json.md
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 60
+- property: sample_selection
+  value: One snapshot of /v2/point/28.0/-15.4/250 (radius 250 nm, the documented maximum; the originally
+    listed radius was 100) at 2026-10-24T10:49:28Z. A single instant is not representative of daily or
+    seasonal traffic.
+- property: sample_status
+  value: ok
+- property: producer_rate_limit_observed
+  value: 'x-ratelimit-limit response header observed on 2026-10-24: ''4, 4;w=1, 60;w=60, 500;w=86400''
+    (not described in the OpenAPI document; semantics not verified).'
+- property: api_key_notice
+  value: The OpenAPI description states that an API key obtained by feeding data may be required in the
+    future; no key was used.
+contractCreatedTs: '2026-10-24T10:50:55Z'

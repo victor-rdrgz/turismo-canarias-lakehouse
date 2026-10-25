@@ -1,0 +1,144 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: fae23185-a180-581a-9e80-92a10366ff26
+version: 0.1.0
+status: draft
+name: Wikimedia hourly pageviews dumps
+domain: web-attention
+description:
+  purpose: 'Hourly pageview counts per Wikimedia project and page from the Wikimedia Analytics dumps. Wikimedia
+    hourly pageview dump files: number of views per project and page for one hour, from May 2015 onwards, including
+    es.wikipedia and pages about Canarias. Definition of pageview and CC0 dedication are published by Wikimedia.'
+  limitations: 'The sample is only the BEGINNING of one hourly file (pageviews-20261020-120000.gz): a 5,000,000-byte
+    Range request, decompressed, first 100,000 lines. Because lines are sorted by domain_code, the sample covers
+    only codes from aa to bg (no es, en or Canarias pages): it is NOT representative of the content. A full file
+    is 61,984,385 bytes (over the 25 MB limit). No header line in the file; column names come from the producer
+    documentation (Wikitech). No separation by agent type or device/app; publication delay not documented; percent-encoding
+    and title encoding not detailed. total_response_size meaning is unclear (observed always 0 in the sample). The
+    listing timestamp is documented as UTC marking the end of the period (research notes). No SLA.'
+  usage: Download the hourly files for the needed hours and filter domain_code (e.g. es, es.m) and the page titles
+    of interest.
+tags:
+- wikimedia
+- pageviews
+- web-traffic
+- cc0
+schema:
+- name: pageviews_hourly
+  logicalType: object
+  physicalType: text
+  description: Space-separated text, one line per (project, page) with views in the hour; no header line; file pageviews-YYYYMMDD-HHMMSS.gz,
+    one per hour.
+  properties:
+  - name: domain_code
+    logicalType: string
+    physicalType: text
+    description: 'Abbreviated project/site code, e.g. ''es'' = es.wikipedia.org; ''.m'' suffix = mobile; ''.zero''
+      and other project suffixes exist. Observed in the sample: only codes from aa to bg (alphabetical start of
+      the file), including the literal two-character value "" (double quotes) in 1925 rows.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 175
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_note
+      value: profile.json (CSV parser) counts the literal "" as empty (1.925%); raw count of that literal value
+        is 1925 rows
+  - name: page_title
+    logicalType: string
+    physicalType: text
+    description: Page title normalized with underscores; '-' on project-level lines. Percent-encoding / encoding
+      detail not documented.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 92283
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_project_line_dash_rows
+      value: 43
+  - name: count_views
+    logicalType: integer
+    physicalType: integer
+    description: 'Number of views in the hour (pageviews as defined by the producer: response status 200 or 304
+      on /wiki/ paths and variants).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 131
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 5769
+    - property: observed_unique_in_sample
+      value: false
+  - name: total_response_size
+    logicalType: integer
+    physicalType: integer
+    description: Sum of response bytes. The research notes say the producer documentation (Wikitech) cites it as
+      removed because imprecise yet still listed; status not verified.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - '0'
+    - property: observed_unique_in_sample
+      value: false
+  quality:
+  - name: observed_total_response_size_zero
+    type: text
+    description: 'Observed in sample of 100000 rows on 2026-10-24; not a producer guarantee: total_response_size
+      is 0 in every row.'
+    dimension: accuracy
+  - name: observed_pair_unique
+    type: text
+    description: 'Observed in sample of 100000 rows on 2026-10-24; not a producer guarantee: (domain_code, page_title)
+      has no duplicates in the sample. The producer documentation (as read in the research notes) states uniqueness
+      per hourly file.'
+    dimension: uniqueness
+slaProperties:
+- property: frequency
+  value: 1
+  unit: hours
+  description: One file per hour, per the producer documentation (as recorded in the research notes); publication
+    delay not documented.
+customProperties:
+- property: source_url
+  value: https://dumps.wikimedia.org/other/pageviews/2026/2026-10/pageviews-20261020-120000.gz
+- property: license
+  value: CC0 (all Analytics datasets are available under the Creative Commons CC0 dedication, per the pageviews
+    readme)
+- property: license_url
+  value: https://dumps.wikimedia.org/other/pageviews/readme.html
+- property: documentation_url
+  value: https://wikitech.wikimedia.org/wiki/Data_Platform/Data_Lake/Traffic/Pageviews
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 100000
+- property: sample_selection
+  value: First 100,000 lines of one hourly file (hour 2026-10-20 12:00:00 per file name), obtained by an HTTP Range
+    request of the first 5,000,000 bytes and partial gzip decompression (357,436 lines available; 100,000 kept).
+    Alphabetical start of the file only (codes aa..bg).
+- property: sample_status
+  value: partial
+- property: file_total_bytes
+  value: 61984385
+- property: file_name
+  value: pageviews-20261020-120000.gz
+contractCreatedTs: '2026-10-24T00:00:00Z'

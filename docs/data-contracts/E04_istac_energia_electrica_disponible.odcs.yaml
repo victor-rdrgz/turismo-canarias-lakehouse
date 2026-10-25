@@ -1,0 +1,450 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: cf3aed9a-4afd-5332-bae7-993c3838052e
+version: 0.1.0
+status: draft
+name: ISTAC electricity available (ENERGIA_ELECTRICA_DISPONIBLE)
+domain: energy
+description:
+  purpose: 'Indicator ''Electricity available'' published by the Canary Islands Statistics Institute (ISTAC):
+    electricity available in MWh (ordinary-regime production plus special-regime production minus generation
+    consumption), monthly and yearly, for the Canary Islands region and each of the seven islands, with
+    variation measures.'
+  limitations: 'Sample is the complete current response of the data endpoint (8,560 observations; 8 territories
+    x 214 periods x 5 measures), taken on 2026-10-24. The structure of the compact response (format/dimension/observation/attribute/attributes)
+    is not defined in the API pages read; the flattening order is inferred from the sample. The original
+    producer of the electricity figures is not named in the pages read. Publication lag: last period in
+    the sample is 2026-06. Meaning of attribute values (ESTADO_OBSERVACION ''Valor provisional''; PERIODO_RECOGIDA
+    ''S''; CONFIDENCIALIDAD_OBSERVACION, OBS_CONF, NOTAS_*) is not explained; only provisional-value status
+    and PERIODO_RECOGIDA appear in the sample. No SLA, deprecation policy or quality rules are published;
+    the metadata mentions confidentiality and note attributes but no values were seen. Monthly and yearly
+    periods are mixed in the same dimension. Terms of use: the legal notice requires citing the source
+    and asks to avoid excessive requests; its full text was only summarised.'
+  usage: Fetch the indicator data endpoint and the metadata sheet; expand observations by GEOGRAPHICAL
+    x TIME x MEASURE. Credit ISTAC as the source.
+tags:
+- istac
+- energy
+- electricity
+- canary-islands
+- open-data
+schema:
+- name: indicator_data_response
+  logicalType: object
+  physicalType: json-document (compact indicator data)
+  description: 'Raw response of the indicator data endpoint: dimension indexes plus flat arrays of observations
+    and attributes. One document holds all territories, periods and measures.'
+  properties:
+  - name: kind
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_values
+      value:
+      - indicators#indicatorData
+  - name: selfLink
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: parentLink
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: format
+    logicalType: array
+    physicalType: array of string
+    description: Order of the dimensions of the flattened observation array. Order semantics are inferred
+      from the sample, not documented in the pages read
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_values
+      value:
+      - GEOGRAPHICAL
+      - TIME
+      - MEASURE
+  - name: dimension
+    logicalType: object
+    physicalType: object
+    description: Per-dimension representation (size and code-to-position index) for GEOGRAPHICAL, TIME
+      and MEASURE. Dimension meaning (territory, period, data representation) is documented in the indicator
+      metadata; the structure itself is not defined by the producer in the pages read
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: observation
+    logicalType: array
+    physicalType: array of string
+    description: Flat array of observation values (decimal numbers encoded as strings), one per combination
+      of the dimensions in 'format'. Layout inferred from the sample (last dimension varies fastest);
+      not documented in the pages read
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_length
+      value: 8560
+  - name: attribute
+    logicalType: array
+    physicalType: array of object|null
+    description: Observation-level attributes aligned with 'observation'; the sample shows null or an
+      ESTADO_OBSERVACION object. Structure not defined by the producer in the pages read
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_length
+      value: 8560
+    - property: observed_non_null
+      value: 240
+  - name: attributes
+    logicalType: array
+    physicalType: array of object
+    description: Dimension-level attributes (id plus value list). In the sample only PERIODO_RECOGIDA
+      appears, aligned with TIME x MEASURE. Structure not defined by the producer in the pages read
+    customProperties:
+    - property: evidence
+      value: observed
+- name: indicator_observations_flat
+  logicalType: object
+  physicalType: csv (derived by the learning project from indicator_data_response)
+  description: 'Row-per-observation view obtained by expanding the compact response (GEOGRAPHICAL x TIME
+    x MEASURE). It is NOT published by the producer; it is derived locally from the sample to profile
+    it. Grain: one row per territory, period and measure.'
+  properties:
+  - name: GEOGRAPHICAL
+    logicalType: string
+    physicalType: string
+    description: Territory. Dimension of the indicator with granularities REGIONS (ES70 Canarias) and
+      ISLANDS (the seven islands). Codes and titles are listed in the indicator metadata.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_values
+      value:
+      - ES70
+      - ES703
+      - ES704
+      - ES705
+      - ES706
+      - ES707
+      - ES708
+      - ES709
+    - property: code_titles
+      value:
+        ES70: Canarias
+        ES703: El Hierro
+        ES704: Fuerteventura
+        ES705: Gran Canaria
+        ES706: La Gomera
+        ES707: La Palma
+        ES708: Lanzarote
+        ES709: Tenerife
+    quality:
+    - type: library
+      metric: invalidValues
+      description: GEOGRAPHICAL must be one of the representation codes listed in the indicator metadata.
+      arguments:
+        validValues:
+        - ES70
+        - ES703
+        - ES704
+        - ES705
+        - ES706
+        - ES707
+        - ES708
+        - ES709
+      mustBe: 0
+      dimension: conformity
+  - name: TIME
+    logicalType: string
+    physicalType: string
+    description: Period. Dimension with granularities MONTHLY (format YYYY-MM) and YEARLY (format YYYY);
+      both kinds of period coexist in the same column.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 214
+    - property: documented_range
+      value: MONTHLY 2010-01 to 2026-06; YEARLY 2010 to 2025
+  - name: MEASURE
+    logicalType: string
+    physicalType: string
+    description: 'Data representation: ABSOLUTE (the value, MWh), ANNUAL_PERCENTAGE_RATE (%), ANNUAL_PUNTUAL_RATE
+      (MWh), INTERPERIOD_PERCENTAGE_RATE (%), INTERPERIOD_PUNTUAL_RATE (MWh). Units as published in the
+      indicator metadata.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_values
+      value:
+      - ABSOLUTE
+      - ANNUAL_PERCENTAGE_RATE
+      - ANNUAL_PUNTUAL_RATE
+      - INTERPERIOD_PERCENTAGE_RATE
+      - INTERPERIOD_PUNTUAL_RATE
+    - property: units
+      value:
+        ABSOLUTE: MWh
+        ANNUAL_PUNTUAL_RATE: MWh
+        INTERPERIOD_PUNTUAL_RATE: MWh
+        ANNUAL_PERCENTAGE_RATE: '%'
+        INTERPERIOD_PERCENTAGE_RATE: '%'
+    - property: decimal_places_documented
+      value: 2
+    quality:
+    - type: library
+      metric: invalidValues
+      description: MEASURE must be one of the representation codes listed in the indicator metadata.
+      arguments:
+        validValues:
+        - ABSOLUTE
+        - ANNUAL_PERCENTAGE_RATE
+        - ANNUAL_PUNTUAL_RATE
+        - INTERPERIOD_PERCENTAGE_RATE
+        - INTERPERIOD_PUNTUAL_RATE
+      mustBe: 0
+      dimension: conformity
+  - name: observation
+    logicalType: number
+    physicalType: string (decimal text, 2 decimals)
+    description: Observation value. The indicator measures electricity available = ordinary-regime production
+      + special-regime production - generation consumption, in MWh; rate measures are in percent.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6685
+    - property: observed_min
+      value: -919723.25
+    - property: observed_max
+      value: 8929406.71
+  - name: estado_observacion
+    logicalType: string
+    physicalType: string
+    description: Derived from observation-level attribute ESTADO_OBSERVACION ('Estado de la observación'
+      in the metadata); empty when the attribute is null. Meaning of the values is not defined beyond
+      the label.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.196
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Valor provisional
+  - name: periodo_recogida
+    logicalType: string
+    physicalType: string
+    description: Derived from dimension-level attribute PERIODO_RECOGIDA ('Periodo - recogida' in the
+      metadata, attached to TIME and MEASURE). The code 'S' is not explained by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.879
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - S
+  quality:
+  - type: library
+    metric: duplicateValues
+    description: 'Observed in sample of 8560 rows on 2026-10-24; not a producer guarantee: no duplicate
+      (GEOGRAPHICAL, TIME, MEASURE) combination. The producer documents these three dimensions as the
+      observation coordinates but does not declare a primary key.'
+    arguments:
+      properties:
+      - GEOGRAPHICAL
+      - TIME
+      - MEASURE
+    mustBe: 0
+    dimension: uniqueness
+  - type: library
+    metric: nullValues
+    description: 'Observed in sample of 8560 rows on 2026-10-24; not a producer guarantee: no null/empty
+      observation.'
+    arguments:
+      properties:
+      - observation
+    mustBe: 0
+    dimension: completeness
+  customProperties:
+  - property: derived_view
+    value: true
+  - property: derivation_script
+    value: flatten_e04.py (learning project scratch)
+- name: indicator_metadata
+  logicalType: object
+  physicalType: json-document
+  description: 'Indicator metadata sheet (without /data): title, concept definition, subject, dimensions
+    and their codes, units, decimals, version and last update.'
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: kind
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: selfLink
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: parentLink
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: code
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: version
+    logicalType: string
+    physicalType: string
+    description: Indicator version; observed 1.148.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: title
+    logicalType: object
+    physicalType: object
+    description: 'Indicator title (localised: es, en). Observed es: ''Energía eléctrica. Disponible''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: subjectCode
+    logicalType: string
+    physicalType: string
+    description: Subject (materia) code; observed T110000.T110300.T110301.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: systemSurveyLinks
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: conceptDescription
+    logicalType: object
+    physicalType: object
+    description: 'Definition of the indicator: electricity available (MWh) = ordinary-regime production
+      + special-regime production - generation consumption.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: dimension
+    logicalType: object
+    physicalType: object
+    description: Dimensions of the indicator (GEOGRAPHICAL, TIME, MEASURE) with granularities, representation
+      codes and, for MEASURE, quantity (unit, symbol, decimal places).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: attribute
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: childLink
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: mainIndicator
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: subjectTitle
+    logicalType: object
+    physicalType: object
+    description: 'Subject title (localised). Observed es: ''Energía''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: lastUpdate
+    logicalType: timestamp
+    physicalType: string (ISO 8601 with offset)
+    description: Date and time of last update of the indicator; observed 2026-09-25T12:20:58.507+01:00.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: decimalPlaces
+    logicalType: integer
+    physicalType: integer
+    description: Number of decimals of the indicator; observed 2.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/indicators/v1.0/indicators/ENERGIA_ELECTRICA_DISPONIBLE/data
+- property: license
+  value: 'ISTAC legal notice: reuse allowed (commercial and non-commercial) citing the source ''Fuente:
+    Instituto Canario de Estadística (ISTAC)''; no guarantee of continuity or accuracy'
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://www3.gobiernodecanarias.org/aplicaciones/appsistac/api
+- property: metadata_url
+  value: https://datos.canarias.es/api/estadisticas/indicators/v1.0/indicators/ENERGIA_ELECTRICA_DISPONIBLE
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 8560
+- property: sample_selection
+  value: Complete response of the data endpoint without parameters (all territories, periods and measures);
+    metadata sheet fetched separately. Profile computed on the locally flattened view (derived_flat.csv).
+- property: sample_status
+  value: ok
+- property: producer_frequency
+  value: Monthly and yearly (as stated in the catalogue; not a contractual SLA)
+contractCreatedTs: '2026-10-24T12:00:00Z'

@@ -1,0 +1,428 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: e31f26ae-359b-5c4c-89e7-40daedf3af3c
+version: 0.1.0
+status: draft
+name: Waste management in Tenerife (weighing control of waste entries)
+domain: environment
+description:
+  purpose: 'Records of waste received at Tenerife facilities (weighing control): municipality and postal
+    code of the depositor, facility, European waste code (LER) and name, type of depositor, date and weight
+    in tonnes.'
+  limitations: 'The data dictionary lists names, text/numeric types and meanings, but no key, valid-value
+    lists (other than True/False), null handling, update policy or change policy. The yearly files are
+    only partially sampled (first 8 MB each of 2023 and 2010); years 2011-2022 not sampled, so schema
+    drift across years is unverified. In the 2010 sample the date field (fecha) is empty in every row,
+    so the 2010 file cannot be placed in time from its contents; whether other early years are the same
+    is unknown. The CKAN frequency says Monthly, but the original record was last modified 2025-02-20
+    and only years up to 2023 are listed; the real update cadence is not verified (SLA frequency below
+    is the declared one, not verified). Timezone of fecha not documented. Units: peso_vertido in tonnes
+    (documented). tipo_vertido_id is typed text but values look numeric; leading zeros of LER codes not
+    verified. Postal code is typed numeric by the producer. Rows lack an identifier: the same (municipality,
+    plant, waste type, date, weight) combination appears more than once, and whether that denotes duplicates
+    or distinct weighings is not documented. Personal data: the records identify companies/organisations
+    by municipality and postal code only; no names observed.'
+  usage: Union the yearly CSV files and load them as one table, keeping the year of the source file because
+    fecha may be empty; apply the data dictionary types explicitly.
+tags:
+- waste
+- tenerife
+- cabildo
+- ler
+schema:
+- name: control_residuos
+  logicalType: object
+  physicalType: CSV (comma-separated, UTF-8 with BOM, header row); one file per year, JSON twin also published
+  description: 'Weighing-control records of waste received at Tenerife waste management facilities (Cabildo
+    de Tenerife). Grain: one record per delivery (vertido/pesaje); the producer declares no unique identifier.'
+  properties:
+  - name: municipio_nombre
+    logicalType: string
+    physicalType: text
+    description: Nombre del municipio donde se localiza la empresa / organismo que realiza el vertido.
+      (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.002
+    - property: observed_distinct
+      value: 16
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ADEJE
+      - ARAFO
+      - ARICO
+      - ARONA
+      - BUENAVISTA DEL NORTE
+      - CANDELARIA
+      - FASNIA
+      - GARACHICO
+      - GRANADILLA DE ABONA
+      - GUANCHA,LA
+      - GUIA DE ISORA
+      - GÜÍMAR
+      - ICOD DE LOS VINOS
+      - LAGUNA,LA
+      - MATANZA,LA
+      - OROTAVA,LA
+    - property: note
+      value: observed names use the form 'OROTAVA,LA' (article after comma)
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 18
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: planta_nombre
+    logicalType: string
+    physicalType: text
+    description: Nombre de la instalación donde se realiza el vertido. (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 11
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Complejo Ambiental - Arico
+      - Compostaje
+      - Envases PT-2 - La Orotava
+      - Envases PT-3 - Arona
+      - Envases PT-4 - El Rosario
+      - PT-1 - La Guancha
+      - PT-2 - La Orotava
+      - PT-3 - Arona
+      - PT-4 - El Rosario
+      - PTMRD - Mezclas de residuos municipales
+      - PTMRD - Residuos voluminosos
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 8
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: planta_vertedero
+    logicalType: string
+    physicalType: text
+    description: 'Indica si el vertido procede una planta de transferencia o es un vertido directo en
+      el Complejo Ambiental. Valores: True/ False. (producer data dictionary)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+    - property: documented_values
+      value:
+      - 'True'
+      - 'False'
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 2
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+    - property: producer_quality_rule
+      value: valid values True/False (documented)
+  - name: tipo_vertido_id
+    logicalType: string
+    physicalType: text
+    description: Código europeo de residuo (LER). (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 32
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 20104.0
+    - property: observed_max
+      value: 200399.0
+    - property: observed_note
+      value: observed values look like integers; 5-digit values such as 20104 are present (leading zero,
+        if any, not preserved or never present; not verified)
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 22
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: tipo_vertido_nombre
+    logicalType: string
+    physicalType: text
+    description: Denominación del tipo de residuo (LER). (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 32
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 22
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: tercero_codigo_postal
+    logicalType: number
+    physicalType: numeric
+    description: Código postal de la empresa / organismo que realiza el vertido. (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 3.431
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 35002.0
+    - property: observed_max
+      value: 38689.0
+    - property: observed_null_pct_2010_sample
+      value: 18.85
+    - property: observed_distinct_2010_sample
+      value: 20
+    - property: dictionary_datatype
+      value: numeric
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: tercero_ayuntamiento
+    logicalType: string
+    physicalType: text
+    description: 'Indica si el vertido procede del servicio de recogida municipal. Valores: True/ False.
+      (producer data dictionary)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.002
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+    - property: documented_values
+      value:
+      - 'True'
+      - 'False'
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 2
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+    - property: producer_quality_rule
+      value: valid values True/False (documented)
+  - name: tercero_particular
+    logicalType: string
+    physicalType: text
+    description: 'Indica si el vertido procede de una empresa/particular a la que se le factura mensualmente
+      Valores: True/ False. (producer data dictionary)'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.002
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+    - property: documented_values
+      value:
+      - 'True'
+      - 'False'
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 2
+    - property: dictionary_datatype
+      value: text
+    - property: observed_sample_2023_rows
+      value: 65902
+    - property: producer_quality_rule
+      value: valid values True/False (documented)
+  - name: fecha
+    logicalType: timestamp
+    physicalType: timestamp
+    description: Fecha en la que se realizó el vertido. (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 59846
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2023-01-01T10:52:00'
+    - property: observed_max
+      value: '2023-12-31T18:40:00'
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM:SS without timezone; timezone not documented
+    - property: observed_null_pct_2010_sample
+      value: 100.0
+    - property: observed_distinct_2010_sample
+      value: 0
+    - property: dictionary_datatype
+      value: timestamp
+    - property: observed_sample_2023_rows
+      value: 65902
+  - name: peso_vertido
+    logicalType: number
+    physicalType: numeric
+    description: Peso del vertido en toneladas. (producer data dictionary)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2172
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 22.739999771118164
+    - property: documented_unit
+      value: tonnes
+    - property: observed_precision_note
+      value: values appear as float32 conversions, e.g. 5.980000019073486
+    - property: observed_null_pct_2010_sample
+      value: 0.0
+    - property: observed_distinct_2010_sample
+      value: 2949
+    - property: dictionary_datatype
+      value: numeric
+    - property: observed_sample_2023_rows
+      value: 65902
+  customProperties:
+  - property: files_published_per_year
+    value: control-de-residuos-YYYY.csv and .json, years 2010-2023 in the CKAN resource list
+  - property: csv_encoding_observed
+    value: UTF-8 with BOM
+  - property: csv_delimiter_observed
+    value: ','
+  - property: ckan_resources_count
+    value: 29
+  quality:
+  - type: library
+    metric: invalidValues
+    mustBe: 0
+    dimension: conformity
+    description: 'Documented by the producer (data dictionary): values of planta_vertedero are True/False.'
+    arguments:
+      validValues:
+      - 'True'
+      - 'False'
+  - type: library
+    metric: invalidValues
+    mustBe: 0
+    dimension: conformity
+    description: 'Documented by the producer (data dictionary): values of tercero_ayuntamiento are True/False.'
+    arguments:
+      validValues:
+      - 'True'
+      - 'False'
+  - type: library
+    metric: invalidValues
+    mustBe: 0
+    dimension: conformity
+    description: 'Documented by the producer (data dictionary): values of tercero_particular are True/False.'
+    arguments:
+      validValues:
+      - 'True'
+      - 'False'
+  - type: text
+    description: 'Observed in sample of 75703 rows (2010 file, first 8 MB) on 2026-10-24; not a producer
+      guarantee: fecha is empty in 100% of rows in the 2010 sample, while in the 2023 sample (65902 rows)
+      it is empty in 0.0% of rows.'
+  - type: text
+    description: 'Observed in sample of 65902 rows (2023 file, first 8 MB) on 2026-10-24; not a producer
+      guarantee: the combination municipio_nombre, planta_nombre, tipo_vertido_id, fecha, peso_vertido
+      is not unique (4 rows in duplicate groups); in the 2010 sample 65981 rows are in duplicate groups
+      (fecha empty). The producer declares no key.'
+  - type: text
+    description: 'Observed in sample of 65902 rows on 2026-10-24; not a producer guarantee: peso_vertido
+      minimum 0.0 and maximum 22.739999771118164 tonnes; no negative values.'
+slaProperties:
+- property: frequency
+  value: 1
+  unit: months
+support:
+- channel: other
+  url: https://datos.tenerife.es/datos/conjuntos-de-datos/gestion-de-residuos-de-tenerife
+  description: Dataset page; the CKAN metadata names Servicio Tecnico de Desarrollo Sostenible (Cabildo
+    de Tenerife) as contact (no e-mail published in the metadata read).
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/catalogos/general/dataset/gestion-de-residuos-de-tenerife
+- property: license
+  value: CC BY (CKAN license_title; license_id cc-by)
+- property: license_url
+  value: http://www.opendefinition.org/licenses/cc-by
+- property: documentation_url
+  value: https://datos.tenerife.es/ckan/dataset/f683b3b9-9276-44f6-8b14-39d26e977d74/resource/36e003e5-1ecb-47a7-98c6-1ed1c2da41b8/download/diccionario-de-datos-sobre-la-recogida-de-residuos.json
+- property: documentation_extra_url
+  value: https://datos.canarias.es/catalogos/general/api/3/action/package_show?id=gestion-de-residuos-de-tenerife
+- property: publisher
+  value: Cabildo Insular de Tenerife (original portal datos.tenerife.es, harvested by datos.canarias.es)
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 141605
+- property: sample_selection
+  value: First 8,388,608 bytes (HTTP Range) of the 2023 CSV (65902 complete data rows after dropping the
+    truncated last line) and of the 2010 CSV (75703 rows), plus the data dictionary JSON. The full yearly
+    CSVs are 17.9 MB and 15.7 MB. Rows are not ordered by date, so each partial file is a block of the
+    sort order, not the first months. Raw truncated files kept; profiles were computed on derived_*_complete_lines.csv.
+    Years 2011-2022 not sampled.
+- property: sample_status
+  value: partial
+- property: ckan_metadata_modified
+  value: 2026-10-21T20:08:29 (datos.canarias.es record)
+- property: ckan_modified_original
+  value: '2025-02-20T09:02:17'
+contractCreatedTs: '2026-10-24T15:02:12Z'

@@ -1,0 +1,1828 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 2c197025-e429-5000-a649-df5b2ee3bcd4
+version: 0.1.0
+status: draft
+name: DGT DATEX II SituationPublication (road traffic incidents, Spain)
+domain: mobility
+description:
+  purpose: 'Real-time road incident feed of the Spanish traffic authority (DGT) through its National Access Point (NAP): DATEX
+    II v3 SituationPublication, DGT profile 3.7 (file datex2_v37.xml). Each situation groups one or more situation records
+    (roadworks, lane closures, speed restrictions, accidents, vehicles stuck, weather and surface conditions) with cause,
+    validity period and a location (road, kilometre point, coordinates, municipality, province, autonomous community) as a
+    segment or a point. Coverage per the NAP: Spanish national road network excluding the Basque Country and Catalonia.'
+  limitations: |-
+    - The profile PDF describes the structure with class diagrams and annotated XML examples, not a field-by-field dictionary; descriptions here come from those annotations. Many elements (severity, overallSeverity, enumerations, units of speed/weight/width/length values, coordinate reference system) are not defined in the text read, and the XSD of the profile was not read.
+    - The enumerated values listed for each column are observed in this one snapshot; the full enumerations are in the DATEX II schema and were not consulted. The extended values (_extended / _extendedValue) are not explained.
+    - Coverage: the NAP states Catalonia and the Basque Country are excluded, yet the sample contains 6 point records in Cataluña (autonomousCommunity) - not explained. Canarias appears (18 point records, 18 segments by autonomous community).
+    - The feed is a snapshot of currently active incidents (cache max-age 7 s observed, update every 1 minute per the NAP): no history; versions of a record are overwritten and expired records disappear.
+    - Licence is ambiguous: the NAP dataset page says 'Licence and Free of charge', its footer shows Creative Commons Attribution (CC BY), and terms point to the DGT legal notice (not read). Treated as unverified.
+    - Registered users get e-mail notices of outages and changes (2 months in advance); there is no SLA. Older profile versions exist as separate datasets (v3.6; v1 deprecated 12/01/2026 per earlier research).
+    - The flattened columns are a modelling choice of this contract; the raw XML is the source of truth. Some columns hold non-ASCII text (names of places).
+  usage: Download the XML periodically, parse situation/situationRecord, and keep (record id, version, load time). Treat identifiers
+    as strings, timestamps as ISO 8601 with offset. Filter Canary Islands by autonomousCommunity = Canarias. Cite DGT as source
+    per the NAP terms.
+tags:
+- mobility
+- traffic
+- road
+- datex2
+- dgt
+- spain
+- near-real-time
+- xml
+schema:
+- name: situation_record_flat
+  logicalType: object
+  physicalType: xml
+  description: One row per situationRecord of the DATEX II v3 (DGT profile 3.7_1.0) SituationPublication XML. The source is
+    a nested XML document (payload > situation > situationRecord); the contract flattens each situationRecord into columns
+    named after the element path relative to situationRecord (attributes marked with @). Columns appear only when the element
+    occurs in the sample; a record has only the elements that apply to its type and location kind (linear segment from/to
+    or single point).
+  properties:
+  - name: situation_id
+    logicalType: string
+    physicalType: xml element (text)
+    description: Identifier of the situation (attribute id of the element situation); a situation groups 1..n situation records.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 648
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2816645.0
+    - property: observed_max
+      value: 24987580.0
+  - name: situation_overallSeverity
+    logicalType: string
+    physicalType: xml element (text)
+    description: Overall severity of the situation (child element overallSeverity of situation). Not defined by the producer
+      in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 87.234
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: highest
+    - property: observed_max
+      value: medium
+    - property: observed_values
+      value:
+      - highest
+      - medium
+  - name: situation_informationStatus
+    logicalType: string
+    physicalType: xml element (text)
+    description: Information status of the situation header (headerInformation/informationStatus); example value real.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: real
+    - property: observed_max
+      value: real
+    - property: observed_values
+      value:
+      - real
+  - name: record@id
+    logicalType: string
+    physicalType: xml attribute
+    description: Identifier of the situation record (attribute id).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 846
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 5684393.0
+    - property: observed_max
+      value: 29358426.0
+    - property: xml_path_relative_to_situationRecord
+      value: record@id
+  - name: record@version
+    logicalType: string
+    physicalType: xml attribute
+    description: Version of the situation record (attribute version); a record is versioned.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 27
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 381.0
+    - property: xml_path_relative_to_situationRecord
+      value: record@version
+  - name: record@type
+    logicalType: string
+    physicalType: xml attribute xsi:type
+    description: 'DATEX II type of the situation record (xsi:type). Types used by the DGT profile: GenericSituationRecord,
+      RoadOrCarriagewayOrLaneManagement, WinterDrivingManagement, SpeedManagement, GeneralInstructionOrMessageToRoadUsers,
+      MaintenanceWorks, AbnormalTraffic, PoorEnvironmentConditions, NonWeatherRelatedRoadConditions, VehicleObstruction, AnimalPresenceObstruction,
+      GeneralObstruction, TransitInformation (list as read in the profile summary; the sample uses a subset).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: sit:AbnormalTraffic
+    - property: observed_max
+      value: sit:VehicleObstruction
+    - property: observed_values
+      value:
+      - sit:AbnormalTraffic
+      - sit:GeneralInstructionOrMessageToRoadUsers
+      - sit:GeneralObstruction
+      - sit:GenericSituationRecord
+      - sit:NonWeatherRelatedRoadConditions
+      - sit:PoorEnvironmentConditions
+      - sit:RoadOrCarriagewayOrLaneManagement
+      - sit:SpeedManagement
+      - sit:VehicleObstruction
+    - property: xml_path_relative_to_situationRecord
+      value: record@type
+  - name: situationRecordCreationTime
+    logicalType: timestamp
+    physicalType: xml element (text)
+    description: Date the first version of the record was generated.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 802
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_format
+      value: ISO 8601 with offset, e.g. +01:00 / +02:00
+  - name: situationRecordVersionTime
+    logicalType: timestamp
+    physicalType: xml element (text)
+    description: Date of the last revision of the record.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 802
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_format
+      value: ISO 8601 with offset, e.g. +01:00 / +02:00
+  - name: probabilityOfOccurrence
+    logicalType: string
+    physicalType: xml element (text)
+    description: Probability of occurrence; certain means confirmed (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: certain
+    - property: observed_max
+      value: certain
+    - property: observed_values
+      value:
+      - certain
+  - name: source/sourceIdentification
+    logicalType: string
+    physicalType: xml element (text)
+    description: Source that registered the information in the system.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '112'
+    - property: observed_max
+      value: JCYL
+    - property: observed_values
+      value:
+      - '112'
+      - DGT
+      - DGT3.0
+      - JCYL
+    - property: xml_path_relative_to_situationRecord
+      value: source/sourceIdentification
+  - name: validity/validityStatus
+    logicalType: string
+    physicalType: xml element (text)
+    description: Validity status; active means active at the moment (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: active
+    - property: observed_max
+      value: active
+    - property: observed_values
+      value:
+      - active
+    - property: xml_path_relative_to_situationRecord
+      value: validity/validityStatus
+  - name: validity/validityTimeSpecification/overallStartTime
+    logicalType: timestamp
+    physicalType: xml element (text)
+    description: Date the situation started or is expected to start if not yet active.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 683
+    - property: observed_unique_in_sample
+      value: false
+    - property: xml_path_relative_to_situationRecord
+      value: validity/validityTimeSpecification/overallStartTime
+    - property: observed_format
+      value: ISO 8601 with offset, e.g. +01:00 / +02:00
+  - name: cause/causeType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Cause of the situation (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.118
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: abnormalTraffic
+    - property: observed_max
+      value: vehicleObstruction
+    - property: observed_values
+      value:
+      - abnormalTraffic
+      - accident
+      - environmentalObstruction
+      - infrastructureDamageObstruction
+      - obstruction
+      - poorEnvironment
+      - roadMaintenance
+      - roadOrCarriagewayOrLaneManagement
+      - vehicleObstruction
+    - property: xml_path_relative_to_situationRecord
+      value: cause/causeType
+  - name: cause/detailedCauseType/roadMaintenanceType
+    logicalType: string
+    physicalType: xml element (text)
+    description: More detailed cause (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 50.827
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: roadworks
+    - property: observed_max
+      value: roadworks
+    - property: observed_values
+      value:
+      - roadworks
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/roadMaintenanceType
+  - name: locationReference/supplementaryPositionalDescription/carriageway/carriageway
+    logicalType: string
+    physicalType: xml element (text)
+    description: Carriageway type (enumerated; the profile example shows unspecifiedCarriageway).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 39.953
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: entrySlipRoad
+    - property: observed_max
+      value: unspecifiedCarriageway
+    - property: observed_values
+      value:
+      - entrySlipRoad
+      - exitSlipRoad
+      - serviceRoad
+      - unspecifiedCarriageway
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/carriageway/carriageway
+  - name: locationReference/supplementaryPositionalDescription/carriageway/lane/laneUsage
+    logicalType: string
+    physicalType: xml element (text)
+    description: Affected lane (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 40.426
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: _extended
+    - property: observed_max
+      value: tidalFlowLane
+    - property: observed_values
+      value:
+      - _extended
+      - allLanesCompleteCarriageway
+      - carPoolLane
+      - centralReservation
+      - leftLane
+      - middleLane
+      - rightLane
+      - tidalFlowLane
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/carriageway/lane/laneUsage
+  - name: locationReference/supplementaryPositionalDescription/roadInformation/roadName
+    logicalType: string
+    physicalType: xml element (text)
+    description: Road name or number.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 385
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A-1
+    - property: observed_max
+      value: ZA-P-2102
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/roadInformation/roadName
+  - name: locationReference/tpegLinearLocation/tpegDirection
+    logicalType: string
+    physicalType: xml element (text)
+    description: Cardinal direction (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: eastBound
+    - property: observed_max
+      value: westBound
+    - property: observed_values
+      value:
+      - eastBound
+      - northBound
+      - northEastBound
+      - northWestBound
+      - southBound
+      - southEastBound
+      - southWestBound
+      - unknown
+      - westBound
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/tpegDirection
+  - name: locationReference/tpegLinearLocation/tpegLinearLocationType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: segment
+    - property: observed_max
+      value: segment
+    - property: observed_values
+      value:
+      - segment
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/tpegLinearLocationType
+  - name: locationReference/tpegLinearLocation/to/pointCoordinates/latitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Latitude of the point (coordinates of the start/end/single point as annotated in the profile examples). Coordinate
+      reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 394
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 27.939915
+    - property: observed_max
+      value: 43.68813
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/pointCoordinates/latitude
+  - name: locationReference/tpegLinearLocation/to/pointCoordinates/longitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Longitude of the point. Coordinate reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 395
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -17.907791
+    - property: observed_max
+      value: 3.2984407
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/pointCoordinates/longitude
+  - name: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+    logicalType: string
+    physicalType: xml element (text)
+    description: Autonomous community of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Andalucía
+    - property: observed_max
+      value: Rioja, La
+    - property: observed_values
+      value:
+      - Andalucía
+      - Aragón
+      - Asturias, Principado de
+      - Balears, Illes
+      - Canarias
+      - Cantabria
+      - Castilla - La Mancha
+      - Castilla y León
+      - Comunitat Valenciana
+      - Extremadura
+      - Galicia
+      - Madrid, Comunidad de
+      - Murcia, Región de
+      - Navarra, Comunidad Foral de
+      - Rioja, La
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+  - name: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+    logicalType: number
+    physicalType: xml element (text)
+    description: Kilometre point of the road at the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 313
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1120.0
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+  - name: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+    logicalType: string
+    physicalType: xml element (text)
+    description: Municipality of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 244
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Coruña
+    - property: observed_max
+      value: Écija
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+  - name: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+    logicalType: string
+    physicalType: xml element (text)
+    description: Province of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Coruña
+    - property: observed_max
+      value: Ávila
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/to/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+  - name: locationReference/tpegLinearLocation/from/pointCoordinates/latitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Latitude of the point (coordinates of the start/end/single point as annotated in the profile examples). Coordinate
+      reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 399
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 27.95788
+    - property: observed_max
+      value: 43.687576
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/pointCoordinates/latitude
+  - name: locationReference/tpegLinearLocation/from/pointCoordinates/longitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Longitude of the point. Coordinate reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 401
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -17.913755
+    - property: observed_max
+      value: 3.2984116
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/pointCoordinates/longitude
+  - name: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+    logicalType: string
+    physicalType: xml element (text)
+    description: Autonomous community of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Andalucía
+    - property: observed_max
+      value: Rioja, La
+    - property: observed_values
+      value:
+      - Andalucía
+      - Aragón
+      - Asturias, Principado de
+      - Balears, Illes
+      - Canarias
+      - Cantabria
+      - Castilla - La Mancha
+      - Castilla y León
+      - Comunitat Valenciana
+      - Extremadura
+      - Galicia
+      - Madrid, Comunidad de
+      - Murcia, Región de
+      - Navarra, Comunidad Foral de
+      - Rioja, La
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+  - name: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+    logicalType: number
+    physicalType: xml element (text)
+    description: Kilometre point of the road at the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 297
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1102.0
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+  - name: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+    logicalType: string
+    physicalType: xml element (text)
+    description: Municipality of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 247
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Coruña
+    - property: observed_max
+      value: Écija
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+  - name: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+    logicalType: string
+    physicalType: xml element (text)
+    description: Province of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Coruña
+    - property: observed_max
+      value: Ávila
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/from/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+  - name: locationReference/tpegLinearLocation/_tpegLinearLocationExtension/extendedTpegLinearLocation/tpegDirectionRoad
+    logicalType: string
+    physicalType: xml element (text)
+    description: Direction of the kilometre numbering (enumerated, DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 45.035
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: both
+    - property: observed_max
+      value: positive
+    - property: observed_values
+      value:
+      - both
+      - negative
+      - positive
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegLinearLocation/_tpegLinearLocationExtension/extendedTpegLinearLocation/tpegDirectionRoad
+  - name: complianceOption
+    logicalType: string
+    physicalType: xml element (text)
+    description: Compliance option of the measure (element shown in the profile examples, e.g. mandatory).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 41.253
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: advisory
+    - property: observed_max
+      value: mandatory
+    - property: observed_values
+      value:
+      - advisory
+      - mandatory
+  - name: forVehiclesWithCharacteristicsOf/vehicleType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Vehicles affected; anyVehicle means all vehicles (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 41.253
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: _extended
+    - property: observed_max
+      value: carOrLightVehicle
+    - property: observed_values
+      value:
+      - _extended
+      - anyVehicle
+      - car
+      - carOrLightVehicle
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/vehicleType
+  - name: roadOrCarriagewayOrLaneManagementType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Type of road, carriageway or lane management, e.g. laneClosures (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 44.326
+    - property: observed_distinct
+      value: 11
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: carriagewayClosures
+    - property: observed_max
+      value: weightRestrictionInOperation
+    - property: observed_values
+      value:
+      - carriagewayClosures
+      - doNotUseSpecifiedLanesOrCarriageways
+      - intermittentShortTermClosures
+      - laneClosures
+      - lanesDeviated
+      - narrowLanes
+      - newRoadworksLayout
+      - roadClosed
+      - singleAlternateLineTraffic
+      - useOfSpecifiedLanesOrCarriagewaysAllowed
+      - weightRestrictionInOperation
+  - name: locationReference/supplementaryPositionalDescription/roadInformation/roadDestination
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 84.752
+    - property: observed_distinct
+      value: 101
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A RUA
+    - property: observed_max
+      value: valencia/en carril izq
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/roadInformation/roadDestination
+  - name: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/comparisonOperator
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.409
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: greaterThan
+    - property: observed_max
+      value: greaterThan
+    - property: observed_values
+      value:
+      - greaterThan
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/comparisonOperator
+  - name: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/grossVehicleWeight
+    logicalType: number
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.409
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5.5
+    - property: observed_max
+      value: 20.0
+    - property: observed_values
+      value:
+      - '10.0'
+      - '20.0'
+      - '5.5'
+      - '7.5'
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/grossVehicleWeight
+  - name: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/typeOfWeight
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.409
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: maximumPermitted
+    - property: observed_max
+      value: maximumPermitted
+    - property: observed_values
+      value:
+      - maximumPermitted
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/grossWeightCharacteristic/typeOfWeight
+  - name: forVehiclesWithCharacteristicsOf/lengthCharacteristic/comparisonOperator
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: greaterThan
+    - property: observed_max
+      value: greaterThan
+    - property: observed_values
+      value:
+      - greaterThan
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/lengthCharacteristic/comparisonOperator
+  - name: forVehiclesWithCharacteristicsOf/lengthCharacteristic/vehicleLength
+    logicalType: number
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 10.0
+    - property: observed_max
+      value: 10.0
+    - property: observed_values
+      value:
+      - '10.0'
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/lengthCharacteristic/vehicleLength
+  - name: locationReference/supplementaryPositionalDescription/infrastructureDescriptor
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.499
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: atRestArea
+    - property: observed_max
+      value: withinJunction
+    - property: observed_values
+      value:
+      - atRestArea
+      - inTunnel
+      - onBridge
+      - onLevelCrossing
+      - onRoundabout
+      - withinJunction
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/infrastructureDescriptor
+  - name: severity
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 89.007
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: highest
+    - property: observed_max
+      value: medium
+    - property: observed_values
+      value:
+      - highest
+      - medium
+  - name: cause/detailedCauseType/infrastructureDamageType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.045
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: damagedRoadSurface
+    - property: observed_max
+      value: damagedRoadSurface
+    - property: observed_values
+      value:
+      - damagedRoadSurface
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/infrastructureDamageType
+  - name: locationReference/tpegPointLocation/tpegDirection
+    logicalType: string
+    physicalType: xml element (text)
+    description: Cardinal direction (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: eastBound
+    - property: observed_max
+      value: westBound
+    - property: observed_values
+      value:
+      - eastBound
+      - northBound
+      - northEastBound
+      - northWestBound
+      - southBound
+      - southEastBound
+      - southWestBound
+      - unknown
+      - westBound
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/tpegDirection
+  - name: locationReference/tpegPointLocation/tpegSimplePointLocationType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: nonLinkedPoint
+    - property: observed_max
+      value: nonLinkedPoint
+    - property: observed_values
+      value:
+      - nonLinkedPoint
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/tpegSimplePointLocationType
+  - name: locationReference/tpegPointLocation/point/pointCoordinates/latitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Latitude of the point (coordinates of the start/end/single point as annotated in the profile examples). Coordinate
+      reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 371
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 27.84613
+    - property: observed_max
+      value: 43.63748
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/pointCoordinates/latitude
+  - name: locationReference/tpegPointLocation/point/pointCoordinates/longitude
+    logicalType: number
+    physicalType: xml element (text)
+    description: Longitude of the point. Coordinate reference system not stated in the profile text read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 373
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -17.797586
+    - property: observed_max
+      value: 2.751698
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/pointCoordinates/longitude
+  - name: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+    logicalType: string
+    physicalType: xml element (text)
+    description: Autonomous community of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 16
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Andalucía
+    - property: observed_max
+      value: Rioja, La
+    - property: observed_values
+      value:
+      - Andalucía
+      - Aragón
+      - Asturias, Principado de
+      - Balears, Illes
+      - Canarias
+      - Cantabria
+      - Castilla - La Mancha
+      - Castilla y León
+      - Cataluña
+      - Comunitat Valenciana
+      - Extremadura
+      - Galicia
+      - Madrid, Comunidad de
+      - Murcia, Región de
+      - Navarra, Comunidad Foral de
+      - Rioja, La
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/autonomousCommunity
+  - name: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+    logicalType: number
+    physicalType: xml element (text)
+    description: Kilometre point of the road at the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 367
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1101.491
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/kilometerPoint
+  - name: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+    logicalType: string
+    physicalType: xml element (text)
+    description: Municipality of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 279
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Laracha
+    - property: observed_max
+      value: Ágreda
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/municipality
+  - name: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+    logicalType: string
+    physicalType: xml element (text)
+    description: Province of the point (DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 43
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: A Coruña
+    - property: observed_max
+      value: Zaragoza
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/point/_tpegNonJunctionPointExtension/extendedTpegNonJunctionPoint/province
+  - name: locationReference/tpegPointLocation/_tpegSimplePointExtension/extendedTpegSimplePoint/tpegDirectionRoad
+    logicalType: string
+    physicalType: xml element (text)
+    description: Direction of the kilometre numbering (enumerated, DGT extension).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 54.965
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: both
+    - property: observed_max
+      value: positive
+    - property: observed_values
+      value:
+      - both
+      - negative
+      - positive
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/tpegPointLocation/_tpegSimplePointExtension/extendedTpegSimplePoint/tpegDirectionRoad
+  - name: situationRecordCreationReference
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 22.695
+    - property: observed_distinct
+      value: 654
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 112_112_GL·I20261024-0416
+    - property: observed_max
+      value: V16_zanwypDXUUer-1792853635319_1
+  - name: validity/validityTimeSpecification/overallEndTime
+    logicalType: timestamp
+    physicalType: xml element (text)
+    description: End of the validity period (shown in the range-closed examples of the profile document).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 60.402
+    - property: observed_distinct
+      value: 123
+    - property: observed_unique_in_sample
+      value: false
+    - property: xml_path_relative_to_situationRecord
+      value: validity/validityTimeSpecification/overallEndTime
+    - property: observed_format
+      value: ISO 8601 with offset, e.g. +01:00 / +02:00
+  - name: forVehiclesWithCharacteristicsOf/widthCharacteristic/comparisonOperator
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.872
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: greaterThan
+    - property: observed_max
+      value: greaterThan
+    - property: observed_values
+      value:
+      - greaterThan
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/widthCharacteristic/comparisonOperator
+  - name: forVehiclesWithCharacteristicsOf/widthCharacteristic/vehicleWidth
+    logicalType: number
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.872
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 5.0
+    - property: observed_values
+      value:
+      - '1.0'
+      - '2.0'
+      - '3.0'
+      - '5.0'
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/widthCharacteristic/vehicleWidth
+  - name: locationReference/supplementaryPositionalDescription/carriageway/lane/laneUsage@_extendedValue
+    logicalType: string
+    physicalType: xml attribute
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.144
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: leftHardShoulder
+    - property: observed_max
+      value: rightHardShoulder
+    - property: observed_values
+      value:
+      - leftHardShoulder
+      - rightHardShoulder
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/carriageway/lane/laneUsage@_extendedValue
+  - name: cause/detailedCauseType/environmentalObstructionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 95.863
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: avalanches
+    - property: observed_max
+      value: rockfalls
+    - property: observed_values
+      value:
+      - avalanches
+      - flooding
+      - forestFire
+      - rockfalls
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/environmentalObstructionType
+  - name: nonWeatherRelatedRoadConditionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.818
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: roadSurfaceInPoorCondition
+    - property: observed_max
+      value: roadSurfaceInPoorCondition
+    - property: observed_values
+      value:
+      - roadSurfaceInPoorCondition
+  - name: generalInstructionToRoadUsersType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.645
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: driveCarefully
+    - property: observed_max
+      value: driveCarefully
+    - property: observed_values
+      value:
+      - driveCarefully
+  - name: cause/detailedCauseType/obstructionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 93.972
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: objectOnTheRoad
+    - property: observed_max
+      value: spillageOnTheRoad
+    - property: observed_values
+      value:
+      - objectOnTheRoad
+      - spillageOnTheRoad
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/obstructionType
+  - name: abnormalTrafficType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 98.818
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: slowTraffic
+    - property: observed_max
+      value: slowTraffic
+    - property: observed_values
+      value:
+      - slowTraffic
+  - name: speedManagementType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.281
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: speedRestrictionInOperation
+    - property: observed_max
+      value: speedRestrictionInOperation
+    - property: observed_values
+      value:
+      - speedRestrictionInOperation
+  - name: temporarySpeedLimit
+    logicalType: number
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 97.281
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 100.0
+    - property: observed_values
+      value:
+      - '1.0'
+      - '100.0'
+      - '2.0'
+      - '20.0'
+      - '30.0'
+      - '4.0'
+      - '40.0'
+      - '50.0'
+      - '80.0'
+  - name: cause/detailedCauseType/roadOrCarriagewayOrLaneManagementType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.173
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: other
+    - property: observed_max
+      value: other
+    - property: observed_values
+      value:
+      - other
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/roadOrCarriagewayOrLaneManagementType
+  - name: locationReference/supplementaryPositionalDescription/geographicDescriptor
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: onPass
+    - property: observed_max
+      value: onPass
+    - property: observed_values
+      value:
+      - onPass
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/geographicDescriptor
+  - name: locationReference/supplementaryPositionalDescription/locationDescription/values/value
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: LUNADA
+    - property: observed_max
+      value: LUNADA
+    - property: observed_values
+      value:
+      - LUNADA
+    - property: xml_path_relative_to_situationRecord
+      value: locationReference/supplementaryPositionalDescription/locationDescription/values/value
+  - name: cause/detailedCauseType/accidentType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 95.626
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: accident
+    - property: observed_max
+      value: accident
+    - property: observed_values
+      value:
+      - accident
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/accidentType
+  - name: forVehiclesWithCharacteristicsOf/vehicleType@_extendedValue
+    logicalType: string
+    physicalType: xml attribute
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.645
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: authorizedVehicle
+    - property: observed_max
+      value: nonAuthorizedVehicle
+    - property: observed_values
+      value:
+      - authorizedVehicle
+      - nonAuthorizedVehicle
+    - property: xml_path_relative_to_situationRecord
+      value: forVehiclesWithCharacteristicsOf/vehicleType@_extendedValue
+  - name: genericSituationRecordName
+    logicalType: string
+    physicalType: xml element (text)
+    description: 'Name of a generic situation record (profile example: incident).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 61.82
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: incident
+    - property: observed_max
+      value: incident
+    - property: observed_values
+      value:
+      - incident
+  - name: mobilityOfObstruction/mobilityType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: mobile
+    - property: observed_max
+      value: mobile
+    - property: observed_values
+      value:
+      - mobile
+    - property: xml_path_relative_to_situationRecord
+      value: mobilityOfObstruction/mobilityType
+  - name: vehicleObstructionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.882
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: vehicleWithOverwideLoad
+    - property: observed_max
+      value: vehicleWithOverwideLoad
+    - property: observed_values
+      value:
+      - vehicleWithOverwideLoad
+  - name: cause/detailedCauseType/vehicleObstructionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: More detailed cause (enumerated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 68.322
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: vehicleCarryingHazardousMaterials
+    - property: observed_max
+      value: vehicleStuck
+    - property: observed_values
+      value:
+      - vehicleCarryingHazardousMaterials
+      - vehicleOnFire
+      - vehicleStuck
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/vehicleObstructionType
+  - name: poorEnvironmentType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.645
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: badWeather
+    - property: observed_max
+      value: badWeather
+    - property: observed_values
+      value:
+      - badWeather
+  - name: cause/detailedCauseType/poorEnvironmentType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.645
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: rain
+    - property: observed_max
+      value: strongWinds
+    - property: observed_values
+      value:
+      - rain
+      - strongWinds
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/poorEnvironmentType
+  - name: obstructionType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.764
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: obstructionOnTheRoad
+    - property: observed_max
+      value: obstructionOnTheRoad
+    - property: observed_values
+      value:
+      - obstructionOnTheRoad
+  - name: cause/detailedCauseType/abnormalTrafficType
+    logicalType: string
+    physicalType: xml element (text)
+    description: Not defined by the producer in the profile document read (element observed in the sample).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 99.645
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: slowTraffic
+    - property: observed_max
+      value: slowTraffic
+    - property: observed_values
+      value:
+      - slowTraffic
+    - property: xml_path_relative_to_situationRecord
+      value: cause/detailedCauseType/abnormalTrafficType
+  quality:
+  - type: text
+    name: observed_record_id_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 846 situation records on 2026-10-24; not a producer guarantee: record@id is unique
+      (one version per id in the file). The producer identifies a record by id and version, but publishes no uniqueness rule.'
+  - type: text
+    name: observed_location_present
+    dimension: completeness
+    description: 'Observed in sample of 846 situation records on 2026-10-24; not a producer guarantee: every record has exactly
+      one location kind (465 linear segments with from/to, 381 single points); the profile document states that all records
+      have a location.'
+  - type: text
+    name: observed_validity_active
+    dimension: conformity
+    description: 'Observed in sample of 846 situation records on 2026-10-24; not a producer guarantee: validityStatus is active
+      and probabilityOfOccurrence is certain in every record.'
+slaProperties:
+- property: frequency
+  value: 1
+  unit: minutes
+support:
+- channel: email
+  url: mailto:nap@dgt.es
+  description: Institutional contact of the DGT National Access Point published on the dataset page.
+customProperties:
+- property: source_url
+  value: https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml
+- property: license
+  value: 'unverified (NAP dataset page: ''Licence and Free of charge''; footer: Creative Commons Attribution (CC BY); conditions
+    point to the DGT legal notice, not read)'
+- property: license_url
+  value: https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7
+- property: documentation_url
+  value: https://nap.dgt.es/datex2/v3/dgt/SituationPublication/DATEX2%20-%20DGT%20%28Spain%29%20RTTI%20SituationPublication%20Profile.pdf
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 846
+- property: sample_selection
+  value: 'Whole file as published at 2026-10-24T17:03:15+02:00 (publicationTime): 648 situations, 846 situation records; flattened
+    to 846 rows only for profiling (derived_records_flat.csv).'
+- property: sample_status
+  value: ok
+- property: publication_time
+  value: '2026-10-24T17:03:15.614+02:00'
+contractCreatedTs: '2026-10-24T12:00:00Z'
