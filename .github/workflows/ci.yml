@@ -31,14 +31,15 @@ jobs:
   bundle-validate:
     name: Validate bundle
     runs-on: ubuntu-latest
-    # Authenticates as the CI/CD service principal (OAuth M2M). Skipped where the credentials are not available,
+    # Authenticates as the CI/CD service principal (OAuth M2M). The workspace host and the alert address are
+    # secrets so that they are masked in the public logs. Skipped where the credentials are not available,
     # such as pull requests from forks.
-    if: ${{ vars.DATABRICKS_HOST != '' && vars.DATABRICKS_CLIENT_ID != '' }}
+    if: ${{ vars.DATABRICKS_CLIENT_ID != '' }}
     env:
-      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-      BUNDLE_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+      BUNDLE_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: databricks/setup-cli@8de769ec2543ee05e456ee2121350efc7efc4bda # v1.22.1

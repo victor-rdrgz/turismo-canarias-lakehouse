@@ -11,10 +11,10 @@ permissions:
   contents: read
 
 env:
-  DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
   DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
   DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-  BUNDLE_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+  BUNDLE_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
 
 jobs:
   staging:
