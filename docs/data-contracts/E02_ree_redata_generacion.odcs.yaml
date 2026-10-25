@@ -1,0 +1,766 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 8eea9462-5acd-5576-a6c7-823eb96f99c7
+version: 0.1.0
+status: draft
+name: REE REData generation and balance (Canarias)
+domain: energy
+description:
+  purpose: 'REData API (Red Electrica de Espana): generation by technology (estructura-generacion) and electric
+    balance (balance-electrico) for the Canarias electric system (geo_limit=canarias, geo_ids=8742), as JSON:API
+    style documents with time series values and percentages.'
+  limitations: 'Units, the list of technologies and the meaning of percentage are not documented on the API page
+    read; attributes vary by widget. No licence/terms on the API page: the research notes point to the generic REE
+    legal notice (https://www.ree.es/es/aviso-legal) as orientative, not read in this pass. No versioning, no SLA,
+    no publication cadence (response carries last-update and meta.cache-control). geo_ids=8742 for Canarias was
+    taken from the sibling source E01 sample, not from the API documentation read here. Hourly generation requests
+    (23 days and 4 days) returned HTTP 400 ''Error Interno'' on 2026-10-24 (stored in error_hour_range23days.json);
+    hourly data for generation was therefore not sampled. Only 2025 daily, 2026 daily (up to 2026-10-23/24) and
+    2025 monthly balance were obtained. Series contain gaps by technology. Only two widgets of about 100 were sampled.'
+  usage: Query /{lang}/datos/{category}/{widget} with start_date, end_date, time_trunc and geo_trunc/geo_limit/geo_ids;
+    flatten included[].attributes.values[].
+tags:
+- ree
+- redata
+- electricity
+- generation
+- canarias
+- api
+schema:
+- name: generation_structure
+  logicalType: object
+  physicalType: json
+  description: 'Response of /es/datos/generacion/estructura-generacion (JSON:API style): generation by technology
+    for the Canarias electric system. The properties below describe the logical table flattened from included[].attributes.values[]
+    (derived_generation.csv); property names show the JSON paths.'
+  properties:
+  - name: source_file
+    logicalType: string
+    physicalType: string
+    description: 'Local helper column (not in the API): which response file the row came from.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: gen_day_2025.json
+    - property: observed_max
+      value: gen_day_2026.json
+    - property: observed_values
+      value:
+      - gen_day_2025.json
+      - gen_day_2026.json
+  - name: data.attributes.last-update
+    logicalType: timestamp
+    physicalType: string
+    description: Last update of the widget (data.attributes.last-update).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2026-05-11T21:41:15.000+02:00'
+    - property: observed_max
+      value: '2026-09-08T18:31:47.000+02:00'
+  - name: included[].type
+    logicalType: string
+    physicalType: string
+    description: Type of the included indicator, here the generation technology name.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Ciclo combinado
+    - property: observed_max
+      value: Turbina de vapor
+  - name: included[].id
+    logicalType: string
+    physicalType: string
+    description: Identifier of the included indicator (string in JSON).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].groupId
+    logicalType: string
+    physicalType: string
+    description: Group identifier of the indicator (string in JSON).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1'
+  - name: included[].attributes.title
+    logicalType: string
+    physicalType: string
+    description: Indicator title.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Ciclo combinado
+    - property: observed_max
+      value: Turbina de vapor
+  - name: included[].attributes.type
+    logicalType: string
+    physicalType: string
+    description: 'Indicator type attribute. Observed: Renovable, No-Renovable, total.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: No-Renovable
+    - property: observed_max
+      value: total
+    - property: observed_values
+      value:
+      - No-Renovable
+      - Renovable
+      - total
+  - name: included[].attributes.magnitude
+    logicalType: string
+    physicalType: string
+    description: Magnitude of the indicator; always null in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].attributes.composite
+    logicalType: boolean
+    physicalType: boolean
+    description: Whether the indicator is composite (documented attribute).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'False'
+    - property: observed_values
+      value:
+      - 'False'
+  - name: included[].attributes.description
+    logicalType: string
+    physicalType: string
+    description: Indicator description; always null in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].attributes.color
+    logicalType: string
+    physicalType: string
+    description: Display colour of the indicator.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '#0090d1'
+    - property: observed_max
+      value: '#ffcc66'
+  - name: included[].attributes.last-update
+    logicalType: timestamp
+    physicalType: string
+    description: Last update of the indicator.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2026-05-11T21:41:12.000+02:00'
+    - property: observed_max
+      value: '2026-10-24T06:46:26.000+02:00'
+  - name: included[].attributes.values[].value
+    logicalType: number
+    physicalType: number
+    description: Value of the indicator for the instant. Unit not defined by the producer in the pages read (typically
+      MWh for generation per the research notes; NOT verified).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5940
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.65
+    - property: observed_max
+      value: 29780.25
+  - name: included[].attributes.values[].percentage
+    logicalType: number
+    physicalType: number
+    description: Percentage over the total; scale not defined (observed range 0 to 1, i.e. a fraction; the research
+      notes mark it NOT verified).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5337
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.00010343594699707879
+    - property: observed_max
+      value: 1.0
+  - name: included[].attributes.values[].datetime
+    logicalType: timestamp
+    physicalType: string
+    description: Instant of the value, ISO 8601 with local offset (+01:00/+02:00); with time_trunc=day observed
+      at 00:00 local.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 662
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2025-01-01T00:00:00.000+01:00'
+    - property: observed_max
+      value: '2026-10-24T00:00:00.000+02:00'
+  quality:
+  - name: observed_key_unique
+    type: text
+    description: 'Observed in sample of 5997 flattened rows on 2026-10-24; not a producer guarantee: (source_file,
+      included.id, datetime) has no duplicates.'
+    dimension: uniqueness
+  - name: observed_series_gaps
+    type: text
+    description: 'Observed in sample on 2026-10-24; not a producer guarantee: series have missing days (e.g. Hidraulica
+      has 37 values in the 2025 daily response; Turbina de gas 363 of 365 days) and the 2026 daily response ends
+      at 2026-10-23/24 depending on the technology.'
+    dimension: completeness
+- name: electric_balance
+  logicalType: object
+  physicalType: json
+  description: 'Response of /es/datos/balance/balance-electrico monthly: groups (Renovable, No-Renovable, Almacenamiento,
+    Demanda) with content items and monthly values. Flattened to derived_balance.csv.'
+  properties:
+  - name: included[].type
+    logicalType: string
+    physicalType: string
+    description: Group name in the balance widget (Renovable, No-Renovable, Almacenamiento, Demanda).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Almacenamiento
+    - property: observed_max
+      value: Renovable
+    - property: observed_values
+      value:
+      - Almacenamiento
+      - Demanda
+      - No-Renovable
+      - Renovable
+  - name: included[].id
+    logicalType: string
+    physicalType: string
+    description: Group identifier.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Almacenamiento
+    - property: observed_max
+      value: Renovable
+    - property: observed_values
+      value:
+      - Almacenamiento
+      - Demanda en b.c.
+      - No-Renovable
+      - Renovable
+  - name: included[].attributes.title
+    logicalType: string
+    physicalType: string
+    description: Group title.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Almacenamiento
+    - property: observed_max
+      value: Renovable
+    - property: observed_values
+      value:
+      - Almacenamiento
+      - Demanda
+      - No-Renovable
+      - Renovable
+  - name: included[].attributes.description
+    logicalType: string
+    physicalType: string
+    description: Group description; observed only on the Demanda group (demand corrected for temperature and working-day
+      effects).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 91.946
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'Demanda corregida: corregidos los efectos de temperatura y l'
+    - property: observed_max
+      value: 'Demanda corregida: corregidos los efectos de temperatura y l'
+    - property: observed_values
+      value:
+      - 'Demanda corregida: corregidos los efectos de temperatura y laboralidad.'
+  - name: included[].attributes.magnitude
+    logicalType: string
+    physicalType: string
+    description: Group magnitude; always null in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].attributes.content[].type
+    logicalType: string
+    physicalType: string
+    description: Technology/concept name of the item inside the group.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Carga batería
+    - property: observed_max
+      value: Turbina de vapor
+  - name: included[].attributes.content[].id
+    logicalType: string
+    physicalType: string
+    description: Item identifier (string in JSON).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].attributes.content[].groupId
+    logicalType: string
+    physicalType: string
+    description: Group identifier of the item.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 4
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Almacenamiento
+    - property: observed_max
+      value: Renovable
+    - property: observed_values
+      value:
+      - Almacenamiento
+      - Demanda en b.c.
+      - No-Renovable
+      - Renovable
+  - name: included[].attributes.content[].attributes.title
+    logicalType: string
+    physicalType: string
+    description: Item title.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Carga batería
+    - property: observed_max
+      value: Turbina de vapor
+  - name: included[].attributes.content[].attributes.description
+    logicalType: string
+    physicalType: string
+    description: Item description; observed to hold the item identifier or a text such as 'Saldo almacenamiento'.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '10288'
+    - property: observed_max
+      value: Saldo almacenamiento
+  - name: included[].attributes.content[].attributes.color
+    logicalType: string
+    physicalType: string
+    description: Display colour.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 13
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '#0090d1'
+    - property: observed_max
+      value: '#ffcc66'
+  - name: included[].attributes.content[].attributes.type
+    logicalType: string
+    physicalType: string
+    description: Item type attribute; observed distinct, total.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: distinct
+    - property: observed_max
+      value: total
+    - property: observed_values
+      value:
+      - distinct
+      - total
+  - name: included[].attributes.content[].attributes.magnitude
+    logicalType: string
+    physicalType: string
+    description: Item magnitude; always null in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: included[].attributes.content[].attributes.composite
+    logicalType: boolean
+    physicalType: boolean
+    description: Whether the item is composite.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'False'
+    - property: observed_values
+      value:
+      - 'False'
+  - name: included[].attributes.content[].attributes.total
+    logicalType: number
+    physicalType: number
+    description: Total of the item over the requested range (observed attribute; not defined by the producer). Unit
+      not defined by the producer in the pages read (typically MWh for generation per the research notes; NOT verified).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -61.894
+    - property: observed_max
+      value: 8983409.248
+    - property: observed_values
+      value:
+      - '-55.58'
+      - '-61.894'
+      - '1239137.3450000002'
+      - '12846.153999999999'
+      - '1373185.79'
+      - '1808897.4360000002'
+      - '1869978.5129999998'
+      - '22188.677'
+      - '269401.371'
+      - '339.861'
+      - '3796050.1629999997'
+      - '461418.03099999996'
+      - '6.314'
+      - '7113486.3149999995'
+      - '8983409.248'
+  - name: included[].attributes.content[].attributes.total-percentage
+    logicalType: number
+    physicalType: number
+    description: Total as fraction of the grand total (observed attribute; not defined by the producer).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 11
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '0'
+      - '0.0001817459385962474'
+      - '0.006869680004713509'
+      - '0.011865739015579801'
+      - '0.03787191808212539'
+      - '0.174195505569058'
+      - '0.2467504454154121'
+      - '0.25429126533717106'
+      - '0.5336413110116456'
+      - '0.7343323896256985'
+      - '1'
+  - name: included[].attributes.content[].attributes.values[].value
+    logicalType: number
+    physicalType: number
+    description: Value for the instant. Unit not defined by the producer in the pages read (typically MWh for generation
+      per the research notes; NOT verified).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 146
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -17.223
+    - property: observed_max
+      value: 817844.672
+  - name: included[].attributes.content[].attributes.values[].percentage
+    logicalType: number
+    physicalType: number
+    description: Percentage over the total; scale not defined (observed range 0 to 1).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 105
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.0003747232223504993
+    - property: observed_max
+      value: 1.0
+  - name: included[].attributes.content[].attributes.values[].datetime
+    logicalType: timestamp
+    physicalType: string
+    description: Instant of the value (monthly, first day of month 00:00 local offset).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '2025-01-01T00:00:00.000+01:00'
+    - property: observed_max
+      value: '2025-12-01T00:00:00.000+01:00'
+  quality:
+  - name: observed_key_unique
+    type: text
+    description: 'Observed in sample of 149 flattened rows on 2026-10-24; not a producer guarantee: (content.id,
+      datetime) has no duplicates.'
+    dimension: uniqueness
+- name: error_response
+  logicalType: object
+  physicalType: json
+  description: Error structure documented for the API (errors array).
+  properties:
+  - name: errors[].status
+    logicalType: string
+    physicalType: string
+    description: 'Status of the error (documented error structure). Observed: ''400''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - '400'
+  - name: errors[].title
+    logicalType: string
+    physicalType: string
+    description: 'Title of the error. Observed: ''Error Interno''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - Error Interno
+  - name: errors[].detail
+    logicalType: string
+    physicalType: string
+    description: 'Detail of the error. Observed: ''Los datos solicitados no estan disponibles en este momento. Intentelo
+      de nuevo mas tarde.'''
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: errors[].code
+    logicalType: string
+    physicalType: string
+    description: Documented in the error structure; not seen in the observed error responses.
+    customProperties:
+    - property: evidence
+      value: documented
+customProperties:
+- property: source_url
+  value: https://apidatos.ree.es/es/datos/generacion/estructura-generacion
+- property: license
+  value: unverified (no terms on the API page read; REE legal notice not read)
+- property: license_url
+  value: https://www.ree.es/es/aviso-legal
+- property: documentation_url
+  value: https://www.ree.es/es/apidatos
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 6146
+- property: sample_selection
+  value: 'Canarias electric system (geo_trunc=electric_system, geo_limit=canarias, geo_ids=8742): estructura-generacion
+    daily 2025-01-01..2025-12-31 and daily 2026-01-01..2026-10-23, balance-electrico monthly 2025. Hourly generation
+    requests failed with HTTP 400. sample_rows = 5,997 generation rows + 149 balance rows.'
+- property: sample_status
+  value: partial
+- property: sample_rows_by_entity
+  value:
+    generation_structure: 5997
+    electric_balance: 149
+- property: request_failures
+  value: 'estructura-generacion time_trunc=hour for 2026-10-01..2026-10-23 and 2026-10-20..2026-10-23: HTTP 400
+    Error Interno'
+contractCreatedTs: '2026-10-24T00:00:00Z'

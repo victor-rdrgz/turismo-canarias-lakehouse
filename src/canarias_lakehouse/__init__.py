@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from canarias-lakehouse!")
+"""Canarias lakehouse: code deployed to Databricks with Declarative Automation Bundles."""

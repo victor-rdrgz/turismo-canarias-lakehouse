@@ -1,0 +1,575 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: bd320502-5c97-5383-a075-4522c23e35b3
+version: 0.1.0
+status: draft
+name: INE Tempus API (JSON)
+domain: statistics
+description:
+  purpose: 'Tempus API of the Instituto Nacional de Estadística (INEbase): REST functions under https://servicios.ine.es/wstempus/js/{language}/{function}/{input}
+    returning JSON for operations, series, tables and data (for example IPC, Frontur, Egatur). Sampled
+    functions: DATOS_SERIE (series IPC251852), OPERACIONES_DISPONIBLES and SERIES_OPERACION (operation
+    FR).'
+  limitations: The API page describes outputs only in prose; JSON field names, types, nullability and
+    enumerations are observed from real responses. Tables for FK_Unidad, FK_Escala, FK_TipoDato and FK_Periodicidad
+    ids were not extracted, so the meaning of the codes is unverified. Date unit (apparent epoch milliseconds)
+    is undocumented. The page states a maximum of 500 elements per page for OPERACIONES_DISPONIBLES, VARIABLES,
+    VARIABLES_OPERACION and SERIES_OPERACION, but SERIES_OPERACION/FR?page=1 returned 10000 elements in
+    the sample, contradicting it. No rate limits, quotas, error codes, SLA, update calendar or versioning
+    policy were found. The API page footer states CC BY-SA 4.0 for the website while linking to CC BY
+    4.0; the legal notice (aviso legal) authorises reuse citing INE as source. The CSV (jaxiT3) outputs
+    and DATOS_TABLA were not sampled. The Canarias-specific Frontur/Egatur series were not downloaded;
+    only the operation-level series list (first page) was. The response of the main series ends at December
+    2025 although sampled in October 2026; whether this is the latest release is unverified.
+  usage: GET the function URL with optional parameters (nult, det, tip, date, p, page). Cite INE as source
+    and include the update date when shown.
+tags:
+- ine
+- statistics
+- ipc
+- tourism
+- api
+schema:
+- name: serie_header
+  logicalType: object
+  physicalType: JSON object (top level of DATOS_SERIE response)
+  description: Series metadata returned at the top level of the DATOS_SERIE function. The API page describes
+    the output only in prose (series name, unit id, scale id, then the data) and does not name the JSON
+    fields.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 1
+  properties:
+  - name: COD
+    logicalType: string
+    physicalType: string
+    description: Series code (Tempus identifier of the series). Not defined by the producer by name on
+      the API page.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value_in_sample
+      value: IPC251852
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: Name of the series (documented in prose as the series name).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value_in_sample
+      value: Nacional. Índice general. Índice.
+  - name: FK_Unidad
+    logicalType: integer
+    physicalType: number
+    description: Tempus identifier of the unit of measure (documented in prose).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value_in_sample
+      value: 133
+  - name: FK_Escala
+    logicalType: integer
+    physicalType: number
+    description: Tempus identifier of the scale (documented in prose).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value_in_sample
+      value: 1
+  - name: Notas
+    logicalType: array
+    physicalType: array of object
+    description: 'Not defined by the producer. Observed: array of objects with keys texto, Fk_TipoNota,
+      textoTipo.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value_in_sample
+      value: 1 note object
+  - name: Data
+    logicalType: array
+    physicalType: array of object
+    description: Array of observations of the series (documented in prose).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value_in_sample
+      value: 120 elements with nult=120
+- name: serie_data_point
+  logicalType: object
+  physicalType: JSON object (element of Data[] in DATOS_SERIE)
+  description: One observation of a series. Documented in prose as date, data-type id, period id, year
+    and value; field names are observed.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 120
+  properties:
+  - name: Fecha
+    logicalType: integer
+    physicalType: number
+    description: Reference date of the observation (documented in prose as date). Unit not documented;
+      sample values are consistent with milliseconds since the Unix epoch at local midnight (observed).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 120
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1451602800000
+    - property: observed_max
+      value: 1764543600000
+  - name: FK_TipoDato
+    logicalType: integer
+    physicalType: number
+    description: Tempus identifier of the data type (documented in prose). Meaning of the ids is in a
+      Tempus reference table not read.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 1
+    - property: observed_values
+      value:
+      - '1'
+  - name: FK_Periodo
+    logicalType: integer
+    physicalType: number
+    description: Tempus identifier of the period (documented in prose). Observed values 1-12 in a monthly
+      series.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 12
+    - property: observed_values
+      value:
+      - '1'
+      - '10'
+      - '11'
+      - '12'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      - '8'
+      - '9'
+  - name: Anyo
+    logicalType: integer
+    physicalType: number
+    description: Year (documented in prose).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2016
+    - property: observed_max
+      value: 2025
+    - property: observed_values
+      value:
+      - '2016'
+      - '2017'
+      - '2018'
+      - '2019'
+      - '2020'
+      - '2021'
+      - '2022'
+      - '2023'
+      - '2024'
+      - '2025'
+  - name: Valor
+    logicalType: number
+    physicalType: number
+    description: Value of the observation (documented in prose). Unit given by FK_Unidad of the series.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 119
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 91.552
+    - property: observed_max
+      value: 119.942
+  - name: Secreto
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: boolean
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+- name: operacion
+  logicalType: object
+  physicalType: JSON object (element of the OPERACIONES_DISPONIBLES array)
+  description: Statistical operations available in Tempus. The API page lists the function but does not
+    describe its output fields; all fields are observed.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 166
+  properties:
+  - name: Id
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 166
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 6
+    - property: observed_max
+      value: 495
+  - name: Cod_IOE
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 13.253
+    - property: observed_distinct
+      value: 144
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 16023
+    - property: observed_max
+      value: 85001
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 166
+    - property: observed_unique_in_sample
+      value: true
+  - name: Codigo
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 163
+    - property: observed_unique_in_sample
+      value: false
+  - name: Url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. Observed values are paths relative to www.ine.es.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 8.434
+    - property: observed_distinct
+      value: 141
+    - property: observed_unique_in_sample
+      value: false
+- name: serie_operacion
+  logicalType: object
+  physicalType: JSON object (element of the SERIES_OPERACION array)
+  description: 'Series of an operation (sample: operation FR, Movimientos Turísticos en Fronteras). The
+    API page lists the function but does not describe its output fields; all fields are observed.'
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 10000
+  properties:
+  - name: Id
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10000
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 282
+    - property: observed_max
+      value: 495398
+  - name: COD
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10000
+    - property: observed_unique_in_sample
+      value: true
+  - name: FK_Operacion
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 330
+    - property: observed_max
+      value: 330
+    - property: observed_values
+      value:
+      - '330'
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9996
+    - property: observed_unique_in_sample
+      value: false
+  - name: Decimales
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 2
+    - property: observed_values
+      value:
+      - '0'
+      - '2'
+  - name: FK_Periodicidad
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer. The API page says PERIODICIDADES lists the periodicity ids
+      (e.g. 1 monthly, 3 quarterly, 6 half-yearly, 12 yearly).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 1
+    - property: observed_values
+      value:
+      - '1'
+  - name: FK_Publicacion
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 407
+    - property: observed_max
+      value: 408
+    - property: observed_values
+      value:
+      - '407'
+      - '408'
+  - name: FK_Clasificacion
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer. All empty in the sample page.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: unknown (all empty)
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: FK_Escala
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 1
+    - property: observed_values
+      value:
+      - '1'
+  - name: FK_Unidad
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 3
+    - property: observed_max
+      value: 299
+    - property: observed_values
+      value:
+      - '135'
+      - '299'
+      - '3'
+customProperties:
+- property: source_url
+  value: https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC251852?nult=1
+- property: license
+  value: Reuse authorised (commercial or not) provided INE is cited as source and the meaning is not distorted,
+    per the INE legal notice (aviso legal). The website footer states CC BY-SA 4.0 but links to CC BY
+    4.0; ambiguity not resolved.
+- property: license_url
+  value: https://www.ine.es/ss/Satellite?L=es_ES&c=Page&cid=1254735849170&p=1254735849170&pagename=Ayuda%2FINELayout
+- property: documentation_url
+  value: https://www.ine.es/dyngs/DAB/index.htm?cid=1100
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: serie_data_point 120; operacion 166; serie_operacion 10000
+- property: sample_selection
+  value: DATOS_SERIE/IPC251852?nult=120 (last 120 monthly periods, 2016-01..2025-12); OPERACIONES_DISPONIBLES
+    (full); SERIES_OPERACION/FR?page=1 (first page only, 3.1 MB; more pages exist, not downloaded).
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T15:03:07Z'

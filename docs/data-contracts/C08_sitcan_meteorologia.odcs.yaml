@@ -1,0 +1,366 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 370a6eea-9dc2-5298-b754-eb613506e55d
+version: 0.1.0
+status: draft
+name: SITCAN weather observations and stations
+domain: weather
+description:
+  purpose: Weather observations from the Government of the Canary Islands SITCAN open-data portal (yearly CSV files
+    inside observaciones.zip) and the catalogue of stations (estaciones.csv).
+  limitations: No data dictionary exists for either file; every column is observed only. The observations ZIP is
+    ~1.64 GB (8 yearly CSV files, Deflate64-compressed); only the first 50,000 data rows of the 2019 file and of
+    the 2026 file were sampled, and they contain a single station (thing_id=2), so coverage of the other 56 stations,
+    of later months and of other quality flags (only 'valid' seen) is unknown. Units were only observed. Update
+    frequency, latency, quality-control process, quality-flag semantics and time-zone semantics are not documented
+    (offsets +00 and +01 are observed). The CRS of the WKT coordinates is not declared. stations CSV is not valid
+    UTF-8 (decoded as latin-1/cp1252). Whether the 'result' value is a validated measurement is unknown.
+  usage: Reference for ingesting raw SITCAN observations and station metadata; join observations.thing_id with stations.thing_id
+    (join inferred from column names).
+tags:
+- weather
+- canary-islands
+- sitcan
+- observations
+- stations
+schema:
+- name: stations
+  logicalType: object
+  physicalType: csv
+  description: 'Station catalogue (estaciones.csv): one row per sensor/station in the sample. No producer documentation
+    of columns.'
+  properties:
+  - name: thing_id
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: inferred_meaning
+      value: Sensor/station identifier; also the join key to observations.thing_id (inferred from matching column
+        name, not producer-defined)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 58.0
+  - name: thing_name
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: inferred_meaning
+      value: Equipment model and serial number (inferred from values)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+  - name: location_id
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 58.0
+  - name: location_description
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: inferred_meaning
+      value: 'Free text: site name, locality, municipality and island (inferred from values)'
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+  - name: location_coordinates
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: WKT POINT(longitude latitude); CRS not declared by the producer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57
+    - property: observed_unique_in_sample
+      value: true
+  - name: date_from
+    logicalType: timestamp
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: YYYY-MM-DD HH:MM:SS+TZ (offset +00 or +01 observed)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 52
+    - property: observed_unique_in_sample
+      value: false
+  - name: date_to
+    logicalType: timestamp
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  customProperties:
+  - property: file
+    value: estaciones.csv
+  - property: encoding_observed
+    value: latin-1 / cp1252 (not valid UTF-8)
+  - property: delimiter
+    value: ','
+  - property: key_note
+    value: thing_id unique in sample only
+  quality:
+  - type: text
+    name: thing_id_unique
+    description: thing_id has no nulls and is unique across rows. Observed in sample of 57 rows on 2026-10-24; not
+      a producer guarantee.
+    dimension: uniqueness
+  - type: text
+    name: date_to_empty
+    description: date_to is empty in all rows. Observed in sample of 57 rows on 2026-10-24; not a producer guarantee.
+    dimension: completeness
+- name: observations
+  logicalType: object
+  physicalType: csv-in-zip
+  description: Station observations in long format (one row per variable per time step), distributed as yearly CSV
+    files inside observaciones.zip. No producer documentation of columns.
+  properties:
+  - name: thing_id
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 2.0
+  - name: datastream_name
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_note
+      value: 14 distinct names per sampled year; 'Precipitation intensity' only seen in 2019 sample, 'Rain (partial
+        accumulated)' only in 2026 sample
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Air temperature (avg.)
+      - Air temperature (max.)
+      - Air temperature (min.)
+      - Atmosferic pressure (avg.)
+      - Dew point (avg.)
+      - Precipitation intensity
+      - Rain (daily accumulated)
+      - Rain (partial accumulated)
+      - Relative humidity (avg.)
+      - Wind direction (avg.)
+      - Wind direction (max.)
+      - Wind direction (sdev.)
+      - Wind speed (avg.)
+      - Wind speed (max.)
+      - Wind speed (sdev.)
+  - name: phenomenon_time_begin
+    logicalType: timestamp
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: YYYY-MM-DD HH:MM:SS+TZ (offset +01 in Oct 2019 sample, +00 in Jan 2026 sample)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7157
+    - property: observed_unique_in_sample
+      value: false
+  - name: phenomenon_time_end
+    logicalType: timestamp
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: same as phenomenon_time_begin
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7152
+    - property: observed_unique_in_sample
+      value: false
+  - name: result_time
+    logicalType: timestamp
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: same as phenomenon_time_begin
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7152
+    - property: observed_unique_in_sample
+      value: false
+  - name: result
+    logicalType: number
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 50931
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -6.9775
+    - property: observed_max
+      value: 1019.072
+  - name: unit_of_measurement
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_pairs
+      value: 'air temperature/dew point: degree celsius; relative humidity: percent; pressure: millibar; wind speed:
+        meter per second; wind direction: degree angle; rain: millimeter; precipitation intensity: millimeter per
+        hour (observed in sample only)'
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - degree angle
+      - degree celsius
+      - meter per second
+      - millibar
+      - millimeter
+      - millimeter per hour
+      - percent
+  - name: observation_validity
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - valid
+  customProperties:
+  - property: file
+    value: observaciones.zip -> observaciones_<year>.csv (2019..2026)
+  - property: delimiter
+    value: ','
+  - property: zip_compression
+    value: Deflate64 (zip method 9)
+  - property: granularity_observed
+    value: one row per (thing_id, datastream_name, time interval); 10-minute intervals observed
+  quality:
+  - type: text
+    name: no_nulls
+    description: No empty values in any column. Observed in sample of 100000 rows on 2026-10-24; not a producer
+      guarantee.
+    dimension: completeness
+  - type: text
+    name: validity_all_valid
+    description: observation_validity equals 'valid' in every row. Observed in sample of 100000 rows on 2026-10-24;
+      not a producer guarantee.
+    dimension: conformity
+customProperties:
+- property: source_url
+  value: https://opendata.sitcan.es/upload/meteorologia/observaciones.zip ; https://opendata.sitcan.es/upload/meteorologia/estaciones.csv
+- property: license
+  value: 'Creative Commons Attribution 3.0 (CC-BY 3.0) unless stated otherwise, per the SITCAN legal notice; attribution
+    ''Fuente: Gobierno de Canarias''. Not stated specifically for the meteorology files.'
+- property: license_url
+  value: https://opendata.sitcan.es/notice
+- property: documentation_url
+  value: https://datos.gob.es/es/aplicaciones/sistema-de-observacion-meteorologica-de-canarias
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 100057
+- property: sample_selection
+  value: 'stations: whole file (57 rows). observations: first 50,000 data rows of observaciones_2019.csv (2019-10-01..2019-10-25)
+    and first 50,000 of observaciones_2026.csv (2025-12-31 23:50..2026-01-25); read via HTTP Range from the ZIP;
+    station thing_id=2 only.'
+- property: sample_status
+  value: partial
+- property: sample_status_reason
+  value: Full ZIP (1.64 GB) exceeds the 25 MB limit; only two head slices of two yearly files were read.
+- property: zip_last_modified
+  value: Tue, 21 Jul 2026 01:44:17 GMT
+contractCreatedTs: '2026-10-24T15:04:26Z'

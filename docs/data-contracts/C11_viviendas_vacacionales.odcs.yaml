@@ -1,0 +1,299 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 53ef9d3c-2f86-5dfa-9bd1-02fd9617a2be
+version: 0.1.0
+status: draft
+name: Canary Islands register of vacation homes
+domain: tourism
+description:
+  purpose: List of extra-hotel establishments of vacation-home typology registered in the General Tourist
+    Register of the Canary Islands, published by the Canary Islands Government open data portal.
+  limitations: 'Sample is the complete CSV resource (72143 rows, 14.2 MB) taken on 2026-10-24; the XLSX
+    copy and the JSON copy (54 MB, over the 25 MB limit) were not downloaded. The dictionary has 16 fields;
+    latitud and longitud appear with empty name, description and type, so their meaning, CRS and unit
+    are not documented. In the CSV the column order is longitud, latitud (the dictionary lists latitud
+    first). The dictionary types codigo_postal as Number but ''_U'' occurs. Valid values for modalidad,
+    tipologia and clasificacion are not published (observed: single value each, plus ''_U'' in clasificacion).
+    No key is declared and establecimiento_id repeats in the sample. Coordinates contain 0 placeholders.
+    Update frequency is not stated on the dataset (catalogue metadata modified 2026-10-24); no SLA, no
+    versioning policy. The register lists commercial establishments; trade names and addresses may identify
+    natural persons who operate them: personal-data treatment not assessed, so the raw sample must not
+    be republished in the repository. Licence field: ''Aviso Legal del Gobierno de Canarias'' (catalogue);
+    full legal text not read.'
+  usage: Download the CSV resource plus the data dictionary; treat '_U' as unknown and 0 coordinates as
+    missing before geocoding.
+tags:
+- tourism
+- accommodation
+- vacation-rental
+- canary-islands
+- register
+schema:
+- name: establecimientos_vivienda_vacacional
+  logicalType: object
+  physicalType: csv (semicolon-separated, UTF-8, header row)
+  description: 'Establishments of extra-hotel vacation-home typology registered in the General Tourist
+    Register of the Canary Islands. Grain: one row per registered establishment (not guaranteed; see limitations).'
+  properties:
+  - name: establecimiento_id
+    logicalType: string
+    physicalType: text
+    description: Identifier of the holiday-home establishment (extra-hotel, vacation home typology).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 72053
+  - name: establecimiento_nombre_comercial
+    logicalType: string
+    physicalType: text
+    description: Trade name of the establishment.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 57722
+  - name: establecimiento_modalidad
+    logicalType: string
+    physicalType: text
+    description: Modality of the establishment.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Extrahotelera
+  - name: establecimiento_tipologia
+    logicalType: string
+    physicalType: text
+    description: Typology of the establishment.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - Vivienda Vacacional
+  - name: establecimiento_clasificacion
+    logicalType: string
+    physicalType: text
+    description: Classification of the establishment. The code '_U' means unknown / not recorded.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_values
+      value:
+      - Categoria Unica
+      - _U
+    - property: observed_unknown_code_rows
+      value: 28
+  - name: direccion
+    logicalType: string
+    physicalType: text
+    description: Street type, name and number. The code '_U' means unknown / not recorded.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 65658
+    - property: observed_unknown_code_rows
+      value: 23
+  - name: direccion_isla_nombre
+    logicalType: string
+    physicalType: text
+    description: Name of the island.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7
+    - property: observed_values
+      value:
+      - El Hierro
+      - Fuerteventura
+      - Gran Canaria
+      - La Gomera
+      - La Palma
+      - Lanzarote
+      - Tenerife
+  - name: direccion_provincia_nombre
+    logicalType: string
+    physicalType: text
+    description: Name of the province.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_values
+      value:
+      - Palmas (Las)
+      - Santa Cruz De Tenerife
+      - _U
+    - property: observed_unknown_code_rows
+      value: 2
+  - name: direccion_municipio_nombre
+    logicalType: string
+    physicalType: text
+    description: Name of the municipality.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 89
+    - property: observed_unknown_code_rows
+      value: 2
+  - name: direccion_localidad_nombre
+    logicalType: string
+    physicalType: text
+    description: Name of the locality. The code '_U' means unknown / not recorded.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 720
+    - property: observed_unknown_code_rows
+      value: 48013
+  - name: direccion_codigo_postal
+    logicalType: string
+    physicalType: text
+    description: Postal code. The dictionary types it as Number and says '_U' means unknown; because '_U'
+      occurs in the data it is declared string here.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 586
+    - property: observed_unknown_code_rows
+      value: 35
+  - name: numero_dormitorios_individuales_explotacion
+    logicalType: integer
+    physicalType: text (numeric)
+    description: Number of single bedrooms in operation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.035
+    - property: observed_distinct
+      value: 26
+  - name: numero_dormitorios_dobles_explotacion
+    logicalType: integer
+    physicalType: text (numeric)
+    description: Number of double bedrooms in operation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.035
+    - property: observed_distinct
+      value: 38
+  - name: plazas
+    logicalType: integer
+    physicalType: text (numeric)
+    description: Number of accommodation places (beds).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+  - name: latitud
+    logicalType: number
+    physicalType: text (decimal, dot separator)
+    description: Listed in the data dictionary without name, description or type; presumed latitude by
+      column name (coordinate reference system not stated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 19838
+    - property: observed_note
+      value: value 0 observed as placeholder in 23845 rows (either coordinate); 64 non-zero rows fall
+        outside lat 27..30 / lon -19..-13
+    - property: evidence_detail
+      value: name and position documented only as a row in the dictionary with empty fields
+  - name: longitud
+    logicalType: number
+    physicalType: text (decimal, dot separator)
+    description: Listed in the data dictionary without name, description or type; presumed longitude by
+      column name (coordinate reference system not stated).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 19896
+    - property: observed_note
+      value: value 0 observed as placeholder in 23845 rows (either coordinate); 64 non-zero rows fall
+        outside lat 27..30 / lon -19..-13
+    - property: evidence_detail
+      value: name and position documented only as a row in the dictionary with empty fields
+  quality:
+  - type: text
+    description: 'Observed in sample of 72143 rows on 2026-10-24; not a producer guarantee: establecimiento_id
+      is NOT unique (170 rows share 80 ids; 15 rows are fully identical to another). The producer does
+      not declare a key.'
+  - type: text
+    description: 'Observed in sample of 72143 rows on 2026-10-24; not a producer guarantee: 23845 rows
+      have latitud or longitud equal to 0 (placeholder) and 64 non-zero rows lie outside the Canary Islands
+      bounding box lat 27..30, lon -19..-13.'
+  - type: text
+    description: 'Observed in sample of 72143 rows on 2026-10-24; not a producer guarantee: the producer
+      states that ''_U'' marks unknown data (columns establecimiento_clasificacion, direccion, direccion_localidad_nombre,
+      direccion_codigo_postal).'
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/catalogos/general/dataset/establecimientos-extrahoteleros-de-tipologia-vivienda-vacacional-inscritos-en-el-registro
+- property: csv_resource_url
+  value: https://datos.canarias.es/catalogos/general/dataset/9f4355a2-d086-4384-ba72-d8c99aa2d544/resource/8ff8cc43-c00b-4513-8f42-a5b961c579e1/download/establecimientos-extrahoteleros-de-tipologia-vivienda-vacacional-inscritos-en-el-registro-genera.csv
+- property: license
+  value: Aviso Legal del Gobierno de Canarias (catalogue licence id gobcan-aviso-legal); full text not
+    read
+- property: license_url
+  value: https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso
+- property: documentation_url
+  value: https://datos.canarias.es/catalogos/general/dataset/establecimientos-extrahoteleros-de-tipologia-vivienda-vacacional-inscritos-en-el-registro
+- property: data_dictionary_url
+  value: https://datos.canarias.es/catalogos/general/dataset/9f4355a2-d086-4384-ba72-d8c99aa2d544/resource/07e101fc-ee77-4a0f-b1ae-b466dbb9e427/download/diccionario_datos_establecimientos-extrahoteleros-vivienda-vacacional.csv
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 72143
+- property: sample_selection
+  value: Complete CSV resource as published (resource modified 2026-10-24T00:51:14 per catalogue); dictionary
+    CSV downloaded alongside.
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T12:00:00Z'

@@ -1,0 +1,618 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 54336eee-bf57-5b06-ad58-4e7434493bbd
+version: 0.1.0
+status: draft
+name: OpenSky Network live aircraft states (Canary Islands bounding box)
+domain: mobility
+description:
+  purpose: Live ADS-B / MLAT state vectors (position, altitude, velocity, identifiers) of aircraft inside
+    a WGS-84 bounding box, from the OpenSky Network REST API.
+  limitations: 'Single anonymous snapshot (25 state vectors) taken on 2026-10-24 for bbox lat 27..30,
+    lon -19..-13; no history (anonymous access gets only the most recent state, time resolution 10 s).
+    The sensors field was null in every vector (no sensor filter). category was not requested (extended=1
+    needed). Credits: anonymous 400/day per endpoint bucket; a bbox of 18 sq deg cost 1 credit (X-Rate-Limit-Remaining
+    399 after the request); 429 returned with X-Rate-Limit-Retry-After-Seconds when exhausted. The REST
+    reference now describes OAuth2 for authenticated use; no account or token was used. The terms-of-use
+    page returned HTTP 403 to the sampling client and was not read, so licence conditions are unverified
+    (the catalogue note says non-commercial/research use). No SLA, no versioning policy, no quality rules
+    beyond nullability. Coverage depends on community receivers; gaps are not characterised.'
+  usage: Call GET /states/all with lamin, lomin, lamax, lomax; respect credit quotas; check terms of use
+    before any reuse.
+tags:
+- opensky
+- aviation
+- real-time
+- canary-islands
+schema:
+- name: states_response
+  logicalType: object
+  physicalType: json object (response root)
+  description: Response root of GET /states/all.
+  properties:
+  - name: time
+    logicalType: integer
+    physicalType: int
+    description: The time which the state vectors in this response are associated with; each vector represents
+      the state within the interval [time - 1, time].
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: 1792854191
+  - name: states
+    logicalType: array
+    physicalType: array of state vector arrays
+    description: The states property is a two-dimensional array; each row is a state vector. May be null
+      when no aircraft match (not observed).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_length
+      value: 25
+- name: state_vector
+  logicalType: object
+  physicalType: json array of 17 positional elements (element of 'states')
+  description: 'State vector of one aircraft at the snapshot instant. Positional array: the property order
+    follows the documented index. Grain: one vector per aircraft per response.'
+  properties:
+  - name: icao24
+    logicalType: string
+    physicalType: string
+    description: Unique ICAO 24-bit address of the transponder in hex string representation.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 25
+    - property: observed_unique_in_sample
+      value: true
+    - property: array_index
+      value: 0
+  - name: callsign
+    logicalType: string
+    physicalType: string | null
+    description: Callsign of the vehicle (8 chars). Can be null if no callsign has been received.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 25
+    - property: observed_unique_in_sample
+      value: true
+    - property: array_index
+      value: 1
+  - name: origin_country
+    logicalType: string
+    physicalType: string
+    description: Country name inferred from the ICAO 24-bit address.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 12
+    - property: observed_values
+      value:
+      - Austria
+      - Denmark
+      - France
+      - Germany
+      - Ireland
+      - Kingdom of the Netherlands
+      - Norway
+      - Portugal
+      - Spain
+      - Sweden
+      - United Kingdom
+      - United States
+    - property: array_index
+      value: 2
+  - name: time_position
+    logicalType: integer
+    physicalType: int | null
+    description: Unix timestamp (seconds) for the last position update. Can be null if no position report
+      was received by OpenSky within the past 15 s.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7
+    - property: observed_min
+      value: 1792854052.0
+    - property: observed_max
+      value: 1792854191.0
+    - property: observed_values
+      value:
+      - 1792854052
+      - 1792854112
+      - 1792854187
+      - 1792854188
+      - 1792854189
+      - 1792854190
+      - 1792854191
+    - property: array_index
+      value: 3
+  - name: last_contact
+    logicalType: integer
+    physicalType: int
+    description: Unix timestamp (seconds) for the last update in general; updated for any new, valid message
+      received from the transponder.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_min
+      value: 1792854055.0
+    - property: observed_max
+      value: 1792854191.0
+    - property: observed_values
+      value:
+      - 1792854055
+      - 1792854112
+      - 1792854187
+      - 1792854188
+      - 1792854190
+      - 1792854191
+    - property: array_index
+      value: 4
+  - name: longitude
+    logicalType: number
+    physicalType: float | null
+    description: WGS-84 longitude in decimal degrees. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 25
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -17.4844
+    - property: observed_max
+      value: -13.0287
+    - property: observed_values
+      value:
+      - -13.0287
+      - -13.1466
+      - -13.4027
+      - -13.637
+      - -13.8979
+      - -14.3331
+      - -14.5204
+      - -14.6925
+      - -15.4256
+      - -15.6432
+      - -15.8536
+      - -16.0844
+      - -16.1793
+      - -16.2961
+      - -16.3439
+      - -16.356
+      - -16.4148
+      - -16.5454
+      - -16.5709
+      - -16.609
+      - -16.6581
+      - -16.7301
+      - -16.843
+      - -16.8992
+      - -17.4844
+    - property: array_index
+      value: 5
+  - name: latitude
+    logicalType: number
+    physicalType: float | null
+    description: WGS-84 latitude in decimal degrees. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 25
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 27.8222
+    - property: observed_max
+      value: 29.8407
+    - property: observed_values
+      value:
+      - 27.8222
+      - 28.0343
+      - 28.4529
+      - 28.4676
+      - 28.4846
+      - 28.4872
+      - 28.7112
+      - 28.7285
+      - 28.8376
+      - 28.937
+      - 29.0184
+      - 29.0197
+      - 29.1351
+      - 29.2164
+      - 29.2382
+      - 29.2919
+      - 29.3833
+      - 29.4577
+      - 29.4807
+      - 29.53
+      - 29.6574
+      - 29.6584
+      - 29.7853
+      - 29.7982
+      - 29.8407
+    - property: array_index
+      value: 6
+  - name: baro_altitude
+    logicalType: number
+    physicalType: float | null
+    description: Barometric altitude in meters. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 4.0
+    - property: observed_distinct
+      value: 21
+    - property: observed_min
+      value: 670.56
+    - property: observed_max
+      value: 12192.0
+    - property: observed_values
+      value:
+      - 10050.78
+      - 10073.64
+      - 10370.82
+      - 11269.98
+      - 11277.6
+      - 11285.22
+      - 11574.78
+      - 11582.4
+      - 11871.96
+      - 12192.0
+      - 3855.72
+      - 5882.64
+      - 670.56
+      - 685.8
+      - 7193.28
+      - 7741.92
+      - 7795.26
+      - 7833.36
+      - 8427.72
+      - 8846.82
+      - 9067.8
+    - property: array_index
+      value: 7
+  - name: on_ground
+    logicalType: boolean
+    physicalType: boolean
+    description: Indicates if the position was retrieved from a surface position report.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_values
+      value:
+      - 'false'
+      - 'true'
+    - property: array_index
+      value: 8
+  - name: velocity
+    logicalType: number
+    physicalType: float | null
+    description: Velocity over ground in m/s. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 25
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 12.35
+    - property: observed_max
+      value: 259.5
+    - property: observed_values
+      value:
+      - 12.35
+      - 179.73
+      - 203.2
+      - 204.67
+      - 208.24
+      - 212.35
+      - 212.91
+      - 216.27
+      - 219.45
+      - 220.46
+      - 220.55
+      - 220.6
+      - 221.35
+      - 221.82
+      - 227.01
+      - 227.54
+      - 228.87
+      - 239.97
+      - 240.28
+      - 242.41
+      - 242.77
+      - 248.51
+      - 259.5
+      - 72.13
+      - 80.69
+    - property: array_index
+      value: 9
+  - name: true_track
+    logicalType: number
+    physicalType: float | null
+    description: True track in decimal degrees clockwise from north (north = 0). Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 24
+    - property: observed_min
+      value: 2.96
+    - property: observed_max
+      value: 298.12
+    - property: observed_values
+      value:
+      - 191.54
+      - 192.78
+      - 2.96
+      - 205.55
+      - 205.96
+      - 206.32
+      - 206.74
+      - 207.51
+      - 207.82
+      - 213.26
+      - 218.61
+      - 218.87
+      - 218.92
+      - 219.04
+      - 27.63
+      - 288.2
+      - 29.78
+      - 290.89
+      - 298.12
+      - 32.28
+      - 33.83
+      - 4.55
+      - 43.15
+      - 52.68
+    - property: array_index
+      value: 10
+  - name: vertical_rate
+    logicalType: number
+    physicalType: float | null
+    description: Vertical rate in m/s; positive means climbing, negative descending. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 4.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_min
+      value: -15.93
+    - property: observed_max
+      value: 11.7
+    - property: observed_values
+      value:
+      - -0.33
+      - -10.4
+      - -11.05
+      - -11.38
+      - -14.31
+      - -15.93
+      - -5.2
+      - 0.0
+      - 0.98
+      - 11.7
+      - 5.53
+      - 5.85
+      - 6.83
+      - 8.13
+      - 8.45
+    - property: array_index
+      value: 11
+  - name: sensors
+    logicalType: array
+    physicalType: int[] | null
+    description: IDs of the receivers which contributed to this state vector. Is null if no filtering
+      for sensor was used in the request.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: array_index
+      value: 12
+  - name: geo_altitude
+    logicalType: number
+    physicalType: float | null
+    description: Geometric altitude in meters. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 4.0
+    - property: observed_distinct
+      value: 21
+    - property: observed_min
+      value: 822.96
+    - property: observed_max
+      value: 12748.26
+    - property: observed_values
+      value:
+      - 10591.8
+      - 10629.9
+      - 10934.7
+      - 11833.86
+      - 11841.48
+      - 11849.1
+      - 12161.52
+      - 12176.76
+      - 12184.38
+      - 12443.46
+      - 12748.26
+      - 4168.14
+      - 6256.02
+      - 7597.14
+      - 8176.26
+      - 822.96
+      - 8237.22
+      - 8275.32
+      - 8907.78
+      - 9319.26
+      - 9563.1
+    - property: array_index
+      value: 13
+  - name: squawk
+    logicalType: string
+    physicalType: string | null
+    description: The transponder code aka squawk. Can be null.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 56.0
+    - property: observed_distinct
+      value: 11
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - '0611'
+      - '2530'
+      - '3721'
+      - '4351'
+      - '5060'
+      - '6216'
+      - '6232'
+      - '6244'
+      - '6272'
+      - '6274'
+      - '7676'
+    - property: array_index
+      value: 14
+  - name: spi
+    logicalType: boolean
+    physicalType: boolean
+    description: Whether flight status indicates special purpose indicator.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_values
+      value:
+      - 'false'
+    - property: array_index
+      value: 15
+  - name: position_source
+    logicalType: integer
+    physicalType: int
+    description: 'Origin of this state''s position: 0 = ADS-B, 1 = ASTERIX, 2 = MLAT, 3 = FLARM.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 0.0
+    - property: observed_values
+      value:
+      - 0
+    - property: array_index
+      value: 16
+    quality:
+    - type: library
+      metric: invalidValues
+      description: position_source must be one of the documented origins (0 ADS-B, 1 ASTERIX, 2 MLAT,
+        3 FLARM).
+      arguments:
+        validValues:
+        - 0
+        - 1
+        - 2
+        - 3
+      mustBe: 0
+      dimension: conformity
+  - name: category
+    logicalType: integer
+    physicalType: int
+    description: 'Aircraft category: 0 = no information ... 20 = line obstacle (coded list in the REST
+      reference). Returned only when the request uses extended=1; the sample request did not, so the field
+      was not returned (vectors had 17 elements).'
+    customProperties:
+    - property: evidence
+      value: documented
+    - property: array_index
+      value: 17
+    - property: documented_values
+      value: 0-20
+  quality:
+  - type: library
+    metric: duplicateValues
+    description: 'Observed in sample of 25 rows on 2026-10-24; not a producer guarantee: icao24 is unique
+      within the snapshot. The producer documents one state vector per aircraft per response but declares
+      no key.'
+    arguments:
+      properties:
+      - icao24
+    mustBe: 0
+    dimension: uniqueness
+customProperties:
+- property: source_url
+  value: https://opensky-network.org/api/states/all?lamin=27&lomin=-19&lamax=30&lomax=-13
+- property: license
+  value: 'unverified (terms-of-use page not readable: HTTP 403); catalogue note: non-commercial / research
+    use'
+- property: license_url
+  value: https://opensky-network.org/about/terms-of-use
+- property: documentation_url
+  value: https://openskynetwork.github.io/opensky-api/rest.html
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 25
+- property: sample_selection
+  value: One anonymous request with bbox lamin=27, lomin=-19, lamax=30, lomax=-13; single snapshot.
+- property: sample_status
+  value: ok
+- property: credit_cost_observed
+  value: 1
+- property: rate_limit_documented
+  value: anonymous 400 credits/day; 1-4 credits per request by area
+contractCreatedTs: '2026-10-24T12:00:00Z'

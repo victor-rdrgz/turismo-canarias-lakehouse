@@ -1,0 +1,528 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: dcf59e0a-a05a-5230-9925-5f5bda9c71c9
+version: 0.1.0
+status: draft
+name: REE REData - Electricity demand evolution (Canarias electric system)
+domain: energy
+description:
+  purpose: Hourly/daily/monthly evolution of electricity demand published by Red Electrica de Espana through the
+    REData API (widget demanda/evolucion), requested here for the Canarias electric system (geo_limit=canarias).
+  limitations: Unit of 'value' is not declared by the producer (hourly values of 779-1446 and daily values of 20944-29615
+    were observed; no unit stated). Meaning of 'percentage' beyond 'proportion between 0 and 1' is not defined.
+    Time zone is not documented; observed ISO offsets +02:00 (October 2026) and +01:00 (January 2025). Geographic
+    ids are only partly documented (8741 peninsular, 7 Castilla-La Mancha); geo_ids=8742 for Canarias was used in
+    the request and returned data but is not in the documentation read. The widget 'evolucion' under category 'demanda'
+    was not found in the widget list of the documentation text read, although it returned data. Update periodicity,
+    latency, rate limits and maximum date range are not documented. An hourly request over 2026-09-01..2026-10-23
+    returned HTTP 400 (Error Interno); a 23-day hourly request and a 365-day daily request succeeded, so the real
+    range limit is unknown. No licence is declared on the API page; the site legal notice requires naming the company
+    as source, stating the date of last update and not altering the meaning, and allows informational non-commercial
+    use; no formal licence named. No version in the URL, no deprecation policy. Fields 'code' and 'expireAt' are
+    documented but were not observed. Field 'icon' was observed but is not documented.
+  usage: 'Raw landing of the JSON response; flatten included[].attributes.values[] to one row per datetime. Request
+    parameters: start_date, end_date (YYYY-MM-DDTHH:MM), time_trunc (hour, day, month, year), geo_trunc=electric_system,
+    geo_limit=canarias, geo_ids=8742.'
+tags:
+- energy
+- electricity
+- demand
+- canarias
+- api
+- json
+schema:
+- name: demand_evolution_response
+  logicalType: object
+  physicalType: json
+  description: JSON:API-style response of the REData widget demanda/evolucion for the electric system of Canarias
+    (one indicator series with timestamped values).
+  properties:
+  - name: data
+    logicalType: object
+    physicalType: object
+    description: Widget envelope
+    properties:
+    - name: type
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - Evolución de la demanda
+    - name: id
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: documented+observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 1
+      - property: observed_unique_in_sample
+        value: false
+      - property: observed_values
+        value:
+        - dem1
+    - name: attributes
+      logicalType: object
+      physicalType: object
+      description: Attributes of the widget
+      properties:
+      - name: title
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 0.0
+        - property: observed_distinct
+          value: 1
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_values
+          value:
+          - Evolución de la demanda
+      - name: last-update
+        logicalType: timestamp
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 0.0
+        - property: observed_distinct
+          value: 1
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_min
+          value: '2026-10-24T06:46:28.000+02:00'
+        - property: observed_max
+          value: '2026-10-24T06:46:28.000+02:00'
+        - property: observed_values
+          value:
+          - '2026-10-24T06:46:28.000+02:00'
+      - name: description
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 100.0
+        - property: observed_distinct
+          value: 0
+        - property: observed_unique_in_sample
+          value: false
+      customProperties:
+      - property: evidence
+        value: documented+observed
+    - name: meta
+      logicalType: object
+      physicalType: object
+      description: Metadata of the response
+      properties:
+      - name: cache-control
+        logicalType: object
+        physicalType: object
+        description: Cache state of the response
+        properties:
+        - name: cache
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 0.0
+          - property: observed_distinct
+            value: 1
+          - property: observed_unique_in_sample
+            value: false
+          - property: observed_values
+            value:
+            - MISS
+        - name: expireAt
+          logicalType: timestamp
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented
+        customProperties:
+        - property: evidence
+          value: documented+observed
+      customProperties:
+      - property: evidence
+        value: documented+observed
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: included
+    logicalType: array
+    physicalType: array
+    description: Array of indicators (series) returned by the widget
+    items:
+      logicalType: object
+      physicalType: object
+      properties:
+      - name: type
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 0.0
+        - property: observed_distinct
+          value: 1
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_values
+          value:
+          - Demanda
+      - name: id
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 0.0
+        - property: observed_distinct
+          value: 1
+        - property: observed_unique_in_sample
+          value: false
+        - property: observed_min
+          value: 10297.0
+        - property: observed_max
+          value: 10297.0
+        - property: observed_values
+          value:
+          - '10297'
+      - name: groupId
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_null_pct
+          value: 100.0
+        - property: observed_distinct
+          value: 0
+        - property: observed_unique_in_sample
+          value: false
+      - name: attributes
+        logicalType: object
+        physicalType: object
+        description: Attributes of the indicator
+        properties:
+        - name: title
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 0.0
+          - property: observed_distinct
+            value: 1
+          - property: observed_unique_in_sample
+            value: false
+          - property: observed_values
+            value:
+            - Demanda
+        - name: description
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 100.0
+          - property: observed_distinct
+            value: 0
+          - property: observed_unique_in_sample
+            value: false
+        - name: color
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 0.0
+          - property: observed_distinct
+            value: 1
+          - property: observed_unique_in_sample
+            value: false
+          - property: observed_values
+            value:
+            - '#ffea00'
+        - name: icon
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: observed
+          - property: observed_null_pct
+            value: 100.0
+          - property: observed_distinct
+            value: 0
+          - property: observed_unique_in_sample
+            value: false
+        - name: type
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 100.0
+          - property: observed_distinct
+            value: 0
+          - property: observed_unique_in_sample
+            value: false
+        - name: magnitude
+          logicalType: string
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 100.0
+          - property: observed_distinct
+            value: 0
+          - property: observed_unique_in_sample
+            value: false
+        - name: composite
+          logicalType: boolean
+          physicalType: boolean
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 0.0
+          - property: observed_distinct
+            value: 1
+          - property: observed_unique_in_sample
+            value: false
+          - property: observed_values
+            value:
+            - 'False'
+        - name: last-update
+          logicalType: timestamp
+          physicalType: string
+          description: Not defined by the producer
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_null_pct
+            value: 0.0
+          - property: observed_distinct
+            value: 1
+          - property: observed_unique_in_sample
+            value: false
+          - property: observed_min
+            value: '2026-10-24T06:46:28.000+02:00'
+          - property: observed_max
+            value: '2026-10-24T06:46:28.000+02:00'
+          - property: observed_values
+            value:
+            - '2026-10-24T06:46:28.000+02:00'
+        - name: values
+          logicalType: array
+          physicalType: array
+          description: Array of observations of the series (fields value, percentage, datetime)
+          items:
+            logicalType: object
+            physicalType: object
+            properties:
+            - name: value
+              logicalType: number
+              physicalType: number
+              description: Not defined by the producer
+              customProperties:
+              - property: evidence
+                value: documented+observed
+              - property: observed_null_pct
+                value: 0.0
+              - property: observed_distinct
+                value: 551
+              - property: observed_unique_in_sample
+                value: false
+              - property: observed_min
+                value: 779.1
+              - property: observed_max
+                value: 1445.69
+              - property: unit_note
+                value: Unit not declared by the producer
+              - property: observed_min_daily_request_2025
+                value: 20943.596
+              - property: observed_max_daily_request_2025
+                value: 29615.498
+            - name: percentage
+              logicalType: number
+              physicalType: number
+              description: Proportion between 0 and 1
+              customProperties:
+              - property: evidence
+                value: documented+observed
+              - property: observed_null_pct
+                value: 0.0
+              - property: observed_distinct
+                value: 1
+              - property: observed_unique_in_sample
+                value: false
+              - property: observed_min
+                value: 1.0
+              - property: observed_max
+                value: 1.0
+              - property: observed_values
+                value:
+                - '1'
+              - property: documented_range
+                value: 0 to 1
+              - property: observed_note
+                value: Constant value 1 in this series in both samples
+            - name: datetime
+              logicalType: timestamp
+              physicalType: string
+              description: Not defined by the producer
+              customProperties:
+              - property: evidence
+                value: documented+observed
+              - property: observed_null_pct
+                value: 0.0
+              - property: observed_distinct
+                value: 552
+              - property: observed_unique_in_sample
+                value: true
+              - property: observed_min
+                value: '2026-10-01T00:00:00.000+02:00'
+              - property: observed_max
+                value: '2026-10-23T23:00:00.000+02:00'
+              - property: format_observed
+                value: ISO 8601 with local UTC offset, e.g. +02:00 in October 2026 and +01:00 in January 2025
+              - property: observed_unique_in_hourly_sample
+                value: true
+              - property: observed_unique_in_daily_sample
+                value: true
+          customProperties:
+          - property: evidence
+            value: documented+observed
+          - property: observed_values_in_hourly_sample
+            value: 552
+          - property: observed_values_in_daily_sample
+            value: 365
+        customProperties:
+        - property: evidence
+          value: documented+observed
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_items_per_response
+      value: 1
+  - name: errors
+    logicalType: array
+    physicalType: array
+    description: Error structure; only present in error responses (not in successful ones)
+    items:
+      logicalType: object
+      physicalType: object
+      properties:
+      - name: code
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented
+      - name: status
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_example
+          value: 400 (error response captured on 2026-10-24)
+      - name: title
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_example
+          value: Error Interno
+      - name: detail
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: documented+observed
+        - property: observed_example
+          value: Los datos solicitados no están disponibles en este momento. Inténtelo de nuevo más tarde.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  quality:
+  - type: text
+    name: observed_unique_datetime
+    dimension: uniqueness
+    description: 'Observed in sample of 552 hourly values (2026-10-01 to 2026-10-23) and 365 daily values (2025)
+      on 2026-10-24: datetime unique within each series; not a producer guarantee'
+  - type: text
+    name: observed_no_null_values
+    dimension: completeness
+    description: 'Observed in sample of 917 values on 2026-10-24: value, percentage and datetime never null; not
+      a producer guarantee'
+customProperties:
+- property: source_url
+  value: https://apidatos.ree.es/es/datos/demanda/evolucion
+- property: license
+  value: 'No licence declared on the API page; see legal notice (reuse conditions: name the company as source, state
+    date of last update, do not alter meaning; informational non-commercial use allowed; other uses require written
+    permission)'
+- property: license_url
+  value: https://www.ree.es/es/aviso-legal
+- property: documentation_url
+  value: https://www.ree.es/es/apidatos
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 917
+- property: sample_selection
+  value: 'Two requests: hourly values 2026-10-01..2026-10-23 (552 rows, sample.json) and daily values 2025-01-01..2025-12-31
+    (365 rows, sample_day_2025.json); an earlier hourly request for 2026-09-01..2026-10-23 returned HTTP 400 and
+    is kept as error_range_52days.json'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T11:00:00Z'

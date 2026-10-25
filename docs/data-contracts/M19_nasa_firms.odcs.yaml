@@ -1,0 +1,583 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: b72d7538-b9d2-5969-946b-1dc514f5970c
+version: 0.1.0
+status: draft
+name: NASA FIRMS VIIRS 375 m active fire detections, Europe region, last 24 hours
+domain: environment
+description:
+  purpose: 'Near-real-time VIIRS 375 m active fire detections distributed by NASA FIRMS (LANCE) as open CSV files per region
+    and platform, covering the last 24 hours. This contract describes the ''Europe'' region files for NOAA-20 and Suomi NPP:
+    one row per fire pixel with location, brightness temperatures, scan/track pixel size, acquisition date and time, satellite,
+    confidence class, processing version, fire radiative power and day/night flag.'
+  limitations: |-
+    - Whether the 'Europe' region file covers the Canary Islands is not documented; in the sample the latitude range is 34.4 to 65.8, and no detection falls inside a box around the Canary Islands (27.5-29.5 N, 18.5-13.2 W), which suggests the region does not include them but does not prove it. A different region file or the area API (which requires a free MAP_KEY and was not used) would be needed.
+    - Units of scan and track, the time zone of acq_date, and the unit of latitude/longitude are not stated in the attribute table.
+    - The files carry version 2.0NRT, which the attribute table (1.0NRT, 1.0) does not list.
+    - N21 is documented as a platform value but no NOAA-21 file was sampled. The documentation announces that delivery of new Suomi NPP data ends on 2 November 2026 (so the Suomi NPP file will stop updating).
+    - Files hold a rolling 24-hour window (replaced about every 60 minutes per the FAQ, NRT data available within 3 hours of observation, best effort): there is no history, and each download is a snapshot. A day-by-day archive must be built by the consumer.
+    - The FIRMS data use policy page returned 404 when first checked; the FAQ states no specific licence. The licence is therefore unverified. No SLA, no uniqueness key and no formal quality rules are documented; the nighttime low-confidence pixels of the South Atlantic Magnetic Anomaly are removed from NRT data.
+    - The VIIRS C2 user guide PDF was not read.
+  usage: Download the regional 24h CSV periodically and append with a load timestamp, deduplicating on latitude, longitude,
+    acq_date, acq_time and satellite. Read acq_time as text. Acknowledge NASA FIRMS (see the FAQ wording) as source.
+tags:
+- environment
+- wildfire
+- satellite
+- nasa
+- firms
+- viirs
+- near-real-time
+schema:
+- name: viirs_noaa20_europe_24h
+  logicalType: object
+  physicalType: csv
+  description: VIIRS 375 m active fire detections of the last 24 hours, NOAA-20 platform, FIRMS region file 'Europe' (J1_VIIRS_C2_Europe_24h.csv).
+    One row per fire pixel detection.
+  properties:
+  - name: latitude
+    logicalType: number
+    physicalType: text
+    description: Center of the nominal 375 m fire pixel (latitude). Units not stated in the attribute table; values read as
+      decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 731
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 34.57275
+    - property: observed_max
+      value: 65.76949
+  - name: longitude
+    logicalType: number
+    physicalType: text
+    description: Center of the nominal 375 m fire pixel (longitude). Units not stated in the attribute table; values read
+      as decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 731
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -21.78882
+    - property: observed_max
+      value: 34.98767
+  - name: bright_ti4
+    logicalType: number
+    physicalType: text
+    description: I-4 channel brightness temperature of the fire pixel, in kelvin.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 660
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 295.01
+    - property: observed_max
+      value: 367.0
+  - name: scan
+    logicalType: number
+    physicalType: text
+    description: Along-scan pixel size (about 375 m at nadir). Unit not stated by the producer; observed values (0.32 to 0.79)
+      are consistent with kilometres but this is not documented.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 43
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.32
+    - property: observed_max
+      value: 0.79
+  - name: track
+    logicalType: number
+    physicalType: text
+    description: Along-track pixel size (about 375 m at nadir). Unit not stated by the producer; see scan.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 43
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.36
+    - property: observed_max
+      value: 0.78
+  - name: acq_date
+    logicalType: date
+    physicalType: text
+    description: Date of VIIRS acquisition (format YYYY-MM-DD). Time zone not stated in the attribute table; acq_time is UTC.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '2026-10-23'
+      - '2026-10-24'
+    - property: observed_format
+      value: YYYY-MM-DD
+  - name: acq_time
+    logicalType: string
+    physicalType: text
+    description: Satellite overpass time, UTC. Observed as four digits HHMM with leading zeros, so it must be read as text.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 43
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 20.0
+    - property: observed_max
+      value: 2246.0
+    - property: observed_format
+      value: HHMM
+  - name: satellite
+    logicalType: string
+    physicalType: text
+    description: 'Platform that acquired the data. Documented values: N (Suomi NPP), N20 (NOAA-20), N21 (NOAA-21).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: N20
+    - property: observed_max
+      value: N20
+    - property: observed_values
+      value:
+      - N20
+  - name: confidence
+    logicalType: string
+    physicalType: text
+    description: 'Gauge of individual pixel quality. Documented values: low, nominal, high (low: mostly daytime sun glint
+      with I-4 anomaly under 15 K; nominal: no sun glint, anomaly over 15 K; high: saturated pixels).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: high
+    - property: observed_max
+      value: nominal
+    - property: observed_values
+      value:
+      - high
+      - low
+      - nominal
+  - name: version
+    logicalType: string
+    physicalType: text
+    description: 'Collection and processing source. Documented values: 1.0NRT (Collection 1, NRT processing) and 1.0 (Collection
+      1, standard processing); the files carry a value that is not in the documentation table (see observed_values).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0NRT
+    - property: observed_max
+      value: 2.0NRT
+    - property: observed_values
+      value:
+      - 2.0NRT
+  - name: bright_ti5
+    logicalType: number
+    physicalType: text
+    description: I-5 channel brightness temperature of the fire pixel, in kelvin.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 637
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 260.39
+    - property: observed_max
+      value: 307.39
+  - name: frp
+    logicalType: number
+    physicalType: text
+    description: Pixel-integrated fire radiative power, in megawatts.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 420
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.17
+    - property: observed_max
+      value: 48.06
+  - name: daynight
+    logicalType: string
+    physicalType: text
+    description: Whether the fire was detected during day (D) or night (N).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: D
+    - property: observed_max
+      value: N
+    - property: observed_values
+      value:
+      - D
+      - N
+  quality:
+  - type: text
+    name: observed_row_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 731 rows on 2026-10-24; not a producer guarantee: latitude + longitude + acq_date
+      + acq_time + satellite is unique. The producer documents no unique key.'
+  - type: text
+    name: observed_no_nulls
+    dimension: completeness
+    description: 'Observed in sample of 731 rows on 2026-10-24; not a producer guarantee: all 13 columns are populated in
+      every row.'
+- name: viirs_suomi_npp_europe_24h
+  logicalType: object
+  physicalType: csv
+  description: VIIRS 375 m active fire detections of the last 24 hours, Suomi NPP platform, FIRMS region file 'Europe' (SUOMI_VIIRS_C2_Europe_24h.csv).
+    One row per fire pixel detection.
+  properties:
+  - name: latitude
+    logicalType: number
+    physicalType: text
+    description: Center of the nominal 375 m fire pixel (latitude). Units not stated in the attribute table; values read as
+      decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 725
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 34.43617
+    - property: observed_max
+      value: 65.769
+  - name: longitude
+    logicalType: number
+    physicalType: text
+    description: Center of the nominal 375 m fire pixel (longitude). Units not stated in the attribute table; values read
+      as decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 726
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -21.79108
+    - property: observed_max
+      value: 34.98841
+  - name: bright_ti4
+    logicalType: number
+    physicalType: text
+    description: I-4 channel brightness temperature of the fire pixel, in kelvin.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 668
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 295.02
+    - property: observed_max
+      value: 367.0
+  - name: scan
+    logicalType: number
+    physicalType: text
+    description: Along-scan pixel size (about 375 m at nadir). Unit not stated by the producer; observed values (0.32 to 0.79)
+      are consistent with kilometres but this is not documented.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 39
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.32
+    - property: observed_max
+      value: 0.77
+  - name: track
+    logicalType: number
+    physicalType: text
+    description: Along-track pixel size (about 375 m at nadir). Unit not stated by the producer; see scan.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 41
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.36
+    - property: observed_max
+      value: 0.78
+  - name: acq_date
+    logicalType: date
+    physicalType: text
+    description: Date of VIIRS acquisition (format YYYY-MM-DD). Time zone not stated in the attribute table; acq_time is UTC.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '2026-10-23'
+      - '2026-10-24'
+    - property: observed_format
+      value: YYYY-MM-DD
+  - name: acq_time
+    logicalType: string
+    physicalType: text
+    description: Satellite overpass time, UTC. Observed as four digits HHMM with leading zeros, so it must be read as text.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 40
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1327.0
+    - property: observed_format
+      value: HHMM
+  - name: satellite
+    logicalType: string
+    physicalType: text
+    description: 'Platform that acquired the data. Documented values: N (Suomi NPP), N20 (NOAA-20), N21 (NOAA-21).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: N
+    - property: observed_max
+      value: N
+    - property: observed_values
+      value:
+      - N
+  - name: confidence
+    logicalType: string
+    physicalType: text
+    description: 'Gauge of individual pixel quality. Documented values: low, nominal, high (low: mostly daytime sun glint
+      with I-4 anomaly under 15 K; nominal: no sun glint, anomaly over 15 K; high: saturated pixels).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: high
+    - property: observed_max
+      value: nominal
+    - property: observed_values
+      value:
+      - high
+      - low
+      - nominal
+  - name: version
+    logicalType: string
+    physicalType: text
+    description: 'Collection and processing source. Documented values: 1.0NRT (Collection 1, NRT processing) and 1.0 (Collection
+      1, standard processing); the files carry a value that is not in the documentation table (see observed_values).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0NRT
+    - property: observed_max
+      value: 2.0NRT
+    - property: observed_values
+      value:
+      - 2.0NRT
+  - name: bright_ti5
+    logicalType: number
+    physicalType: text
+    description: I-5 channel brightness temperature of the fire pixel, in kelvin.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 643
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 258.11
+    - property: observed_max
+      value: 310.03
+  - name: frp
+    logicalType: number
+    physicalType: text
+    description: Pixel-integrated fire radiative power, in megawatts.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 404
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.3
+    - property: observed_max
+      value: 27.83
+  - name: daynight
+    logicalType: string
+    physicalType: text
+    description: Whether the fire was detected during day (D) or night (N).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: D
+    - property: observed_max
+      value: N
+    - property: observed_values
+      value:
+      - D
+      - N
+  quality:
+  - type: text
+    name: observed_row_unique
+    dimension: uniqueness
+    description: 'Observed in sample of 726 rows on 2026-10-24; not a producer guarantee: latitude + longitude + acq_date
+      + acq_time + satellite is unique. The producer documents no unique key.'
+  - type: text
+    name: observed_no_nulls
+    dimension: completeness
+    description: 'Observed in sample of 726 rows on 2026-10-24; not a producer guarantee: all 13 columns are populated in
+      every row.'
+slaProperties:
+- property: frequency
+  value: 60
+  unit: minutes
+customProperties:
+- property: source_url
+  value: https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv
+- property: source_url_2
+  value: https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv
+- property: license
+  value: unverified (FAQ asks to cite 'NASA FIRMS' and read the LANCE Disclaimer; no specific licence stated; data-use-policy
+    page returned 404)
+- property: license_url
+  value: unverified
+- property: documentation_url
+  value: https://www.earthdata.nasa.gov/data/tools/firms/active-fire-data-attributes-modis-viirs
+- property: documentation_url_faq
+  value: https://www.earthdata.nasa.gov/data/tools/firms/faq
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 1457
+- property: sample_selection
+  value: 'Whole files as published at sampling time (rolling last 24 hours): NOAA-20 731 rows (file last-modified 2026-10-24
+    14:41:43 GMT), Suomi NPP 726 rows (last-modified 2026-10-24 14:49:43 GMT). No filtering.'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T12:00:00Z'

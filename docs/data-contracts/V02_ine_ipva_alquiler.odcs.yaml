@@ -1,0 +1,592 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: d239846d-9d20-5655-b232-99b0a3371efe
+version: 0.1.0
+status: draft
+name: INE Rental housing price index (IPVA) via Tempus3 API
+domain: housing
+description:
+  purpose: 'Rental housing price index (Indice de Precios de Vivienda en Alquiler) published by INE through
+    the Tempus3 JSON API: series data points, series metadata and the list of tables of the operation.'
+  limitations: The API documentation describes the response in prose only; Secreto, Data and COD are not
+    defined. The meaning of FK_TipoDato=1, FK_Periodo=28, FK_Clasificacion=50 and FK_Escala=1 was not
+    looked up. Index base (2015=100 is only observed from the value 100.0 in 2015, and table codes start
+    with 2015) is not documented here. The methodology of the IPVA (sources, coverage, treatment) was
+    not located in this review. The last data point is 2024 although the table metadata shows a modification
+    on 2026-05-11; the publication calendar and revision policy are not verified. No rate limit or SLA
+    documented. Licence for the API data is not explicitly stated (site footer says CC BY-SA 4.0). Only
+    one series was sampled; a Canarias series by building type, size or contract age and the provincial
+    series (islands are not a level in the sampled tables) are not verified. DATOS_SERIE without the nult
+    parameter returned 404; use nult or date parameters.
+  usage: Call DATOS_SERIE/{COD}?nult=N for the data of a series (e.g. IPVA4947 = Canarias, Total, Index)
+    and SERIE/{COD} for metadata; resolve lookup identifiers via UNIDADES and PERIODICIDADES.
+tags:
+- housing
+- rent
+- price-index
+- ine
+- tempus3
+schema:
+- name: series_data_point
+  logicalType: object
+  physicalType: JSON object (element of Data[] in DATOS_SERIE response)
+  description: 'One annual data point of series IPVA4947 (Canarias, Total, Index). Grain: one value per
+    series per period.'
+  properties:
+  - name: Fecha
+    logicalType: integer
+    physicalType: long
+    description: 'Date of the data point (DATOS_SERIE output: ''date''). Observed as milliseconds since
+      the Unix epoch, always 1 January at local midnight (e.g. 1293836400000 = 2010-12-31T23:00:00Z);
+      the unit is not documented.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1293836400000.0
+    - property: observed_max
+      value: 1704063600000.0
+    - property: observed_interpretation
+      value: ms epoch
+  - name: FK_TipoDato
+    logicalType: integer
+    physicalType: integer
+    description: 'Identifier of the data type (DATOS_SERIE output: ''data type identifier''). Meaning
+      of value 1 not looked up.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1'
+  - name: FK_Periodo
+    logicalType: integer
+    physicalType: integer
+    description: 'Identifier of the period (DATOS_SERIE output: ''period identifier''). Meaning of value
+      28 not looked up; same value as FK_Periodo_ini in operation tables.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 28.0
+    - property: observed_max
+      value: 28.0
+    - property: observed_values
+      value:
+      - '28'
+  - name: Anyo
+    logicalType: integer
+    physicalType: integer
+    description: 'Year of the data point (DATOS_SERIE output: ''year'').'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 2011.0
+    - property: observed_max
+      value: 2024.0
+    - property: observed_values
+      value:
+      - '2011'
+      - '2012'
+      - '2013'
+      - '2014'
+      - '2015'
+      - '2016'
+      - '2017'
+      - '2018'
+      - '2019'
+      - '2020'
+      - '2021'
+      - '2022'
+      - '2023'
+      - '2024'
+  - name: Valor
+    logicalType: number
+    physicalType: float
+    description: 'Value of the data point (DATOS_SERIE output: ''value''). For this series the unit is
+      ''Indice'' (FK_Unidad 133, from the UNIDADES list); the base period is not documented here (value
+      100.0 is observed for 2015).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 99.33
+    - property: observed_max
+      value: 124.014
+  - name: Secreto
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer (the API documentation page does not describe this field).
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+  quality:
+  - type: text
+    description: 'Observed in sample of 14 rows on 2026-10-24; not a producer guarantee: (Fecha) and Anyo
+      are unique per data point; Valor has no empty values; all rows have FK_TipoDato=1, FK_Periodo=28
+      and Secreto=false.'
+  - type: text
+    description: 'Observed in sample; not a producer guarantee: one data point per year for 2011-2024
+      with no gaps.'
+- name: series_metadata
+  logicalType: object
+  physicalType: JSON object (SERIE response)
+  description: Metadata of a Tempus3 series; observed for IPVA4947 only. The DATOS_SERIE response also
+    carries COD, Nombre, FK_Unidad and FK_Escala at its top level.
+  properties:
+  - name: Id
+    logicalType: integer
+    physicalType: integer
+    description: 'Series identifier (SERIE output: ''series identifiers'').'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 4947.0
+    - property: observed_max
+      value: 4947.0
+    - property: observed_values
+      value:
+      - '4947'
+  - name: COD
+    logicalType: string
+    physicalType: string
+    description: Series code (input of DATOS_SERIE). Format of the code is not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - IPVA4947
+  - name: FK_Operacion
+    logicalType: integer
+    physicalType: integer
+    description: 'Operation identifier (SERIE output: operation object). Value 432 matches OPERACION/IPVA:
+      ''Indice de Precios de Vivienda en Alquiler''.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 432.0
+    - property: observed_max
+      value: 432.0
+    - property: observed_values
+      value:
+      - '432'
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: 'Series name (SERIE/DATOS_SERIE output). Observed: ''Canarias. Total. Indice.'''
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 'Canarias. Total. Índice. '
+  - name: Decimales
+    logicalType: integer
+    physicalType: integer
+    description: Number of decimals to display for the series' data (SERIE output).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 3.0
+    - property: observed_max
+      value: 3.0
+    - property: observed_values
+      value:
+      - '3'
+  - name: FK_Periodicidad
+    logicalType: integer
+    physicalType: integer
+    description: Periodicity identifier. Value 12 corresponds to 'Anual' (code A) in the PERIODICIDADES
+      list.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 12.0
+    - property: observed_max
+      value: 12.0
+    - property: observed_values
+      value:
+      - '12'
+  - name: FK_Publicacion
+    logicalType: integer
+    physicalType: integer
+    description: Publication identifier (SERIE output).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 580.0
+    - property: observed_max
+      value: 580.0
+    - property: observed_values
+      value:
+      - '580'
+  - name: FK_Clasificacion
+    logicalType: integer
+    physicalType: integer
+    description: 'Classification identifier (SERIE output: classification, temporal version information
+      such as index base). Meaning of value 50 not looked up.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 50.0
+    - property: observed_max
+      value: 50.0
+    - property: observed_values
+      value:
+      - '50'
+  - name: FK_Escala
+    logicalType: integer
+    physicalType: integer
+    description: Scale identifier (SERIE/DATOS_SERIE output). Meaning of value 1 not looked up.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 1.0
+    - property: observed_values
+      value:
+      - '1'
+  - name: FK_Unidad
+    logicalType: integer
+    physicalType: integer
+    description: Unit identifier. Value 133 corresponds to 'Indice' in the UNIDADES list.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 133.0
+    - property: observed_max
+      value: 133.0
+    - property: observed_values
+      value:
+      - '133'
+- name: operation_tables
+  logicalType: object
+  physicalType: JSON array of objects (TABLAS_OPERACION response)
+  description: 'Tables published for the IPVA operation (20 tables: indices by autonomous community, province,
+    municipality, district and weights, by building type, size and contract age).'
+  properties:
+  - name: Id
+    logicalType: integer
+    physicalType: integer
+    description: Table identifier (TABLAS_OPERACION output).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 50015.0
+    - property: observed_max
+      value: 59067.0
+  - name: Nombre
+    logicalType: string
+    physicalType: string
+    description: Table name (TABLAS_OPERACION output).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+  - name: Codigo
+    logicalType: string
+    physicalType: string
+    description: 'Table code: geographic level and classification (TABLAS_OPERACION output).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 2015_NAC-CCAA
+      - 2015_NAC-CCAA_P
+      - 2015_NAC-DIST
+      - 2015_NAC-MUN
+      - 2015_NAC-MUN_P
+      - 2015_NAC-PROV
+      - 2015_NAC-PROV_P
+      - 2015_NAC_P
+      - NAC-CCAA_P
+      - NAC-PROV_P
+  - name: FK_Periodicidad
+    logicalType: integer
+    physicalType: integer
+    description: Periodicity identifier (12 = Anual in PERIODICIDADES).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 12.0
+    - property: observed_max
+      value: 12.0
+    - property: observed_values
+      value:
+      - '12'
+  - name: FK_Publicacion
+    logicalType: integer
+    physicalType: integer
+    description: Publication identifier.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 580.0
+    - property: observed_max
+      value: 580.0
+    - property: observed_values
+      value:
+      - '580'
+  - name: FK_Periodo_ini
+    logicalType: integer
+    physicalType: integer
+    description: 'Start period of the table (TABLAS_OPERACION output: start period).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 28.0
+    - property: observed_max
+      value: 28.0
+    - property: observed_values
+      value:
+      - '28'
+  - name: Anyo_Periodo_ini
+    logicalType: integer
+    physicalType: integer
+    description: 'Start year of the table (TABLAS_OPERACION output: start year).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2011.0
+    - property: observed_max
+      value: 2021.0
+    - property: observed_values
+      value:
+      - '2011'
+      - '2012'
+      - '2021'
+  - name: FechaRef_fin
+    logicalType: string
+    physicalType: string
+    description: 'End reference: null when the last published period matches the publication date, otherwise
+      end period and year of the last published data (documented). Observed as the string ''null'' in
+      all tables.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'null'
+  - name: Ultima_Modificacion
+    logicalType: integer
+    physicalType: long
+    description: Last modification of the table (TABLAS_OPERACION output). Observed as ms epoch (1778486400000
+      = 2026-05-11T08:00:00Z).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1778486400000.0
+    - property: observed_max
+      value: 1778486400000.0
+    - property: observed_values
+      value:
+      - '1778486400000'
+support:
+- channel: other
+  url: https://www.ine.es/infoine/
+  description: INE 'Contacto' page referenced from the API documentation page.
+customProperties:
+- property: source_url
+  value: https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPVA4947?nult=500
+- property: license
+  value: 'INE site footer on the API documentation page: ''Este sitio web y su contenido estan bajo licencia
+    CC BY-SA 4.0''. Whether this applies to the Tempus3 API data responses is not explicitly stated there;
+    earlier research noted INE general conditions (cite the source). Unverified for the API.'
+- property: license_url
+  value: https://www.ine.es/dyngs/DAB/index.htm?cid=1100
+- property: documentation_url
+  value: https://www.ine.es/dyngs/DAB/index.htm?cid=1100
+- property: documentation_extra_url
+  value: https://servicios.ine.es/wstempus/js/ES/OPERACION/IPVA
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 35
+- property: sample_selection
+  value: Complete series IPVA4947 (nult=500 returned all 14 annual points, 2011-2024), its SERIE metadata,
+    the TABLAS_OPERACION list for IPVA (20 tables), OPERACION/IPVA, UNIDADES and PERIODICIDADES lookup
+    lists. Other series (provinces, municipalities, building types) not sampled.
+- property: sample_status
+  value: ok
+- property: data_periodicity_documented
+  value: Anual (FK_Periodicidad 12 in PERIODICIDADES)
+- property: operation
+  value: IPVA - Indice de Precios de Vivienda en Alquiler (OPERACION id 432)
+- property: note_url_without_nult
+  value: DATOS_SERIE/IPVA4947 without parameters returned HTTP 404 on 2026-10-24; with nult it returned
+    data.
+contractCreatedTs: '2026-10-24T15:05:49Z'

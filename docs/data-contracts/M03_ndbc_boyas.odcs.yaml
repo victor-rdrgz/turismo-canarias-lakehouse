@@ -1,0 +1,1091 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 2b547557-dd53-5bb6-875d-14e3c6e0aa62
+version: 0.1.0
+status: draft
+name: NOAA NDBC buoy and station observations (latest_obs, realtime2, activestations)
+domain: marine-weather
+description:
+  purpose: 'Near-real-time meteorological and wave observations from NOAA National Data Buoy Center stations: latest
+    observation per station (latest_obs.txt), rolling 45-day station files (data/realtime2/<station>.txt) and the
+    active-stations list (activestations.xml).'
+  limitations: Missing-value marker MM is observed in the files but not stated in the documentation read. Column
+    definitions of latest_obs.txt, STN/LAT/LON and the activestations.xml attributes are not described by the producer
+    (only the file's own header lines and an elevation comment). Timestamps are UTC per the measurement descriptions
+    page; the realtime2 file page states no time zone. No numeric request limit (only 'limit your retrievals to
+    a minimal level'). No licence stated on the pages read; the site footer links to the NWS disclaimer, which says
+    NWS web information is public domain unless noted otherwise; applicability to every NDBC file is unverified.
+    Not every data type exists at every station. The realtime2 txt sample is a single buoy (41041, North Equatorial
+    Atlantic), not a Canarias station; no NDBC station near the Canary Islands has been selected. Columns VIS and
+    TIDE are 100% MM in the 41041 sample. realtime2 files describe 10-minute rows although the page says most stations
+    report hourly. Automatic real-time quality control is mentioned but its rules are not detailed. Column order
+    differs between latest_obs and realtime2. Other realtime2 file types (spec, cwind, ocean...) were not sampled.
+    FTP is announced to be discontinued in favour of HTTPS.
+  usage: Raw text landing; parse headers by name, treat MM as null, build timestamp from date parts in UTC, join
+    station id to activestations for position.
+tags:
+- marine
+- weather
+- buoys
+- noaa
+- txt
+- xml
+schema:
+- name: latest_obs
+  logicalType: object
+  physicalType: text/whitespace-delimited
+  description: 'Latest observation per station (all stations, one row each) from latest_obs.txt; two header lines
+    starting with # (names and units).'
+  properties:
+  - name: STN
+    logicalType: string
+    physicalType: text
+    description: Not defined by the producer
+    quality:
+    - type: library
+      name: observed_no_nulls_STN
+      metric: nullValues
+      mustBe: 0
+      unit: rows
+      dimension: completeness
+      description: Observed in sample of 865 rows on 2026-10-24; not a producer guarantee
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 865
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_note
+      value: Station identifier; numeric-looking and alphanumeric ids both occur
+  - name: LAT
+    logicalType: number
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 847
+    - property: observed_min
+      value: -22.0
+    - property: observed_max
+      value: 71.315
+    - property: note
+      value: 'Header unit line in the file: deg'
+  - name: LON
+    logicalType: number
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 848
+    - property: observed_min
+      value: -177.468
+    - property: observed_max
+      value: 179.808
+    - property: note
+      value: 'Header unit line in the file: deg'
+  - name: YYYY
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 2026.0
+    - property: observed_max
+      value: 2026.0
+    - property: note
+      value: 'Header unit line in the file: yr mo day hr mn; Timestamps in realtime and historical data files are
+        UTC (stated on the measurement descriptions page)'
+  - name: MM
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 10.0
+    - property: observed_max
+      value: 10.0
+  - name: DD
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 24.0
+    - property: observed_max
+      value: 24.0
+  - name: hh
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 3
+    - property: observed_min
+      value: 8.0
+    - property: observed_max
+      value: 10.0
+  - name: mm
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 22
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 56.0
+  - name: WDIR
+    logicalType: integer
+    physicalType: text
+    description: Direction the wind blows from, clockwise from true north (degT); same averaging period as WSPD
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 29.711
+    - property: observed_present_values
+      value: 608
+    - property: observed_distinct_present
+      value: 38
+    - property: observed_min
+      value: 10.0
+    - property: observed_max
+      value: 360.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WSPD
+    logicalType: number
+    physicalType: text
+    description: Wind speed in m/s; 8-minute average for buoys, 2-minute for land stations; reported hourly
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 26.127
+    - property: observed_present_values
+      value: 639
+    - property: observed_distinct_present
+      value: 54
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 21.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: GST
+    logicalType: number
+    physicalType: text
+    description: Peak gust speed in m/s within the WSPD period (5 or 8 second peak)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 37.457
+    - property: observed_present_values
+      value: 541
+    - property: observed_distinct_present
+      value: 57
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 27.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WVHT
+    logicalType: number
+    physicalType: text
+    description: 'Significant wave height in m: mean of the highest one-third of waves over 20 minutes'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 74.22
+    - property: observed_present_values
+      value: 223
+    - property: observed_distinct_present
+      value: 44
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 6.8
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: DPD
+    logicalType: number
+    physicalType: text
+    description: 'Dominant wave period in seconds: period of the waves with the most energy'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 76.879
+    - property: observed_present_values
+      value: 200
+    - property: observed_distinct_present
+      value: 17
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 17.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: APD
+    logicalType: number
+    physicalType: text
+    description: Average wave period in seconds of all waves over 20 minutes
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 81.734
+    - property: observed_present_values
+      value: 158
+    - property: observed_distinct_present
+      value: 63
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 10.4
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: MWD
+    logicalType: integer
+    physicalType: text
+    description: Direction (degT, clockwise from true north) from which waves at the dominant period come
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 80.462
+    - property: observed_present_values
+      value: 169
+    - property: observed_distinct_present
+      value: 131
+    - property: observed_min
+      value: 6.0
+    - property: observed_max
+      value: 358.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: PRES
+    logicalType: number
+    physicalType: text
+    description: Sea-level pressure in hPa
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 29.595
+    - property: observed_present_values
+      value: 609
+    - property: observed_distinct_present
+      value: 258
+    - property: observed_min
+      value: 958.7
+    - property: observed_max
+      value: 1041.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: PTDY
+    logicalType: number
+    physicalType: text
+    description: Pressure change in hPa over the preceding three hours, signed
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 60.925
+    - property: observed_present_values
+      value: 338
+    - property: observed_distinct_present
+      value: 49
+    - property: observed_min
+      value: -5.8
+    - property: observed_max
+      value: 5.7
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: ATMP
+    logicalType: number
+    physicalType: text
+    description: Air temperature in degC
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 21.387
+    - property: observed_present_values
+      value: 680
+    - property: observed_distinct_present
+      value: 261
+    - property: observed_min
+      value: -3.5
+    - property: observed_max
+      value: 29.4
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WTMP
+    logicalType: number
+    physicalType: text
+    description: Sea surface temperature in degC
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 43.006
+    - property: observed_present_values
+      value: 493
+    - property: observed_distinct_present
+      value: 196
+    - property: observed_min
+      value: 1.2
+    - property: observed_max
+      value: 30.6
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: DEWP
+    logicalType: number
+    physicalType: text
+    description: Dew point temperature in degC, measured at the same height as air temperature
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 64.046
+    - property: observed_present_values
+      value: 311
+    - property: observed_distinct_present
+      value: 186
+    - property: observed_min
+      value: -6.8
+    - property: observed_max
+      value: 26.1
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: VIS
+    logicalType: number
+    physicalType: text
+    description: Station visibility in nautical miles (buoys limited to 0-1.6 nmi)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 94.913
+    - property: observed_present_values
+      value: 44
+    - property: observed_distinct_present
+      value: 8
+    - property: observed_min
+      value: 0.5
+    - property: observed_max
+      value: 27.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: TIDE
+    logicalType: number
+    physicalType: text
+    description: Water level in feet relative to Mean Lower Low Water (MLLW)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 95.723
+    - property: observed_present_values
+      value: 37
+    - property: observed_distinct_present
+      value: 27
+    - property: observed_min
+      value: -1.03
+    - property: observed_max
+      value: 2.27
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  quality:
+  - &id001
+    type: text
+    name: observed_mm_missing_marker
+    dimension: completeness
+    description: 'Observed in sample on 2026-10-24: the token MM appears in measurement columns as missing value;
+      not a producer guarantee'
+  - type: text
+    name: observed_unique_stn
+    dimension: uniqueness
+    description: 'Observed in sample of 865 rows on 2026-10-24: STN unique; not a producer guarantee'
+  customProperties:
+  - property: evidence
+    value: observed
+  - property: sample_rows
+    value: 865
+- name: realtime2_station_txt
+  logicalType: object
+  physicalType: text/whitespace-delimited
+  description: 'Standard meteorological file data/realtime2/<station>.txt (rolling 45 days, newest first); sample
+    is station 41041. Two header lines starting with # (names and units); station is given only by the file name.'
+  properties:
+  - name: YY
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_min
+      value: 2026.0
+    - property: observed_max
+      value: 2026.0
+    - property: note
+      value: 'Header unit line in the file: yr mo dy hr mn; the column is named YY but holds 4-digit years; Timestamps
+        in realtime and historical data files are UTC (stated on the measurement descriptions page)'
+  - name: MM
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_min
+      value: 9.0
+    - property: observed_max
+      value: 10.0
+  - name: DD
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 30
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 30.0
+  - name: hh
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 24
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 23.0
+  - name: mm
+    logicalType: integer
+    physicalType: text
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 50.0
+  - name: WDIR
+    logicalType: integer
+    physicalType: text
+    description: Direction the wind blows from, clockwise from true north (degT); same averaging period as WSPD
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.297
+    - property: observed_present_values
+      value: 6388
+    - property: observed_distinct_present
+      value: 30
+    - property: observed_min
+      value: 10.0
+    - property: observed_max
+      value: 360.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WSPD
+    logicalType: number
+    physicalType: text
+    description: Wind speed in m/s; 8-minute average for buoys, 2-minute for land stations; reported hourly
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.062
+    - property: observed_present_values
+      value: 6403
+    - property: observed_distinct_present
+      value: 12
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 11.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: GST
+    logicalType: number
+    physicalType: text
+    description: Peak gust speed in m/s within the WSPD period (5 or 8 second peak)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.062
+    - property: observed_present_values
+      value: 6403
+    - property: observed_distinct_present
+      value: 15
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 14.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WVHT
+    logicalType: number
+    physicalType: text
+    description: 'Significant wave height in m: mean of the highest one-third of waves over 20 minutes'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 49.664
+    - property: observed_present_values
+      value: 3225
+    - property: observed_distinct_present
+      value: 15
+    - property: observed_min
+      value: 0.9
+    - property: observed_max
+      value: 2.3
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: DPD
+    logicalType: number
+    physicalType: text
+    description: 'Dominant wave period in seconds: period of the waves with the most energy'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 67.223
+    - property: observed_present_values
+      value: 2100
+    - property: observed_distinct_present
+      value: 12
+    - property: observed_min
+      value: 5.0
+    - property: observed_max
+      value: 16.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: APD
+    logicalType: number
+    physicalType: text
+    description: Average wave period in seconds of all waves over 20 minutes
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 49.696
+    - property: observed_present_values
+      value: 3223
+    - property: observed_distinct_present
+      value: 32
+    - property: observed_min
+      value: 4.7
+    - property: observed_max
+      value: 7.9
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: MWD
+    logicalType: integer
+    physicalType: text
+    description: Direction (degT, clockwise from true north) from which waves at the dominant period come
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 49.696
+    - property: observed_present_values
+      value: 3223
+    - property: observed_distinct_present
+      value: 178
+    - property: observed_min
+      value: 0.0
+    - property: observed_max
+      value: 359.0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: PRES
+    logicalType: number
+    physicalType: text
+    description: Sea-level pressure in hPa
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.062
+    - property: observed_present_values
+      value: 6403
+    - property: observed_distinct_present
+      value: 90
+    - property: observed_min
+      value: 1009.6
+    - property: observed_max
+      value: 1018.5
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: ATMP
+    logicalType: number
+    physicalType: text
+    description: Air temperature in degC
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.468
+    - property: observed_present_values
+      value: 6377
+    - property: observed_distinct_present
+      value: 37
+    - property: observed_min
+      value: 25.0
+    - property: observed_max
+      value: 28.8
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: WTMP
+    logicalType: number
+    physicalType: text
+    description: Sea surface temperature in degC
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 1.686
+    - property: observed_present_values
+      value: 6299
+    - property: observed_distinct_present
+      value: 23
+    - property: observed_min
+      value: 28.2
+    - property: observed_max
+      value: 30.6
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: DEWP
+    logicalType: number
+    physicalType: text
+    description: Dew point temperature in degC, measured at the same height as air temperature
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 0.468
+    - property: observed_present_values
+      value: 6377
+    - property: observed_distinct_present
+      value: 41
+    - property: observed_min
+      value: 22.5
+    - property: observed_max
+      value: 26.5
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: VIS
+    logicalType: number
+    physicalType: text
+    description: Station visibility in nautical miles (buoys limited to 0-1.6 nmi)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 100.0
+    - property: observed_present_values
+      value: 0
+    - property: observed_distinct_present
+      value: 0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: PTDY
+    logicalType: number
+    physicalType: text
+    description: Pressure change in hPa over the preceding three hours, signed
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 83.253
+    - property: observed_present_values
+      value: 1073
+    - property: observed_distinct_present
+      value: 50
+    - property: observed_min
+      value: -2.7
+    - property: observed_max
+      value: 2.5
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  - name: TIDE
+    logicalType: number
+    physicalType: text
+    description: Water level in feet relative to Mean Lower Low Water (MLLW)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_missing_marker_pct
+      value: 100.0
+    - property: observed_present_values
+      value: 0
+    - property: observed_distinct_present
+      value: 0
+    - property: missing_marker_note
+      value: Text token MM marks a missing value in the sample; this convention is observed, not stated in the documentation
+        read
+  quality:
+  - *id001
+  - type: text
+    name: observed_unique_timestamp
+    dimension: uniqueness
+    description: 'Observed in sample of 6407 rows on 2026-10-24: (YY, MM, DD, hh, mm) unique; not a producer guarantee'
+  customProperties:
+  - property: evidence
+    value: documented+observed
+  - property: sample_rows
+    value: 6407
+  - property: column_order_note
+    value: PTDY sits after PRES in latest_obs but after VIS in realtime2 (observed); parse by header name, not position
+- name: activestations
+  logicalType: object
+  physicalType: xml
+  description: 'Station list (activestations.xml): one <station/> element per active station, data in attributes;
+    root attributes created and count are observed.'
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    quality:
+    - type: library
+      name: observed_no_nulls_id
+      metric: nullValues
+      mustBe: 0
+      unit: rows
+      dimension: completeness
+      description: Observed in sample of 1352 rows on 2026-10-24; not a producer guarantee
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1352
+    - property: observed_unique_in_sample
+      value: true
+  - name: lat
+    logicalType: number
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1238
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -46.956
+    - property: observed_max
+      value: 71.315
+  - name: lon
+    logicalType: number
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1238
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -179.797
+    - property: observed_max
+      value: 180.0
+  - name: elev
+    logicalType: number
+    physicalType: string
+    description: Site elevation in meters above mean sea level, when present (stated in an XML comment inside the
+      file)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 19.527
+    - property: observed_distinct
+      value: 211
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: -11.4
+    - property: observed_max
+      value: 332.0
+  - name: name
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 2.441
+    - property: observed_distinct
+      value: 1306
+    - property: observed_unique_in_sample
+      value: false
+  - name: owner
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 106
+    - property: observed_unique_in_sample
+      value: false
+  - name: pgm
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - IOOS Partners
+      - International Partners
+      - Marine METAR
+      - NDBC Meteorological/Ocean
+      - NERRS
+      - NOS/CO-OPS
+      - TAO
+      - Tsunami
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 7
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - buoy
+      - dart
+      - fixed
+      - oilrig
+      - other
+      - tao
+      - usv
+  - name: met
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 3.55
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - n
+      - y
+  - name: currents
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 3.55
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - n
+      - y
+  - name: waterquality
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 3.55
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - n
+      - y
+  - name: dart
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 3.55
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - n
+      - y
+  quality:
+  - type: text
+    name: observed_unique_id
+    dimension: uniqueness
+    description: 'Observed in sample of 1352 rows on 2026-10-24: id unique; not a producer guarantee'
+  customProperties:
+  - property: evidence
+    value: observed
+  - property: sample_rows
+    value: 1352
+  - property: root_attributes_observed
+    value: created=2026-10-24T10:45:02UTC, count=1352
+customProperties:
+- property: source_url
+  value: https://www.ndbc.noaa.gov/data/realtime2/
+- property: license
+  value: 'unverified: no licence stated on the pages read; NDBC pages link the NWS disclaimer (NWS web information
+    is public domain unless noted otherwise)'
+- property: license_url
+  value: https://www.weather.gov/disclaimer
+- property: documentation_url
+  value: https://www.ndbc.noaa.gov/faq/measdes.shtml
+- property: documentation_url_2
+  value: https://www.ndbc.noaa.gov/faq/rt_data_access.shtml
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 8624
+- property: sample_selection
+  value: latest_obs.txt complete (865 stations); realtime2/41041.txt complete 45 days (2026-09-09 00:00 to 2026-10-24
+    10:10 UTC, 6407 rows); activestations.xml complete (1352 stations)
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T11:00:00Z'

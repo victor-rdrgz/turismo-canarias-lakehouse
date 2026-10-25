@@ -1,0 +1,222 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 5a7fd642-4568-555d-a02d-b49327174f1f
+version: 0.1.0
+status: draft
+name: 'Digital elevation model tiles: Copernicus DEM GLO-30 and SRTM Skadi'
+domain: geospatial
+description:
+  purpose: 'Static global elevation rasters in 1x1 degree tiles: Copernicus DEM GLO-30 Public (Digital
+    Surface Model, COG) and Skadi (SRTMGL1-format HGT, gzip) hosted on AWS Open Data.'
+  limitations: 'Copernicus README does not state the height unit, the vertical datum, the nodata value
+    or the CRS (CRS and pixel size here are read from the sample GeoTIFF header). Observed heights (maximum
+    3705.99 over Tenerife) look like metres but the unit is not documented. 81% of pixels in the sample
+    tile are exactly 0 (sea); how ocean pixels inside a land tile relate to the ''ocean has no tiles''
+    statement is not documented. Copernicus GLO-30 Public does not cover every country; no per-tile versioning
+    is published (release ''2021'' per the AWS registry; updates only if the public tile list changes).
+    Skadi: the page read documents the format (int16 big-endian, meters, EGM96, void -32768, gzip, EPSG:4326)
+    but not the tile naming, grid size (observed 3601 x 3601) or bathymetry; the sample contains many
+    negative values (ocean) whose source is not documented here. Skadi sources/attributions are in a separate
+    attribution document that was not reviewed in detail and licence terms for Skadi were not confirmed.
+    No SLA published for either dataset. Only one tile per product (Tenerife area, N28 W017) was sampled;
+    other latitude bands (different widths), tiles with nodata, or tiles over other islands were not sampled.
+    Raster values were decoded locally with a custom script (numpy + zlib); results are not cross-checked
+    against GDAL.'
+  usage: Read tiles by lat/lon name and sample height for points or aggregate to a grid; treat Copernicus
+    values as surface (including buildings/vegetation) and Skadi as meters over the EGM96 geoid; handle
+    the Skadi void value -32768.
+tags:
+- elevation
+- dem
+- raster
+- copernicus
+- srtm
+- static
+schema:
+- name: copernicus_dem_glo30_tile
+  logicalType: object
+  physicalType: Cloud Optimized GeoTIFF (raster, one tile of 1x1 degree)
+  description: 'Copernicus DEM GLO-30 Public tile (10 arc-second resolution naming; 30 m). Grain: one
+    pixel = one height value. Observed tile: 3600 x 3600 pixels, 1024 x 1024 TIFF tiles, DEFLATE with
+    floating-point predictor (PREDICTOR=3), float32, EPSG:4326 (read from the GeoTIFF GeoKeys), pixel
+    size 0.000277777... degrees, upper-left corner lon -17, lat 29.'
+  properties:
+  - name: tile_name
+    logicalType: string
+    physicalType: string
+    description: 'Tile folder/file name: Copernicus_DSM_COG_[resolution]_[northing]_[easting]_DEM; resolution
+      in arc seconds (10 = GLO-30, 30 = GLO-90); northing/easting are degrees whose decimal part is always
+      00.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_value
+      value: Copernicus_DSM_COG_10_N28_00_W017_00_DEM
+    - property: observed_n
+      value: 1
+    - property: note
+      value: Not a column inside the file; it is part of the object path
+  - name: height
+    logicalType: number
+    physicalType: float32 (single band, raster pixel value)
+    description: Height of the Digital Surface Model (includes buildings, infrastructure and vegetation).
+      Unit and vertical datum are not stated by the producer.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_pixels
+      value: 12960000
+    - property: observed_min
+      value: -5.89944314956665
+    - property: observed_max
+      value: 3705.992431640625
+    - property: observed_mean
+      value: 163.951
+    - property: observed_zero_pixels
+      value: 10531460
+    - property: observed_zero_pct
+      value: 81.26
+    - property: observed_negative_pixels
+      value: 123
+    - property: observed_nan_pixels
+      value: 0
+    - property: observed_nodata_tag
+      value: absent (no GDAL_NODATA tag in the TIFF)
+    - property: producer_statement_ocean
+      value: No tiles for ocean areas; height can be assumed zero
+  customProperties:
+  - property: file_format
+    value: Cloud Optimized GeoTIFF
+  - property: compression
+    value: DEFLATE, PREDICTOR=3 (documented)
+  - property: tile_width_height_documented
+    value: COG height 3600 px; TIFF tile 1024x1024; width varies with latitude (3600 px at 0-50 degrees)
+  - property: observed_width
+    value: 3600
+  - property: observed_height
+    value: 3600
+  - property: observed_crs
+    value: EPSG:4326 (GeoKey 2048)
+  - property: observed_pixel_scale_deg
+    value: 0.0002777777777777778
+  - property: observed_upper_left_lon_lat
+    value:
+    - -17.0
+    - 29.0
+  quality:
+  - type: text
+    description: 'Producer-documented: ocean areas have no tiles and height can be assumed to be zero;
+      GLO-30 Public does not cover all countries.'
+  - type: text
+    description: 'Observed in sample of 12960000 pixels (1 tile) on 2026-10-24; not a producer guarantee:
+      the tile has no NaN pixels and no nodata tag; 123 pixels are negative (minimum -5.9).'
+- name: skadi_hgt_tile
+  logicalType: object
+  physicalType: gzip-compressed HGT (raw int16 big-endian matrix, 1x1 degree tile)
+  description: 'SRTMGL1-format elevation tile from the Mapzen/Tilezen terrain tiles on AWS (Skadi). Grain:
+    one value = one grid cell. Observed tile: 3601 x 3601 values (25,934,402 bytes uncompressed, 7,828,263
+    bytes gzip). Unprojected WGS84 (EPSG:4326); matrix dimensions are not stated by the producer page
+    read (observed from file size).'
+  properties:
+  - name: tile_name
+    logicalType: string
+    physicalType: string
+    description: 'Object path: skadi/{N|S}{lat}/{N|S}{lat}{E|W}{lon}.hgt.gz. Pattern inferred from the
+      known URL N28/N28W017.hgt.gz; the producer page read only gives the extension .hgt.gz.'
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_value
+      value: N28/N28W017.hgt.gz
+    - property: observed_n
+      value: 1
+  - name: elevation
+    logicalType: integer
+    physicalType: int16 big-endian signed (raster value, row-major, no header)
+    description: Elevation in meters, WGS84/EGM96 geoid; value range -32767 to 32767; voids flagged -32768.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values_count
+      value: 12967201
+    - property: observed_min
+      value: -3706
+    - property: observed_max
+      value: 3696
+    - property: observed_void_count
+      value: 0
+    - property: observed_zero_count
+      value: 9099
+    - property: observed_negative_count
+      value: 10218408
+    - property: observed_negative_pct
+      value: 78.8
+    - property: documented_nodata_value
+      value: -32768
+    - property: documented_unit
+      value: meters
+    - property: documented_vertical_datum
+      value: WGS84/EGM96 geoid
+    logicalTypeOptions:
+      minimum: -32767
+      maximum: 32767
+  customProperties:
+  - property: observed_side
+    value: 3601
+  - property: documented_storage
+    value: row-major, no header or trailer, big-endian
+  - property: compression
+    value: gzip
+  - property: crs_documented
+    value: EPSG:4326
+  quality:
+  - type: text
+    description: 'Producer-documented: values are signed 16-bit in the range -32767 to 32767 meters; voids
+      are flagged with -32768.'
+  - type: text
+    description: 'Observed in sample of 12967201 values (1 tile) on 2026-10-24; not a producer guarantee:
+      0 voids (-32768); 10218408 negative values (minimum -3706) although the tile is mostly ocean; the
+      producer page read does not address ocean/bathymetry handling.'
+support:
+- channel: Sentinel Hub forum (Copernicus DEM on AWS)
+  url: https://forum.sentinel-hub.com/c/aws-copdem/28
+  scope: copernicus_dem_glo30_tile
+- channel: Joerd GitHub issues (Terrain Tiles / Skadi)
+  url: https://github.com/tilezen/joerd/issues
+  scope: skadi_hgt_tile
+customProperties:
+- property: source_url
+  value: https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W017_00_DEM/Copernicus_DSM_COG_10_N28_00_W017_00_DEM.tif
+    ; https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28W017.hgt.gz
+- property: license
+  value: 'Copernicus DEM: free of charge for the general public under the Copernicus licence terms (AWS
+    Registry of Open Data). Skadi / Terrain Tiles: the AWS registry page gives no licence text and points
+    to the Joerd attribution document (not reviewed in detail); the prior research listed SRTM as public
+    domain, unverified here.'
+- property: license_url
+  value: https://registry.opendata.aws/copernicus-dem/
+- property: license_url_skadi
+  value: https://github.com/tilezen/joerd/blob/master/docs/attribution.md
+- property: documentation_url
+  value: https://copernicus-dem-30m.s3.amazonaws.com/readme.html
+- property: documentation_extra_urls
+  value:
+  - https://registry.opendata.aws/copernicus-dem/
+  - https://registry.opendata.aws/terrain-tiles/
+  - https://github.com/tilezen/joerd/blob/master/docs/formats.md
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 25927201
+- property: sample_selection
+  value: 'One tile per product covering Tenerife (lat 28-29, lon -17 to -16): Copernicus GLO-30 COG (8,892,541
+    bytes) and Skadi N28W017.hgt.gz (7,828,263 bytes); total 16.7 MB. sample_rows = pixels/values decoded
+    (Copernicus 12,960,000 + Skadi 12,967,201). Whole raw files are saved.'
+- property: sample_status
+  value: ok
+- property: copernicus_release
+  value: Copernicus DEM 2021 release (AWS Registry of Open Data)
+- property: copernicus_update_policy
+  value: None, except GLO-30 Public can be updated if the public tile list changes (AWS Registry of Open
+    Data)
+contractCreatedTs: '2026-10-24T15:00:07Z'

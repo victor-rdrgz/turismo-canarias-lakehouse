@@ -1,0 +1,361 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 909b636e-4754-56a0-9b41-27e6a45e5f17
+version: 0.1.0
+status: draft
+name: NOAA SWPC space weather JSON feeds
+domain: space-weather
+description:
+  purpose: 'Space weather JSON products from the NOAA Space Weather Prediction Center: planetary K-index, GOES X-ray
+    flux (1-day) and alerts/watches/warnings.'
+  limitations: 'None of the three JSON feeds has a field dictionary or schema: all fields are observed; only the
+    Kp index scale/interval, the X-ray bands and the 1-minute X-ray cadence are described on producer product pages.
+    Units of flux/observed_flux, the meaning of a_running and electron_correction, and the time zone of time_tag
+    (Kp) and issue_datetime are not documented. The JSON update cadence, retention window and change policy are
+    not documented (the observed Kp file spans ~7 days, the X-ray file 1 day, the alerts file ~1 month, which may
+    change). The producer''s own key ''electron_contaminaton'' is misspelled. Alert messages are free text. Only
+    one snapshot per feed was taken; other X-ray satellites/files (secondary, 3-day, 7-day) and other products were
+    not sampled. Licence page read (weather.gov disclaimer) is a general NWS statement; the SWPC data-access page
+    states no specific terms.'
+  usage: Raw ingestion of three public JSON arrays; each file is a rolling window, so snapshots must be accumulated
+    by the consumer.
+tags:
+- space-weather
+- noaa
+- swpc
+- geomagnetic
+- xray
+schema:
+- name: planetary_k_index
+  logicalType: object
+  physicalType: json-array
+  description: Estimated planetary K-index in 3-hour steps (noaa-planetary-k-index.json).
+  properties:
+  - name: time_tag
+    logicalType: timestamp
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM:SS without zone designator
+    - property: time_zone
+      value: not declared in the JSON (UTC unverified)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 60
+    - property: observed_unique_in_sample
+      value: true
+  - name: Kp
+    logicalType: number
+    physicalType: number
+    description: Estimated planetary K-index. The producer's product page describes the index on a 0-9 scale over
+      3-hour intervals, with 5 or higher indicating a geomagnetic storm; the JSON field itself is not documented.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: documented_scale
+      value: 0-9, storm at 5 or higher (product page)
+    - property: observed_note
+      value: fractional values (thirds) observed although the page describes an integer scale
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.33
+    - property: observed_max
+      value: 4.67
+  - name: a_running
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 14
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 39.0
+  - name: station_count
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 6.0
+    - property: observed_max
+      value: 8.0
+  customProperties:
+  - property: file
+    value: products/noaa-planetary-k-index.json
+  - property: root
+    value: array of objects
+  quality:
+  - type: text
+    name: time_tag_unique
+    description: time_tag is unique and never empty. Observed in sample of 60 rows on 2026-10-24; not a producer
+      guarantee.
+    dimension: uniqueness
+- name: goes_xrays_1_day
+  logicalType: object
+  physicalType: json-array
+  description: GOES primary-satellite X-ray flux, 1-day file (json/goes/primary/xrays-1-day.json); one row per band
+    per minute.
+  properties:
+  - name: time_tag
+    logicalType: timestamp
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: YYYY-MM-DDTHH:MM:SSZ
+    - property: documented_cadence
+      value: page states 1-minute averages for GOES X-ray flux
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1437
+    - property: observed_unique_in_sample
+      value: false
+  - name: satellite
+    logicalType: integer
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 18.0
+    - property: observed_max
+      value: 18.0
+  - name: flux
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2759
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 9.999999717180685e-10
+    - property: observed_max
+      value: 1.330412715105922e-06
+  - name: observed_flux
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2874
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.8812201574291976e-08
+    - property: observed_max
+      value: 1.3904424349675537e-06
+  - name: electron_correction
+    logicalType: number
+    physicalType: number
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2874
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1.4043147089637387e-08
+    - property: observed_max
+      value: 8.435326037670166e-08
+  - name: electron_contaminaton
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+  - name: energy
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: documented_bands
+      value: 0.1-0.8 nm and 0.05-0.4 nm (product page)
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - 0.05-0.4nm
+      - 0.1-0.8nm
+  customProperties:
+  - property: file
+    value: json/goes/primary/xrays-1-day.json
+  - property: root
+    value: array of objects
+  quality:
+  - type: text
+    name: no_nulls
+    description: No empty values in any field. Observed in sample of 2874 rows on 2026-10-24; not a producer guarantee.
+    dimension: completeness
+  - type: text
+    name: two_bands
+    description: Only the energy bands 0.05-0.4nm and 0.1-0.8nm and a single satellite value appear. Observed in
+      sample of 2874 rows on 2026-10-24; not a producer guarantee.
+    dimension: conformity
+- name: swpc_alerts
+  logicalType: object
+  physicalType: json-array
+  description: Space-weather alerts, watches and warnings (products/alerts.json).
+  properties:
+  - name: product_id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 18
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - A20F
+      - A30F
+      - BHIS
+      - EF3A
+      - K04A
+      - K04W
+      - K05A
+      - K05W
+      - K06A
+      - K06W
+      - K07A
+      - K07W
+      - MSIS
+      - SGIW
+      - TIIA
+      - TIVA
+      - XM5A
+      - XM5S
+  - name: issue_datetime
+    logicalType: timestamp
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_format
+      value: YYYY-MM-DD HH:MM:SS.fff
+    - property: time_zone
+      value: not declared in the JSON; the message body states UTC
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 94
+    - property: observed_unique_in_sample
+      value: true
+  - name: message
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 94
+    - property: observed_unique_in_sample
+      value: true
+  customProperties:
+  - property: file
+    value: products/alerts.json
+  - property: root
+    value: array of objects
+  quality:
+  - type: text
+    name: no_nulls
+    description: No empty values in any field. Observed in sample of 94 rows on 2026-10-24; not a producer guarantee.
+    dimension: completeness
+customProperties:
+- property: source_url
+  value: https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json ; https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json
+    ; https://services.swpc.noaa.gov/products/alerts.json
+- property: license
+  value: Public domain per the NWS disclaimer (most information on NWS pages is public domain; free use for any
+    lawful purpose; no implied endorsement, no claiming ownership); the SWPC data-access page states no specific
+    terms
+- property: license_url
+  value: https://www.weather.gov/disclaimer
+- property: documentation_url
+  value: https://www.spaceweather.gov/products/planetary-k-index
+- property: documentation_url_extra
+  value: https://www.spaceweather.gov/products/goes-x-ray-flux ; https://www.spaceweather.gov/content/data-access
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 3028
+- property: sample_selection
+  value: 'Full response of each of the 3 endpoints as served on 2026-10-24: Kp 60 rows (2026-10-17..2026-10-24),
+    X-ray 2874 rows (2026-10-23 14:59Z..2026-10-24 14:56Z), alerts 94 rows (2026-09-25..2026-10-24).'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T15:06:06Z'

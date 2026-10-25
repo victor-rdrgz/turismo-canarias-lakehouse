@@ -1,0 +1,759 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: ad62378c-ed0c-5ec8-a0b2-b442d01a4f7c
+version: 0.1.0
+status: draft
+name: USGS earthquake GeoJSON feeds
+domain: hazards
+description:
+  purpose: 'Earthquake events published by the USGS as GeoJSON FeatureCollections: real-time summary feeds
+    (https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/*.geojson) and the FDSN event web service
+    (https://earthquake.usgs.gov/fdsnws/event/1/query, formats geojson, csv, quakeml and others). The
+    producer recommends the real-time GeoJSON feeds for automated applications.'
+  limitations: The GeoJSON format page documents field names and types only; it gives no definitions,
+    units, nullability or allowed values for any property (status, alert, magType, type, tsunami, sig,
+    time units are all undefined there). Observed values are listed only as observed. Time unit (apparent
+    epoch milliseconds) is not documented. Events can be updated or deleted after publication (field updated;
+    FDSN includedeleted parameter exists but was not exercised). FDSN limit is 1-20000 and larger result
+    sets return HTTP 400; default format is QuakeML. No SLA and no license page for the API were read
+    beyond the general USGS copyright statement. The sample is global (past-day feed); the Canary Islands
+    bounding-box query (lat 27..30, lon -19..-13, 2016-01-01..2026-10-24) returned only 7 events, so Canarias
+    coverage in this catalogue is thin and its completeness vs the local IGN network is unknown. The feed
+    life cycle policy page was not read. Contract covers the GeoJSON representation only; CSV and QuakeML
+    are not described.
+  usage: Poll the real-time feed (Cache-Control max-age 60 observed in prior research, not re-verified)
+    or query FDSN with starttime/endtime/bbox/limit; key on feature id and handle later updates via the
+    updated field.
+tags:
+- earthquakes
+- seismology
+- geojson
+- usgs
+- hazards
+schema:
+- name: earthquake_feature
+  logicalType: object
+  physicalType: GeoJSON Feature (element of FeatureCollection.features)
+  description: One seismic event per Feature in the USGS GeoJSON feed. Property names below follow the
+    producer; feature_type, geometry_type and geometry_coordinates are the feature-level type, geometry.type
+    and geometry.coordinates.
+  customProperties:
+  - property: observed_rows_in_sample
+    value: 209
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Event identifier (String). Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: id
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+    quality:
+    - type: library
+      metric: duplicateValues
+      mustBe: 0
+      unit: rows
+      description: 'Observed in sample of 209 rows on 2026-10-24: no duplicate values; not a producer
+        guarantee.'
+  - name: mag
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.mag
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 118
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0.2
+    - property: observed_max
+      value: 6.9
+  - name: place
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.place
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 197
+    - property: observed_unique_in_sample
+      value: false
+  - name: time
+    logicalType: integer
+    physicalType: long
+    description: Not defined by the producer. Unit not stated on the format page; the sample values are
+      consistent with milliseconds since the Unix epoch (observed, not documented).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.time
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1792769533051
+    - property: observed_max
+      value: 1792853259810
+  - name: updated
+    logicalType: integer
+    physicalType: long
+    description: Not defined by the producer. Unit not stated; values in the sample are of the same magnitude
+      as time.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.updated
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 1792770297426
+    - property: observed_max
+      value: 1792853474410
+  - name: tz
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.tz
+    - property: observed_type_in_sample
+      value: unknown (all empty)
+    - property: observed_null_pct
+      value: 100.0
+    - property: observed_distinct
+      value: 0
+    - property: observed_unique_in_sample
+      value: false
+  - name: url
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.url
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+  - name: detail
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.detail
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+  - name: felt
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer. Sample values are stored as integers or empty.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.felt
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 94.737
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 7
+    - property: observed_values
+      value:
+      - '0.0'
+      - '1.0'
+      - '2.0'
+      - '3.0'
+      - '4.0'
+      - '7.0'
+  - name: cdi
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.cdi
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 94.737
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 4.8
+    - property: observed_values
+      value:
+      - '1.0'
+      - '2.2'
+      - '2.7'
+      - '3.1'
+      - '3.4'
+      - '4.8'
+  - name: mmi
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.mmi
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 95.215
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 5.051
+    - property: observed_values
+      value:
+      - '0.0'
+      - '1.0'
+      - '3.348'
+      - '3.499'
+      - '3.837'
+      - '3.861'
+      - '4.458'
+      - '5.051'
+  - name: alert
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.alert
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 96.651
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - green
+  - name: status
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.status
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - automatic
+      - reviewed
+  - name: tsunami
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.tsunami
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1
+    - property: observed_values
+      value:
+      - '0'
+      - '1'
+  - name: sig
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.sig
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 88
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1
+    - property: observed_max
+      value: 734
+  - name: net
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.net
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 10
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ak
+      - ci
+      - hv
+      - nc
+      - nn
+      - pr
+      - tx
+      - us
+      - uu
+      - uw
+  - name: code
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.code
+    - property: observed_type_in_sample
+      value: mixed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+  - name: ids
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.ids
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+  - name: sources
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.sources
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 16
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ',ak,'
+      - ',ak,us,'
+      - ',ci,'
+      - ',hv,'
+      - ',hv,us,'
+      - ',nc,'
+      - ',nc,nn,'
+      - ',nn,'
+      - ',pr,'
+      - ',tx,'
+      - ',us,'
+      - ',us,ak,'
+      - ',us,at,'
+      - ',us,pr,'
+      - ',uu,'
+      - ',uw,'
+  - name: types
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.types
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - ',associate,dyfi,ground-failure,impact-link,losspager,origin,phase-data,shakemap,'
+      - ',dyfi,moment-tensor,origin,phase-data,shakemap,'
+      - ',dyfi,nearby-cities,origin,phase-data,'
+      - ',dyfi,origin,phase-data,'
+      - ',dyfi,origin,phase-data,shakemap,'
+      - ',focal-mechanism,nearby-cities,origin,phase-data,'
+      - ',focal-mechanism,nearby-cities,origin,phase-data,scitech-link,'
+      - ',ground-failure,losspager,origin,phase-data,shakemap,'
+      - ',losspager,moment-tensor,origin,phase-data,shakemap,'
+      - ',losspager,origin,phase-data,shakemap,'
+      - ',moment-tensor,origin,phase-data,'
+      - ',nearby-cities,origin,phase-data,'
+      - ',nearby-cities,origin,phase-data,scitech-link,'
+      - ',origin,phase-data,'
+      - ',origin,phase-data,shakemap,'
+  - name: nst
+    logicalType: integer
+    physicalType: integer
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.nst
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 69
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 5
+    - property: observed_max
+      value: 216
+  - name: dmin
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.dmin
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 154
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 8.806
+  - name: rms
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.rms
+    - property: observed_type_in_sample
+      value: number
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 83
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 0
+    - property: observed_max
+      value: 1.8
+  - name: gap
+    logicalType: number
+    physicalType: decimal
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.gap
+    - property: observed_type_in_sample
+      value: integer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 138
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 12
+    - property: observed_max
+      value: 320
+  - name: magType
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.magType
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - mb
+      - md
+      - ml
+      - mwr
+      - mww
+  - name: type
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer (producer documents the type only; no definition, unit or
+      allowed values.)
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: properties.type
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - earthquake
+      - explosion
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer. The format page states that title is a field of the metadata
+      object, not of the feature properties; it appears in feature properties in the sample.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: source_path
+      value: properties.title
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 208
+    - property: observed_unique_in_sample
+      value: false
+  - name: geometry_type
+    logicalType: string
+    physicalType: string
+    description: Geometry type of the feature; documented as the fixed value Point.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: geometry.type
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Point
+  - name: geometry_coordinates
+    logicalType: array
+    physicalType: array of number
+    description: Array of longitude, latitude, depth. Units are not stated on the GeoJSON format page
+      (the FDSN service documents depth in km and coordinates in decimal degrees; see limitations).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: geometry.coordinates
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 209
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_element_order
+      value: '[longitude, latitude, depth]'
+  - name: feature_type
+    logicalType: string
+    physicalType: string
+    description: Feature object type; documented as the fixed value Feature.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: source_path
+      value: type
+    - property: observed_type_in_sample
+      value: string
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - Feature
+customProperties:
+- property: source_url
+  value: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson
+- property: license
+  value: Public domain (USGS-authored information is considered U.S. Public Domain, per the USGS copyrights-and-credits
+    page; credit to the U.S. Geological Survey is requested). Not stated on the API pages themselves.
+- property: license_url
+  value: https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits
+- property: documentation_url
+  value: https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
+- property: fdsn_documentation_url
+  value: https://earthquake.usgs.gov/fdsnws/event/1/
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 209 (all_day feed, profiled); 7 (FDSN Canary Islands bbox query); all_hour feed also saved
+- property: sample_selection
+  value: 'Main profiled sample: summary/all_day.geojson (global, past 24 h at 2026-10-24 ~15:00 UTC).
+    Additional: summary/all_hour.geojson and an FDSN query format=geojson, bbox lat 27..30 lon -19..-13,
+    starttime 2016-01-01, endtime 2026-10-24, limit 20000 (7 events).'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T15:01:11Z'

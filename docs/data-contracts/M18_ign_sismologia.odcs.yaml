@@ -1,0 +1,324 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 5eeed30d-66f0-5ba9-b593-7d4422b212d9
+version: 0.1.0
+status: draft
+name: IGN seismology GeoRSS feed
+domain: seismology
+description:
+  purpose: RSS 2.0 / GeoRSS feed of the Instituto Geográfico Nacional listing recent earthquakes in Spain (last
+    ten days) with epicentre coordinates.
+  limitations: 'The producer publishes no field dictionary for this feed; item fields are observed only. The feed
+    covers the whole of Spain and neighbouring seismic zones, not only the Canary Islands (Canary Islands events
+    must be filtered, e.g. by coordinates or by region names such as ''ATLÁNTICO-CANARIAS'' observed in the description).
+    Magnitude, region, event date-time and coordinates are only available as free text inside item/description (geo:lat
+    and geo:long are separate elements). Magnitude type, depth, intensity, time zone of the dates, update frequency
+    and revision policy are not documented. There is no pubDate or event identifier element: the event id appears
+    only inside the link/guid URL (evid parameter). Only a 20-item snapshot was taken. Licence was not read on the
+    producer''s page (the source registry lists CC BY 4.0 IGN España, unconfirmed here).'
+  usage: Poll the feed and keep new events; filter to the Canary Islands area downstream.
+tags:
+- seismology
+- earthquakes
+- georss
+- ign
+- canary-islands
+schema:
+- name: channel
+  logicalType: object
+  physicalType: xml-element
+  description: RSS 2.0 channel header of the IGN seismology feed.
+  properties:
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: link
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: 'Channel text published by the producer: lists earthquakes in Spain during the last ten days; the
+      information is subject to modification due to continuous revision of the seismic analysis (paraphrased from
+      the feed).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: language
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: dc:language
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+- name: item
+  logicalType: object
+  physicalType: xml-element
+  description: One RSS item per earthquake (GeoRSS, RSS 2.0 with geo namespace).
+  properties:
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_pattern
+      value: '-Info.terremoto: dd/mm/yyyy h:mm:ss (matches in all sampled rows)'
+    - property: time_zone
+      value: not declared by the producer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - '-Info.terremoto: 15/10/2026 20:34:45'
+      - '-Info.terremoto: 16/10/2026 0:57:05'
+      - '-Info.terremoto: 16/10/2026 15:03:49'
+      - '-Info.terremoto: 17/10/2026 12:03:16'
+      - '-Info.terremoto: 17/10/2026 14:01:44'
+      - '-Info.terremoto: 17/10/2026 2:53:18'
+      - '-Info.terremoto: 17/10/2026 8:21:56'
+      - '-Info.terremoto: 18/10/2026 21:09:10'
+      - '-Info.terremoto: 18/10/2026 6:41:30'
+      - '-Info.terremoto: 19/10/2026 20:45:44'
+      - '-Info.terremoto: 19/10/2026 21:34:59'
+      - '-Info.terremoto: 19/10/2026 3:31:29'
+      - '-Info.terremoto: 20/10/2026 16:37:11'
+      - '-Info.terremoto: 21/10/2026 20:04:05'
+      - '-Info.terremoto: 21/10/2026 6:41:11'
+      - '-Info.terremoto: 22/10/2026 21:57:21'
+      - '-Info.terremoto: 22/10/2026 2:30:45'
+      - '-Info.terremoto: 23/10/2026 10:50:00'
+      - '-Info.terremoto: 23/10/2026 12:05:14'
+      - '-Info.terremoto: 23/10/2026 8:46:04'
+  - name: link
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_pattern
+      value: '...detailTerremoto?evid=<id>'
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ugbbe
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ugjsf
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uhlqp
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uijbg
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uitxc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ujbfb
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ujfay
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ukmbj
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ulosm
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026umbis
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026unjlz
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026unlcg
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uowuc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026upyqc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uqzcy
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026urlwq
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026usyjm
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026utttz
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026utxwh
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uuaiv
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_pattern
+      value: 'Se ha producido un terremoto de magnitud <m> en <region> en la fecha <dd/mm/yyyy h:mm:ss> en la siguiente
+        localización: <lat>,<lon> (matches in all sampled rows)'
+    - property: magnitude_type
+      value: not declared by the producer
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - 'Se ha producido un terremoto de magnitud 2.6 en SW CABO DE SAN VICENTE en la fecha 17/10/2026 2:53:18 en
+        la siguiente localización: 36.5138,-11.0883'
+      - 'Se ha producido un terremoto de magnitud 2.7 en ALBORÁN NORTE en la fecha 23/10/2026 8:46:04 en la siguiente
+        localización: 36.3711,-3.6672'
+      - 'Se ha producido un terremoto de magnitud 2.7 en ALBORÁN SUR en la fecha 17/10/2026 14:01:44 en la siguiente
+        localización: 35.5351,-3.5561'
+      - 'Se ha producido un terremoto de magnitud 2.7 en E ST JEAN PIED DE PORT.FRA en la fecha 16/10/2026 15:03:49
+        en la siguiente localización: 43.1855,-1.1012'
+      - 'Se ha producido un terremoto de magnitud 2.7 en NE TORRE DE MONCORVO.POR en la fecha 19/10/2026 21:34:59
+        en la siguiente localización: 41.2048,-6.989'
+      - 'Se ha producido un terremoto de magnitud 2.7 en SE PRIARANZA DEL BIERZO.LE en la fecha 23/10/2026 10:50:00
+        en la siguiente localización: 42.45,-6.6141'
+      - 'Se ha producido un terremoto de magnitud 2.7 en W SIDI SLIMANE.MAC en la fecha 21/10/2026 20:04:05 en la
+        siguiente localización: 34.2658,-5.9667'
+      - 'Se ha producido un terremoto de magnitud 2.8 en N BÉDAR.AL en la fecha 18/10/2026 21:09:10 en la siguiente
+        localización: 37.2295,-1.9915'
+      - 'Se ha producido un terremoto de magnitud 2.8 en SW CABO DE SAN VICENTE en la fecha 22/10/2026 21:57:21
+        en la siguiente localización: 36.7252,-11.0596'
+      - 'Se ha producido un terremoto de magnitud 2.8 en SW SESIMBRA.POR en la fecha 17/10/2026 8:21:56 en la siguiente
+        localización: 38.3777,-9.32'
+      - 'Se ha producido un terremoto de magnitud 2.8 en W CÁJAR.GR en la fecha 18/10/2026 6:41:30 en la siguiente
+        localización: 37.132,-3.5817'
+      - 'Se ha producido un terremoto de magnitud 2.9 en NE TOSES.GI en la fecha 17/10/2026 12:03:16 en la siguiente
+        localización: 42.3269,2.0215'
+      - 'Se ha producido un terremoto de magnitud 3.0 en ATLÁNTICO-CANARIAS en la fecha 21/10/2026 6:41:11 en la
+        siguiente localización: 28.1361,-16.2466'
+      - 'Se ha producido un terremoto de magnitud 3.1 en AZORES-CABO DE SAN VICENTE en la fecha 16/10/2026 0:57:05
+        en la siguiente localización: 37.01,-12.2195'
+      - 'Se ha producido un terremoto de magnitud 3.2 en ALBORÁN NORTE en la fecha 22/10/2026 2:30:45 en la siguiente
+        localización: 36.3697,-3.6468'
+      - 'Se ha producido un terremoto de magnitud 3.4 en NW LOS GALLARDOS.AL en la fecha 19/10/2026 3:31:29 en la
+        siguiente localización: 37.1767,-1.9502'
+      - 'Se ha producido un terremoto de magnitud 3.5 en ATLÁNTICO-PORTUGAL en la fecha 20/10/2026 16:37:11 en la
+        siguiente localización: 38.638,-11.1862'
+      - 'Se ha producido un terremoto de magnitud 3.5 en AZORES-CABO DE SAN VICENTE en la fecha 23/10/2026 12:05:14
+        en la siguiente localización: 37.6091,-15.2479'
+      - 'Se ha producido un terremoto de magnitud 3.6 en MEDITERRÁNEO-BALEARES en la fecha 19/10/2026 20:45:44 en
+        la siguiente localización: 39.2451,5.6779'
+      - 'Se ha producido un terremoto de magnitud 3.8 en NE BENUZA.LE en la fecha 15/10/2026 20:34:45 en la siguiente
+        localización: 42.4331,-6.6522'
+  - name: guid
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_equals_link
+      value: true
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_values
+      value:
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ugbbe
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ugjsf
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uhlqp
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uijbg
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uitxc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ujbfb
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ujfay
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ukmbj
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026ulosm
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026umbis
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026unjlz
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026unlcg
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uowuc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026upyqc
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uqzcy
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026urlwq
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026usyjm
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026utttz
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026utxwh
+      - http://www.ign.es/web/ign/portal/sis-catalogo-terremotos/-/catalogo-terremotos/detailTerremoto?evid=es2026uuaiv
+  - name: geo:lat
+    logicalType: number
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: namespace
+      value: http://www.w3.org/2003/01/geo/wgs84_pos#
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 28.1361
+    - property: observed_max
+      value: 43.1855
+  - name: geo:long
+    logicalType: number
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: namespace
+      value: http://www.w3.org/2003/01/geo/wgs84_pos#
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -16.2466
+    - property: observed_max
+      value: 5.6779
+  quality:
+  - type: text
+    name: guid_unique
+    description: guid is unique and equals link across items. Observed in sample of 20 rows on 2026-10-24; not a
+      producer guarantee.
+    dimension: uniqueness
+  - type: text
+    name: description_pattern
+    description: description matches the observed sentence pattern in all items. Observed in sample of 20 rows on
+      2026-10-24; not a producer guarantee.
+    dimension: conformity
+  - type: text
+    name: no_nulls
+    description: No item element is empty. Observed in sample of 20 rows on 2026-10-24; not a producer guarantee.
+    dimension: completeness
+slaProperties:
+- property: retention
+  value: 10
+  unit: d
+  element: item
+  description: Channel description states the feed lists earthquakes of the last ten days and that data is subject
+    to revision.
+customProperties:
+- property: source_url
+  value: https://www.ign.es/ign/RssTools/sismologia.xml
+- property: license
+  value: unverified (source registry lists CC BY 4.0 IGN España; not confirmed on the producer's pages read)
+- property: license_url
+  value: unverified
+- property: documentation_url
+  value: https://www.ign.es/web/ign/portal/sis-catalogo-terremotos
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 20
+- property: sample_selection
+  value: 'Full feed as served on request (single snapshot): 20 items, events 2026-10-15..2026-10-23.'
+- property: sample_status
+  value: ok
+contractCreatedTs: '2026-10-24T15:05:09Z'

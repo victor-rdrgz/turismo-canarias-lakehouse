@@ -1,0 +1,571 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 9824ae23-04cb-52ea-b0d1-faf95fc74412
+version: 0.1.0
+status: draft
+name: BOE open data API - daily summary (sumario)
+domain: legal
+description:
+  purpose: 'REST API of the Agencia Estatal Boletin Oficial del Estado that returns the daily summary (sumario) of the BOE
+    for a date: sections, departments, optional epigraphs and items (provisions and announcements) with titles and links to
+    PDF, HTML and XML. Output JSON or XML according to the Accept header. This contract covers the BOE summary endpoint /datosabiertos/api/boe/sumario/{fecha};
+    consolidated legislation and BORME endpoints exist but were not sampled.'
+  limitations: |-
+    - Sample covers 8 issues (2010-01-04, 2015-01-02, 2020-01-02, 2025-01-02, 2026-10-21 to 2026-10-24), 1,499 items; it is not the full history and not all section/department combinations.
+    - JSON shape is irregular: single child nodes appear as objects, multiple as arrays; 'item' and 'departamento' vary; a 'texto' wrapper appears in some departamento nodes; none of this is explained in the technical PDF (dated 28 Jun 2024).
+    - Numeric fields documented as NUMBER arrive as JSON strings; departamento codigo is documented as 4 digits but 3-digit values appear.
+    - Error responses (e.g. 404 for dates without an issue) are returned as XML even with Accept: application/json (observed).
+    - No SLA, rate limit, update time of day or versioning policy is published for this API; the PDF is the only versioned document. Access may be suspended without notice for terms breaches (legal notice, Quinta.5).
+    - Documented type table for the item node is partially garbled in the PDF text; lengths in this contract come from the producer documentation as extracted and may need re-checking against the XSD.
+    - Titles may mention persons (e.g. appointments, notarial announcements); no personal data is reproduced in this contract.
+    - Content is a summary index: it does not include provision text; the legal text must be fetched from the HTML/XML links (not sampled).
+  usage: 'One request per publication date (AAAAMMDD) with Accept: application/json; handle missing dates (404) and Sunday/holiday
+    gaps; normalise object-or-array nodes and the departamento.texto wrapper before loading. Cite ''Fuente de los datos: Agencia
+    Estatal Boletin Oficial del Estado'' per the legal notice.'
+tags:
+- legal
+- boe
+- official-gazette
+- spain
+- json-api
+- daily
+schema:
+- name: sumario_response
+  logicalType: object
+  physicalType: json
+  description: Envelope of the API response (status plus data.sumario). In the XML variant the root is 'response'.
+  properties:
+  - name: status.code
+    logicalType: string
+    physicalType: string
+    description: 'Result code of the operation: 200 ok; 400 invalid identifier or parameters; 404 requested information does
+      not exist; 403 non-GET methods.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - '200'
+      - '404'
+    - property: note
+      value: 'Observed: 404 for a Sunday (no issue) returned an XML body even though Accept: application/json was sent.'
+  - name: status.text
+    logicalType: string
+    physicalType: string
+    description: Short message with the meaning of the result code.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_values
+      value:
+      - ok
+      - La información solicitada no existe
+  - name: data.sumario
+    logicalType: object
+    physicalType: object
+    description: Single sumario node holding metadatos and diario [1..n]; diario has more than one occurrence only when an
+      extraordinary issue is published in addition to the usual one.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_note
+      value: diario was always an array with one element in the 8 sampled issues.
+- name: sumario_item_flat
+  logicalType: object
+  physicalType: json (flattened hierarchy)
+  description: 'One row per item (provision or announcement), denormalised with its issue, section, department and optional
+    epigraph. Observed JSON shape variants (sample of 8 issues): item is an object when there is one and an array otherwise
+    (at epigrafe level and at departamento level); departamento may be an object instead of an array; some departamento nodes
+    wrap their content under a ''texto'' key (6 of 326 in the sample); the response for a non-existent date (404) is XML.
+    The flat schema was produced by normalising these variants.'
+  properties:
+  - name: fecha_publicacion
+    logicalType: date
+    physicalType: string (JSON string, yyyyMMdd)
+    description: Publication date of the daily issue in ISO 8601 AAAAMMDD; matches the date requested in the call.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: source_path
+      value: data.sumario.metadatos.fecha_publicacion
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_example
+      value: '20240529'
+    - property: documented_date_format
+      value: yyyyMMdd
+    logicalTypeOptions:
+      format: yyyyMMdd
+  - name: publicacion
+    logicalType: string
+    physicalType: string
+    description: Acronym of the publication the summary belongs to; fixed value BOE.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - BOE
+    - property: source_path
+      value: data.sumario.metadatos.publicacion
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 3
+    logicalTypeOptions:
+      maxLength: 3
+  - name: diario_numero
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Daily issue number; consecutive number restarting each year.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 6
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2.0
+    - property: observed_max
+      value: 264.0
+    - property: source_path
+      value: data.sumario.diario[].numero
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_format
+      value: \d{1,3}
+  - name: sumario_identificador
+    logicalType: string
+    physicalType: string
+    description: Identifier of the summary, e.g. BOE-S-2024-130.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: source_path
+      value: data.sumario.diario[].sumario_diario.identificador
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 20
+    logicalTypeOptions:
+      maxLength: 20
+  - name: seccion_codigo
+    logicalType: string
+    physicalType: string
+    description: Section code (e.g. 1, 2A, 2B, 3, 5...).
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 8
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - '1'
+      - 2A
+      - 2B
+      - '3'
+      - '4'
+      - 5A
+      - 5B
+      - 5C
+    - property: source_path
+      value: data.sumario.diario[].seccion[].codigo
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 2
+    logicalTypeOptions:
+      maxLength: 2
+  - name: seccion_nombre
+    logicalType: string
+    physicalType: string
+    description: Section name, e.g. I. Disposiciones generales.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 9
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_values
+      value:
+      - I. Disposiciones generales
+      - II. Autoridades y personal. - A. Nombramientos, situaciones e incidencias
+      - II. Autoridades y personal. - B. Oposiciones y concursos
+      - III. Otras disposiciones
+      - IV. Administración de Justicia
+      - V. Anuncios. - A. Anuncios de licitaciones públicas y adjudicaciones
+      - V. Anuncios. - A. Contratación del Sector Público
+      - V. Anuncios. - B. Otros anuncios oficiales
+      - V. Anuncios. - C. Anuncios particulares
+    - property: source_path
+      value: data.sumario.diario[].seccion[].nombre
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 150
+    logicalTypeOptions:
+      maxLength: 150
+  - name: departamento_codigo
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Code of the issuing department.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 83
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 310.0
+    - property: observed_max
+      value: 9606.0
+    - property: source_path
+      value: data.sumario.diario[].seccion[].departamento[].codigo
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_format
+      value: \d{4}
+    - property: observed_note
+      value: Documented as 4 digits but values with 3 digits occur in the sample (min length 3); keep as string or integer
+        without assuming fixed width.
+  - name: departamento_nombre
+    logicalType: string
+    physicalType: string
+    description: Name of the department.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 83
+    - property: observed_unique_in_sample
+      value: false
+    - property: source_path
+      value: data.sumario.diario[].seccion[].departamento[].nombre
+    - property: documented_cardinality
+      value: '[1..1]'
+  - name: epigrafe_nombre
+    logicalType: string
+    physicalType: string
+    description: Descriptor grouping several provisions; only included in sections 1, 2A, 2B, 3 and 5.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 64.643
+    - property: observed_distinct
+      value: 82
+    - property: observed_unique_in_sample
+      value: false
+    - property: source_path
+      value: data.sumario.diario[].seccion[].departamento[].epigrafe[].nombre
+    - property: observed_note
+      value: In the sample epigrafe appears only in sections 1, 2A, 2B and 3 (the documentation says 1, 2A, 2B, 3 and 5; sections
+        5A/5B/5C had none).
+    - property: documented_cardinality_of_epigrafe_node
+      value: '[0..n]; epigrafe@nombre [1..1] within the node'
+    - property: documented_max_length
+      value: 500
+    logicalTypeOptions:
+      maxLength: 500
+  - name: item_identificador
+    logicalType: string
+    physicalType: string
+    description: Identifier of the provision or announcement, e.g. BOE-A-2024-10761.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1499
+    - property: observed_unique_in_sample
+      value: true
+    - property: source_path
+      value: '...item.identificador'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 20
+    logicalTypeOptions:
+      maxLength: 20
+  - name: item_control
+    logicalType: string
+    physicalType: string
+    description: Internal-use data item of provisions, e.g. 2024/8474.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 64.643
+    - property: observed_distinct
+      value: 530
+    - property: observed_unique_in_sample
+      value: true
+    - property: source_path
+      value: '...item.control'
+    - property: documented_cardinality
+      value: '[0..1]'
+    - property: observed_note
+      value: Present for all items of sections 1, 2A, 2B, 3 and absent for all items of sections 4, 5A, 5B, 5C in the sample.
+  - name: item_titulo
+    logicalType: string
+    physicalType: string
+    description: Title of the provision or announcement.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1235
+    - property: observed_unique_in_sample
+      value: false
+    - property: source_path
+      value: '...item.titulo'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 4000
+    logicalTypeOptions:
+      maxLength: 4000
+  - name: item_url_pdf
+    logicalType: string
+    physicalType: string (JSON string; url_pdf.texto)
+    description: URL of the PDF version on https://www.boe.es.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1499
+    - property: observed_unique_in_sample
+      value: true
+    - property: source_path
+      value: '...item.url_pdf.texto'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 150
+    logicalTypeOptions:
+      maxLength: 150
+  - name: item_url_pdf_szBytes
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Size in bytes of the PDF file.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1448
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 139525.0
+    - property: observed_max
+      value: 6826405.0
+    - property: source_path
+      value: '...item.url_pdf.szBytes'
+    - property: documented_cardinality
+      value: '[1..1]'
+  - name: item_url_pdf_szKBytes
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Size in KBytes of the PDF file.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 186
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 136.0
+    - property: observed_max
+      value: 6666.0
+    - property: source_path
+      value: '...item.url_pdf.szKBytes'
+    - property: documented_cardinality
+      value: '[1..1]'
+  - name: item_url_pdf_pagina_inicial
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Number of the first page of the PDF.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1324
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 142824.0
+    - property: source_path
+      value: '...item.url_pdf.pagina_inicial'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: observed_note
+      value: Values look like page numbers within the whole year volume (up to 6 digits), not page numbers within the PDF
+        file; meaning beyond the documented text is not verified.
+  - name: item_url_pdf_pagina_final
+    logicalType: integer
+    physicalType: string (JSON string; documented NUMBER)
+    description: Number of the last page of the PDF.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1323
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 142841.0
+    - property: source_path
+      value: '...item.url_pdf.pagina_final'
+    - property: documented_cardinality
+      value: '[1..1]'
+  - name: item_url_html
+    logicalType: string
+    physicalType: string
+    description: URL of the HTML version on https://www.boe.es.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1499
+    - property: observed_unique_in_sample
+      value: true
+    - property: source_path
+      value: '...item.url_html'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 150
+    logicalTypeOptions:
+      maxLength: 150
+  - name: item_url_xml
+    logicalType: string
+    physicalType: string
+    description: URL of the XML version on https://www.boe.es.
+    required: true
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1499
+    - property: observed_unique_in_sample
+      value: true
+    - property: source_path
+      value: '...item.url_xml'
+    - property: documented_cardinality
+      value: '[1..1]'
+    - property: documented_max_length
+      value: 150
+    logicalTypeOptions:
+      maxLength: 150
+  quality:
+  - name: observed_unique_item_identificador
+    type: library
+    metric: duplicateValues
+    mustBe: 0
+    unit: rows
+    arguments:
+      properties:
+      - item_identificador
+    description: 'Observed in sample of 1499 items on 2026-10-24: no duplicate item_identificador; not a producer guarantee.'
+customProperties:
+- property: source_url
+  value: https://www.boe.es/datosabiertos/api/boe/sumario/{fecha}
+- property: license
+  value: 'Reuse under the BOE legal notice ''licencia tipo'' (resolution of 27 June 2024): commercial and non-commercial reuse
+    allowed with source attribution; see terms'
+- property: license_url
+  value: https://www.boe.es/informacion/aviso_legal/index.php
+- property: documentation_url
+  value: https://www.boe.es/datosabiertos/api/api.php
+- property: technical_pdf_url
+  value: https://www.boe.es/datosabiertos/documentos/APIsumarioBOE.pdf
+- property: required_attribution
+  value: 'Fuente de los datos: Agencia Estatal Boletin Oficial del Estado (copy/distribution); Basado en datos de la Agencia
+    Estatal Boletin Oficial del Estado (derived works)'
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 1499
+- property: sample_selection
+  value: '8 requests, one per date: 2026-10-24, 2026-10-23, 2026-10-22, 2026-10-21 (most recent), 2025-01-02, 2020-01-02,
+    2015-01-02, 2010-01-04 (older tranches for shape variation), plus 2026-10-18 (Sunday) to observe the 404. Sample rows
+    = items flattened from the hierarchy.'
+- property: sample_status
+  value: ok
+- property: json_shape_observations
+  value: 'Observed JSON shape variants (sample of 8 issues): item is an object when there is one and an array otherwise (at
+    epigrafe level and at departamento level); departamento may be an object instead of an array; some departamento nodes
+    wrap their content under a ''texto'' key (6 of 326 in the sample); the response for a non-existent date (404) is XML.
+    The flat schema was produced by normalising these variants.'
+contractCreatedTs: '2026-10-24T15:06:20Z'

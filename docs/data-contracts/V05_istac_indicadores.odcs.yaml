@@ -1,0 +1,832 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 3816ea57-3278-5512-a074-5634f6769ae1
+version: 0.1.0
+status: draft
+name: ISTAC indicators API
+domain: economy
+description:
+  purpose: 'ISTAC indicators API (v1.0): catalog of 402 statistical indicators of Canarias (employment, tourism,
+    housing, prices, etc.), indicator fiches and indicator data as cubes over GEOGRAPHICAL x TIME x MEASURE. The
+    sample covers the catalog list and the full data of one indicator, PARO_REGISTRADO (registered unemployment,
+    monthly 2008-03 to 2026-09, Canarias, 7 islands and municipalities).'
+  limitations: 'Only 1 of 402 indicators was inspected in detail (PARO_REGISTRADO); other indicators differ in granularity,
+    dimensions and measures. No global data dictionary; the meaning of fields comes from each indicator fiche. Primary
+    source of the data (e.g. employment service) is not cited in what was read. Observation values are strings in
+    the JSON and use ''.'' for unavailable data; their cube order is derived from the ''format'' array. The OpenAPI/Swagger
+    description of the API was not read in this sample pass. No SLA, no deprecation policy. License: the Aviso legal
+    cites reuse under Ley 37/2007 with attribution; no named license.'
+  usage: Raw landing of ISTAC indicators; use the catalog to discover indicators and the data endpoint with GEOGRAPHICAL/TIME/MEASURE
+    cubes for series.
+tags:
+- istac
+- indicators
+- employment
+- canarias
+- official-statistics
+- api
+schema:
+- name: indicators_catalog
+  logicalType: object
+  physicalType: json
+  description: 'Response of GET /indicators?limit=500: the list of all ISTAC indicators (402 at sample time) with
+    summary fields.'
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 402
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: ACCIDENTES_CIRCULACION
+    - property: observed_max
+      value: VIVIENDA_PROTEGIDA_PRECIO_M2
+  - name: kind
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: indicators#indicator
+    - property: observed_max
+      value: indicators#indicator
+    - property: observed_values
+      value:
+      - indicators#indicator
+  - name: selfLink
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 402
+    - property: observed_unique_in_sample
+      value: true
+  - name: code
+    logicalType: string
+    physicalType: string
+    description: Indicator code (e.g. PARO_REGISTRADO); same value as id in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 402
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: ACCIDENTES_CIRCULACION
+    - property: observed_max
+      value: VIVIENDA_PROTEGIDA_PRECIO_M2
+  - name: version
+    logicalType: string
+    physicalType: string
+    description: Version of the indicator (e.g. 1.149 for PARO_REGISTRADO in its fiche). Published as a string.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 114
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 1.0
+    - property: observed_max
+      value: 4.32
+  - name: lastUpdate
+    logicalType: timestamp
+    physicalType: string
+    description: Last update of the indicator, ISO 8601 with offset.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 402
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: '2022-06-27T15:29:55.790+01:00'
+    - property: observed_max
+      value: '2026-10-23T13:30:13.883+01:00'
+  - name: title
+    logicalType: object
+    physicalType: object
+    description: Indicator title, one text per language.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: es
+      logicalType: string
+      physicalType: string
+      description: Text in language 'es' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 402
+      - property: observed_unique_in_sample
+        value: true
+    - name: en
+      logicalType: string
+      physicalType: string
+      description: Text in language 'en' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 46.02
+      - property: observed_distinct
+        value: 217
+      - property: observed_unique_in_sample
+        value: true
+    - name: __default__
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 402
+      - property: observed_unique_in_sample
+        value: true
+    - name: ca
+      logicalType: string
+      physicalType: string
+      description: Text in language 'ca' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: de
+      logicalType: string
+      physicalType: string
+      description: Text in language 'de' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: eu
+      logicalType: string
+      physicalType: string
+      description: Text in language 'eu' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: fr
+      logicalType: string
+      physicalType: string
+      description: Text in language 'fr' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: gl
+      logicalType: string
+      physicalType: string
+      description: Text in language 'gl' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: it
+      logicalType: string
+      physicalType: string
+      description: Text in language 'it' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.507
+      - property: observed_distinct
+        value: 6
+      - property: observed_unique_in_sample
+        value: true
+    - name: pt
+      logicalType: string
+      physicalType: string
+      description: Text in language 'pt' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 97.015
+      - property: observed_distinct
+        value: 12
+      - property: observed_unique_in_sample
+        value: true
+  - name: subjectCode
+    logicalType: string
+    physicalType: string
+    description: Subject (materia) code, e.g. T090000.T090100 (Empleo).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 62
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: T010000.T010100
+    - property: observed_max
+      value: T800000.T800600.T800601
+  - name: subjectTitle
+    logicalType: object
+    physicalType: object
+    description: Subject (materia) title, one text per language.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: es
+      logicalType: string
+      physicalType: string
+      description: Text in language 'es' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 62
+      - property: observed_unique_in_sample
+        value: false
+    - name: en
+      logicalType: string
+      physicalType: string
+      description: Text in language 'en' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 62
+      - property: observed_unique_in_sample
+        value: false
+    - name: __default__
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 62
+      - property: observed_unique_in_sample
+        value: false
+  - name: conceptDescription
+    logicalType: object
+    physicalType: object
+    description: Definition of the indicator (concept description), one text per language; may contain HTML markup
+      in the sample.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: es
+      logicalType: string
+      physicalType: string
+      description: Text in language 'es' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 389
+      - property: observed_unique_in_sample
+        value: false
+    - name: en
+      logicalType: string
+      physicalType: string
+      description: Text in language 'en' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 47.264
+      - property: observed_distinct
+        value: 180
+      - property: observed_unique_in_sample
+        value: false
+    - name: __default__
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 0.0
+      - property: observed_distinct
+        value: 389
+      - property: observed_unique_in_sample
+        value: false
+  - name: notes
+    logicalType: object
+    physicalType: object
+    description: Indicator notes, one text per language; optional; may contain HTML markup.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    properties:
+    - name: es
+      logicalType: string
+      physicalType: string
+      description: Text in language 'es' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 59.95
+      - property: observed_distinct
+        value: 87
+      - property: observed_unique_in_sample
+        value: false
+    - name: en
+      logicalType: string
+      physicalType: string
+      description: Text in language 'en' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 67.413
+      - property: observed_distinct
+        value: 66
+      - property: observed_unique_in_sample
+        value: false
+    - name: __default__
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 59.95
+      - property: observed_distinct
+        value: 87
+      - property: observed_unique_in_sample
+        value: false
+  - name: acronym
+    logicalType: object
+    physicalType: object
+    description: Acronym of the indicator, optional.
+    customProperties:
+    - property: evidence
+      value: observed
+    properties:
+    - name: es
+      logicalType: string
+      physicalType: string
+      description: Text in language 'es' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 97.512
+      - property: observed_distinct
+        value: 8
+      - property: observed_unique_in_sample
+        value: false
+    - name: en
+      logicalType: string
+      physicalType: string
+      description: Text in language 'en' as published.
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 98.756
+      - property: observed_distinct
+        value: 4
+      - property: observed_unique_in_sample
+        value: false
+    - name: __default__
+      logicalType: string
+      physicalType: string
+      description: Not defined by the producer
+      customProperties:
+      - property: evidence
+        value: observed
+      - property: observed_null_pct
+        value: 97.512
+      - property: observed_distinct
+        value: 8
+      - property: observed_unique_in_sample
+        value: false
+  - name: systemSurveyLinks
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 50.995
+    - property: observed_distinct
+      value: 32
+    - property: observed_unique_in_sample
+      value: false
+    items:
+      logicalType: object
+      physicalType: object
+      properties:
+      - name: kind
+        logicalType: string
+        physicalType: string
+        description: Not defined by the producer
+        customProperties:
+        - property: evidence
+          value: observed
+      - name: href
+        logicalType: string
+        physicalType: string
+        description: Link to an indicators system (e.g. C00075A).
+        customProperties:
+        - property: evidence
+          value: observed
+  - name: mainIndicator
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 2
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 'False'
+    - property: observed_max
+      value: 'True'
+    - property: observed_values
+      value:
+      - 'False'
+      - 'True'
+  quality:
+  - name: observed_id_unique
+    type: text
+    description: 'Observed in sample of 402 rows on 2026-10-24; not a producer guarantee: id is unique across the
+      catalog.'
+    dimension: uniqueness
+- name: indicator_fiche
+  logicalType: object
+  physicalType: json
+  description: 'Response of GET /indicators/PARO_REGISTRADO: the full fiche of one indicator (title, concept, notes,
+    dimensions, attributes). Only this indicator was read.'
+  properties:
+  - name: id
+    logicalType: string
+    physicalType: string
+    description: Indicator code.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: kind
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: selfLink
+    logicalType: string
+    physicalType: string
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: parentLink
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: code
+    logicalType: string
+    physicalType: string
+    description: Indicator code.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: version
+    logicalType: string
+    physicalType: string
+    description: Indicator version (1.149 at sample time).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: title
+    logicalType: object
+    physicalType: object
+    description: Title per language (es, en, __default__).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: subjectCode
+    logicalType: string
+    physicalType: string
+    description: Subject code (T090000.T090100).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: systemSurveyLinks
+    logicalType: array
+    physicalType: array
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: conceptDescription
+    logicalType: object
+    physicalType: object
+    description: 'Definition: pending employment applications on the last day of the month in public employment
+      offices, excluding some groups.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: notes
+    logicalType: object
+    physicalType: object
+    description: Notes listing the excluded groups (employed workers, not immediately available, etc.).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: dimension
+    logicalType: object
+    physicalType: object
+    description: 'Dimensions of the indicator: GEOGRAPHICAL (granularities REGIONS, ISLANDS, MUNICIPALITIES with
+      representation codes), TIME (granularity MONTHLY with period codes) and MEASURE (representations with unit,
+      type and decimal places).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: attribute
+    logicalType: object
+    physicalType: object
+    description: 'Attributes of the indicator with attachment level: CONFIDENCIALIDAD_OBSERVACION, NOTAS_OBSERVACION,
+      NOTAS_DATASET, ESTADO_OBSERVACION, OBS_CONF (OBSERVATION level), MEDIDA (DATASET level).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: childLink
+    logicalType: object
+    physicalType: object
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: mainIndicator
+    logicalType: boolean
+    physicalType: boolean
+    description: Not defined by the producer
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: subjectTitle
+    logicalType: object
+    physicalType: object
+    description: Subject title per language (Empleo).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: lastUpdate
+    logicalType: timestamp
+    physicalType: string
+    description: Last update (2026-10-20T16:11:11.297+01:00 at sample time).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: decimalPlaces
+    logicalType: integer
+    physicalType: number
+    description: Decimal places (0 at sample time).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+- name: indicator_data
+  logicalType: object
+  physicalType: json
+  description: 'Response of GET /indicators/PARO_REGISTRADO/data (all territories, all periods, all measures). JSON
+    cube: dimension indexes plus flat observation and attribute arrays in the order of ''format'' [GEOGRAPHICAL,
+    TIME, MEASURE]. The properties below describe the logical flattened table (derived_flat.csv) used for profiling;
+    the physical JSON keys are format, dimension, observation, attribute, attributes.'
+  properties:
+  - name: GEOGRAPHICAL
+    logicalType: string
+    physicalType: string
+    description: 'Territory dimension code. Documented granularities: REGIONS (ES70 Canarias), ISLANDS (ES70x),
+      MUNICIPALITIES (INE-style codes such as 35004).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 96
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '35001'
+    - property: observed_max
+      value: ES709
+  - name: TIME
+    logicalType: string
+    physicalType: string
+    description: Time dimension, monthly granularity (MONTHLY), code format YYYY-MM.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 223
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: 2008-03
+    - property: observed_max
+      value: 2026-09
+  - name: MEASURE
+    logicalType: string
+    physicalType: string
+    description: 'Measure representation. Documented: ABSOLUTE (Dato, persons, 0 decimals), ANNUAL_PUNTUAL_RATE
+      (Variacion anual, persons), INTERPERIOD_PUNTUAL_RATE (Variacion interperiodica, persons), ANNUAL_PERCENTAGE_RATE
+      (Tasa variacion anual, %, 2 decimals), INTERPERIOD_PERCENTAGE_RATE (Tasa variacion interperiodica, %, 2 decimals).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 5
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: ABSOLUTE
+    - property: observed_max
+      value: INTERPERIOD_PUNTUAL_RATE
+    - property: observed_values
+      value:
+      - ABSOLUTE
+      - ANNUAL_PERCENTAGE_RATE
+      - ANNUAL_PUNTUAL_RATE
+      - INTERPERIOD_PERCENTAGE_RATE
+      - INTERPERIOD_PUNTUAL_RATE
+  - name: OBS_VALUE
+    logicalType: string
+    physicalType: string
+    description: Observation value, published as a string in the observation array of the JSON; unit depends on
+      MEASURE. Placeholder '.' observed when the value is not available (see OBS_CONF).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 15824
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: '-0.00'
+    - property: observed_max
+      value: '999'
+  - name: OBS_CONF
+    logicalType: string
+    physicalType: string
+    description: Attribute 'Confidencialidad de la observacion' (OBS_CONF, OBSERVATION level). Observed value 'Dato
+      no disponible' on 2,496 observations; empty otherwise (null in the attribute array).
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 97.668
+    - property: observed_distinct
+      value: 1
+    - property: observed_unique_in_sample
+      value: false
+    - property: observed_min
+      value: Dato no disponible
+    - property: observed_max
+      value: Dato no disponible
+    - property: observed_values
+      value:
+      - Dato no disponible
+  - name: MEDIDA
+    logicalType: string
+    physicalType: string
+    description: Dataset-level attribute (attributes array) with value PARO_REGISTRADO. Not a column of the flattened
+      sample.
+    customProperties:
+    - property: evidence
+      value: observed
+  quality:
+  - name: observed_key_unique
+    type: text
+    description: 'Observed in sample of 107040 flattened rows on 2026-10-24; not a producer guarantee: (GEOGRAPHICAL,
+      TIME, MEASURE) has no duplicates (cube order guarantees 96 x 223 x 5 combinations).'
+    dimension: uniqueness
+  - name: observed_unavailable_marker
+    type: text
+    description: 'Observed in sample of 107040 rows on 2026-10-24; not a producer guarantee: OBS_VALUE equals ''.''
+      exactly when OBS_CONF is ''Dato no disponible'' (2,496 rows, all between 2008-03 and 2009-02).'
+    dimension: completeness
+support:
+- channel: email
+  url: mailto:consultas.istac@gobiernodecanarias.org
+  description: ISTAC contact published in the ISTAC dataset metadata (T02 sample).
+customProperties:
+- property: source_url
+  value: https://datos.canarias.es/api/estadisticas/indicators/v1.0/indicators
+- property: license
+  value: 'Aviso Legal ISTAC: reuse allowed (commercial and non-commercial) under Ley 37/2007 provided the source
+    is cited, e.g. ''Fuente: Instituto Canario de Estadistica (ISTAC)''. No named license.'
+- property: license_url
+  value: http://www.gobiernodecanarias.org/istac/aviso_legal.html
+- property: documentation_url
+  value: https://datos.canarias.es/api/estadisticas/indicators/v1.0/indicators/PARO_REGISTRADO
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 107442
+- property: sample_selection
+  value: 'Catalog: all 402 indicators (one request, limit=500). Fiche and data: only PARO_REGISTRADO, full data
+    (96 territories x 223 months x 5 measures = 107,040 observations) flattened to derived_flat.csv for profiling.
+    Counts: sample_rows = 107,040 data rows + 402 catalog rows.'
+- property: sample_status
+  value: partial
+- property: sample_rows_by_entity
+  value:
+    indicators_catalog: 402
+    indicator_fiche: 1
+    indicator_data: 107040
+- property: indicator_inspected
+  value: PARO_REGISTRADO (version 1.149, lastUpdate 2026-10-20T16:11:11.297+01:00)
+contractCreatedTs: '2026-10-24T00:00:00Z'

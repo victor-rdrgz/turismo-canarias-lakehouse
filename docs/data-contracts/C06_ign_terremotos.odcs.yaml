@@ -1,0 +1,231 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: 7ba64937-5107-59f3-98d6-9689f9f62f27
+version: 0.1.0
+status: draft
+name: IGN earthquakes last 10 days (GeoRSS)
+domain: geoscience
+description:
+  purpose: IGN (Instituto Geografico Nacional) GeoRSS feed of earthquakes in Spain and nearby areas during the last
+    ten days, including the Canarias region (zone name ATLANTICO-CANARIAS observed). Data are subject to revision
+    according to the channel description.
+  limitations: 'There is no field documentation for the feed: the meaning of each element comes from the channel
+    description and element names. Time zone of event dates, magnitude type, depth and intensity are not provided
+    or not stated (depth and intensity are absent from the feed). Zone names and magnitude must be parsed from free
+    text. Only the last ten days are available: history requires own accumulation. Update cadence is not documented
+    by the IGN for the feed (response headers observed: Cache-Control s-maxage=120, served via CloudFront). License
+    not verified: the IGN catalogue page asks for the credit ''Instituto Geografico Nacional (IGN). Catalogo de
+    terremotos'' and gives DOI 10.7419/162.03.2022, but no license is named; applicability to the feed is not stated.
+    The datos.gob.es catalogue entry could not be read (redirected to a maintenance page). Sample is a single snapshot
+    of 20 items.'
+  usage: Poll the feed and accumulate events by guid/evid to build a history; parse magnitude, zone and datetime
+    from description/title.
+tags:
+- ign
+- earthquakes
+- seismology
+- georss
+- canarias
+schema:
+- name: rss_channel
+  logicalType: object
+  physicalType: xml
+  description: Channel element of the RSS 2.0 / GeoRSS document.
+  properties:
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: 'Channel title. Observed: ''GeoRSS Sismologia IGN''.'
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: link
+    logicalType: string
+    physicalType: string
+    description: 'Channel link. Observed: http://www.ign.es/ign/rss'
+    customProperties:
+    - property: evidence
+      value: observed
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: 'Channel description: lets you consult earthquakes in Spain during the last ten days; the information
+      is subject to modification as a result of continuous review of the seismic analysis.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+  - name: language
+    logicalType: string
+    physicalType: string
+    description: Channel language; observed 'es' (also dc:language).
+    customProperties:
+    - property: evidence
+      value: observed
+- name: rss_item_earthquake
+  logicalType: object
+  physicalType: xml
+  description: One item per earthquake in the last ten days (RSS item with geo:lat / geo:long).
+  properties:
+  - name: title
+    logicalType: string
+    physicalType: string
+    description: 'Item title. Observed pattern ''-Info.terremoto: dd/mm/yyyy h:mm:ss'' (event date-time; time zone
+      NOT stated by the producer).'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+  - name: link
+    logicalType: string
+    physicalType: string
+    description: Link to the event detail page in the IGN earthquake catalogue; contains evid=esYYYYxxxxx.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+  - name: description
+    logicalType: string
+    physicalType: string
+    description: 'Free text. Observed template: ''Se ha producido un terremoto de magnitud M en ZONE en la fecha
+      dd/mm/yyyy h:mm:ss en la siguiente localizacion: lat,lon''. Magnitude type is not stated; fields must be parsed
+      from text.'
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+  - name: guid
+    logicalType: string
+    physicalType: string
+    description: Item identifier; same URL as link in the sample, with the event id (evid) as query parameter.
+    customProperties:
+    - property: evidence
+      value: observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+  - name: geo:lat
+    logicalType: number
+    physicalType: number
+    description: Latitude of the epicentre (W3C WGS84 geo namespace), decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: 28.1361
+    - property: observed_max
+      value: 43.1855
+    - property: observed_values
+      value:
+      - '28.1361'
+      - '34.2658'
+      - '35.5351'
+      - '36.3697'
+      - '36.3711'
+      - '36.5138'
+      - '36.7252'
+      - '37.01'
+      - '37.132'
+      - '37.1767'
+      - '37.2295'
+      - '37.6091'
+      - '38.3777'
+      - '38.638'
+      - '39.2451'
+      - '41.2048'
+      - '42.3269'
+      - '42.4331'
+      - '42.45'
+      - '43.1855'
+  - name: geo:long
+    logicalType: number
+    physicalType: number
+    description: Longitude of the epicentre (W3C WGS84 geo namespace), decimal degrees.
+    customProperties:
+    - property: evidence
+      value: documented+observed
+    - property: observed_null_pct
+      value: 0.0
+    - property: observed_distinct
+      value: 20
+    - property: observed_unique_in_sample
+      value: true
+    - property: observed_min
+      value: -16.2466
+    - property: observed_max
+      value: 5.6779
+    - property: observed_values
+      value:
+      - '-1.1012'
+      - '-1.9502'
+      - '-1.9915'
+      - '-11.0596'
+      - '-11.0883'
+      - '-11.1862'
+      - '-12.2195'
+      - '-15.2479'
+      - '-16.2466'
+      - '-3.5561'
+      - '-3.5817'
+      - '-3.6468'
+      - '-3.6672'
+      - '-5.9667'
+      - '-6.6141'
+      - '-6.6522'
+      - '-6.989'
+      - '-9.32'
+      - '2.0215'
+      - '5.6779'
+  quality:
+  - name: observed_guid_unique
+    type: text
+    description: 'Observed in sample of 20 items on 2026-10-24; not a producer guarantee: guid (event URL) is unique
+      within the feed.'
+    dimension: uniqueness
+  - name: observed_window
+    type: text
+    description: 'Observed in sample of 20 items on 2026-10-24; not a producer guarantee: the feed held 20 items,
+      ordered newest first, with event dates from 15/10/2026 to 23/10/2026; the producer states a ten-day window.'
+    dimension: timeliness
+customProperties:
+- property: source_url
+  value: https://www.ign.es/ign/RssTools/sismologia.xml
+- property: license
+  value: unverified (the IGN catalogue page asks for the credit 'Instituto Geografico Nacional (IGN). Catalogo de
+    terremotos'; no license named)
+- property: documentation_url
+  value: https://www.ign.es/web/ign/portal/sis-catalogo-terremotos
+- property: sample_date
+  value: '2026-10-24'
+- property: sample_rows
+  value: 20
+- property: sample_selection
+  value: Single snapshot of the whole feed (20 items, 12,788 bytes) on 2026-10-24T15:02:03Z; no selection needed.
+- property: sample_status
+  value: ok
+- property: citation_requested_by_ign_catalogue
+  value: Instituto Geografico Nacional (IGN). Catalogo de terremotos. DOI 10.7419/162.03.2022
+contractCreatedTs: '2026-10-24T00:00:00Z'
