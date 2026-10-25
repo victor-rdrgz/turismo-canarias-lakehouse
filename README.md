@@ -30,7 +30,12 @@ tests/unit/                        unit tests (pytest, no network)
 docs/
   adr/                             architecture decision records
   data-contracts/                  ODCS data contracts per source
-.github/workflows/ci.yml           lint, tests and bundle validation on every pull request
+.github/
+  workflows/ci.yml                 lint, tests and bundle validation on every pull request
+  pull_request_template.md         Definition of Done checklist
+  ISSUE_TEMPLATE/                  bug and feature templates
+CONTRIBUTING.md                    way of working: issues, branches, pull requests, releases
+CHANGELOG.md                       release history
 ```
 
 ## Development
@@ -47,7 +52,8 @@ databricks bundle deploy -t dev    # deploy to the development target
 databricks bundle run ingest_gobierno_canarias_landing -t dev
 ```
 
-Workflow: short-lived feature branch → pull request (CI must pass) → merge to `main` → deploy.
+Work is planned in GitHub Issues. Branching, pull requests, the Definition of Done and releases are described in
+[CONTRIBUTING.md](CONTRIBUTING.md); the release history is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Data sources
 
