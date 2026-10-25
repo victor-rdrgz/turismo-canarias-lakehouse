@@ -28,14 +28,15 @@ src/
   notebooks/                       thin notebook entry points used by jobs
 tests/unit/                        unit tests (pytest, no network)
 docs/
-  adr/                             architecture decision records
+  adr/                             architecture decision records (template: 0000-template.md)
   data-contracts/                  ODCS data contracts per source
 .github/
   workflows/ci.yml                 lint, tests and bundle validation on every pull request
   pull_request_template.md         Definition of Done checklist
-  ISSUE_TEMPLATE/                  bug and feature templates
+  ISSUE_TEMPLATE/                  issue forms: bug, feature, design question
+  release.yml                      release notes categories, by pull request label
 CONTRIBUTING.md                    way of working: issues, branches, pull requests, releases
-CHANGELOG.md                       release history
+CODE_OF_CONDUCT.md, SECURITY.md    community standards and vulnerability reporting
 ```
 
 ## Development
@@ -53,7 +54,7 @@ databricks bundle run ingest_gobierno_canarias_landing -t dev
 ```
 
 Work is planned in GitHub Issues. Branching, pull requests, the Definition of Done and releases are described in
-[CONTRIBUTING.md](CONTRIBUTING.md); the release history is in [CHANGELOG.md](CHANGELOG.md).
+[CONTRIBUTING.md](CONTRIBUTING.md); releases and their notes are in GitHub Releases.
 
 ## Data sources
 

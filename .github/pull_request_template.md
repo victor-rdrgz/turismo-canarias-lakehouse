@@ -1,8 +1,8 @@
 ## Summary
 
-<!-- What changes and why, in a few lines. -->
+<!-- The problem, the approach and the result; why the change is needed and where the review should start. -->
 
-Closes #
+Related issue: <!-- `Closes #<number>` when this pull request targets main; `#<number>` when it is stacked on another pull request; delete the line for trivial changes. -->
 
 ## Verification
 
@@ -10,10 +10,10 @@ Closes #
 
 ## Definition of Done
 
-- [ ] Linked to an issue and limited to one concern
-- [ ] Unit tests added or updated; lint, format and tests pass
+- [ ] One purpose, linked to its issue when there is one
+- [ ] Unit tests added or updated (a bug fix includes a test that reproduces the bug); lint, format and tests pass
 - [ ] `databricks bundle validate` passes for every target
 - [ ] Job, bundle or ingestion changes deployed to `dev` and verified with a job run
 - [ ] ADR, README, data contracts or runbook updated when affected
 - [ ] No secrets, credentials, personal data or AI assistant files in the diff
-- [ ] `CHANGELOG.md` updated under `Unreleased`
+- [ ] Label added (`bug`, `enhancement`, `documentation`, ...): the release notes are generated from it

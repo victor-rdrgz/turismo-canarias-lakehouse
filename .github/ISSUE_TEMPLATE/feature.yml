@@ -19,4 +19,4 @@ body:
     id: notes
     attributes:
       label: Notes
-      description: Design options, references to documentation, open questions.
+      description: References to documentation, constraints, open questions.
